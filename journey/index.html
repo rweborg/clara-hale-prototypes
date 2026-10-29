@@ -130,6 +130,12 @@ body.th-d{--bg:#3E2C1F;--bar:rgba(255,250,242,.94);--barink:#2A221B;--ink:#2A221
 /* scenes */
 #scene{position:fixed;inset:0;z-index:90;background:#0E0D0C;color:#F3EEE6;display:flex;align-items:center;justify-content:center;overflow:auto}
 #scene.lite{background:rgba(10,9,8,.72);backdrop-filter:blur(6px)}
+/* Album-cover opener. The photo URL is CASE.cover, applied by intro() — not a fixed CSS path. */
+#scene.album{overflow:clip;background:#0B1018}
+#scene.album .album-bg{position:absolute;inset:0;background-position:center 42%;background-size:cover;background-repeat:no-repeat;filter:blur(2px);transform:scale(1.06);z-index:0;pointer-events:none}
+#scene.album .album-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(100deg,rgba(7,11,20,.74) 0%,rgba(7,11,20,.56) 36%,rgba(7,11,20,.30) 64%,rgba(7,11,20,.40) 100%),linear-gradient(180deg,rgba(6,9,16,.42) 0%,rgba(6,9,16,.10) 46%,rgba(6,9,16,.58) 100%)}
+#scene.album .sc{position:relative;z-index:2;text-shadow:0 2px 18px rgba(0,0,0,.62)}
+#scene.album .sc .btn{text-shadow:none}
 .sc{max-width:980px;width:100%;padding:30px;animation:fadein .6s}@keyframes fadein{from{opacity:0;transform:translateY(12px)}}
 .sc h1{font:44px ArchivoBlack,Arial;line-height:1.05;letter-spacing:-.01em}.sc .kick{font:700 13px Atkinson;letter-spacing:.2em;text-transform:uppercase;color:#F2C14E;margin-bottom:12px}
 .sc p.lead{font-size:19px;line-height:1.5;opacity:.85;margin:14px 0 24px;max-width:640px}
@@ -220,6 +226,12 @@ const A = CFG.A, TR = CFG.TR, esc = s => String(s).replace(/[&<>"]/g, c => ({'&'
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 // ---------------- data ----------------
 // Progression is the case itself (envelopes -> items -> realizations -> accusation -> file away). There are no in-game days.
+// Future cases supply their own cover path on CASE.cover (a path or URL, e.g. assets/covers/their-case.jpg).
+const CASE = {
+  title: 'The Vanishing of\nClara Hale',
+  kick: 'Pine Hollow Case Files · Case 1',
+  lead: 'A woman is missing from a small Montana town. Listen to the interviews, look at the evidence, and work out what happened to Clara.',
+  cover: 'assets/covers/clara-hale.jpg'};
 const BEATS = [['intro', 'Intro'], ['handoff', 'Case handoff'], ['build', 'Case folder'], ['envA', 'Envelope A'], ['realize', 'Realization'], ['accuse', 'Accuse'], ['file', 'File away']];
 // Desk ambience follows the player's REAL clock. Cosmetic only: it never gates progress and never marks game time.
 const AMB = {morning: ['🌤', 'Morning'], day: ['☀️', 'Daytime'], evening: ['🌇', 'Evening'], night: ['🌙', 'Night']};
@@ -587,10 +599,15 @@ $('#jumprow').innerHTML = BEATS.map(([k, l]) => `<button data-j="${k}">${l}</but
 // ---------------- scenes: intro, handoff, day card ----------------
 function caseCard(kick, recap, btn, then) { SFX.paper(); const s = scene(`<div class="dcard"><div class="kick">${kick}</div><div class="big" style="font-size:44px">★</div><p class="recap">${esc(recap)}</p><button class="btn gold" id="dc">${btn}</button></div>`);
   $('#dc').onclick = () => { unscene(); then(); }; }
+function paintCaseCover(s) { if (!CASE.cover) return; s.classList.add('album');
+  const bg = document.createElement('div'); bg.className = 'album-bg'; bg.setAttribute('aria-hidden', 'true');
+  bg.style.backgroundImage = `url("${String(CASE.cover).replace(/["\\]/g, '')}")`;
+  const scrim = document.createElement('div'); scrim.className = 'album-scrim'; scrim.setAttribute('aria-hidden', 'true');
+  s.prepend(bg, scrim); }
 function intro() { clearSave(); S.beat = 'intro'; render();
-  const s = scene(`<div class="kick">Pine Hollow Case Files · Case 1</div><h1>The Vanishing of<br>Clara Hale</h1><p class="lead">A woman is missing from a small Montana town. Listen to the interviews, look at the evidence, and work out what happened to Clara.</p>
-    <div class="row"><button class="btn gold" id="i1">▶ Begin</button><span style="opacity:.6;font-size:14px">🎧 Headphones help · about 2 hours, at your own pace · your progress saves on this device</span></div>`);
-  $('#i1').onclick = cold; }
+  const s = scene(`<div class="kick">${esc(CASE.kick)}</div><h1>${esc(CASE.title).replace(/\n/g, '<br>')}</h1><p class="lead">${esc(CASE.lead)}</p>
+    <div class="row"><button class="btn gold" id="i1">▶ Begin</button><span style="opacity:.78;font-size:14px">🎧 Headphones help · about 2 hours, at your own pace · your progress saves on this device</span></div>`);
+  paintCaseCover(s); $('#i1').onclick = cold; }
 async function cold() { const L = ['Pine Hollow, Montana. Population eleven hundred and change.', 'Saturday night was the Harvest Festival. Lanterns strung all along the north field, where the lake path starts into the pines.', 'Clara Hale, thirty-four, was seen at that festival a little after nine.', 'By seven the next morning, her Subaru was sitting at the Copper Lake trailhead. Keys in the ignition. Her phone, gone.', 'Clara, gone.'];
   scene(`<div class="kick">Cold open · narrated by Det. Sam Ortiz</div><div class="cold">${L.map(l => `<span>${esc(l)} </span>`).join('<br>')}</div><div class="row" style="margin-top:26px"><button class="btn gold" id="c1">Continue</button><button class="skip" id="c2">Skip intro</button></div>`);
   let stop = false; $('#c1').onclick = () => { stop = true; pickDesk(); }; $('#c2').onclick = () => { stop = true; pickDesk(); };
