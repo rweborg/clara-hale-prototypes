@@ -100,7 +100,7 @@ body.th-d{--bg:#3E2C1F;--bar:rgba(255,250,242,.94);--barink:#2A221B;--ink:#2A221
 .it .bt button.alt{background:#EDE6DA;color:#1D1B18}
 .it.gone{animation:gone .4s forwards}@keyframes gone{to{opacity:0;transform:translateY(-30px) scale(.9)}}
 .allout{grid-column:1/-1;text-align:center;font:700 15px Atkinson;color:#4A443C;padding:20px}
-.viewer{display:flex;gap:20px;align-items:flex-start;justify-content:center}.viewer img{max-height:calc(100vh - 140px);max-width:62vw;border-radius:4px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.viewer{display:flex;gap:20px;align-items:flex-start;justify-content:center;pointer-events:none}.viewer > *{pointer-events:auto}.viewer img{max-height:calc(100vh - 140px);max-width:62vw;border-radius:4px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
 .viewer .panel{max-width:320px}
 /* player */
 .player{width:min(820px,100%);margin:0 auto;border-radius:28px;padding:22px;color:#fff;display:grid;grid-template-columns:300px 1fr;gap:20px}
@@ -483,7 +483,15 @@ function deskClick(n) { SFX.click();
   if (n === 'lamp') { S.lampOff = !S.lampOff; SFX.click(); return render(); } }
 // ---------------- overlays ----------------
 function ov(html, onclose) { const o = $('#ov'); o.innerHTML = `<div class="back"><button class="btn2" id="ovx">← Put it back on the desk</button></div><div class="box">${html}</div>`; o.hidden = false;
-  const close = () => { o.hidden = true; o.innerHTML = ''; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close; return o; }
+  const close = () => { o.hidden = true; o.innerHTML = ''; o.onpointerdown = o.onclick = null; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close;
+  // Click the dimmed desk around the item to put it back. The press has to start and end out there,
+  // so a drag that begins on a list, pin, or tape control does not dismiss, and neither does the button.
+  const outside = e => { const t = e.target; if (!t || !t.closest || t.closest('.back')) return false; const box = o.querySelector('.box'); if (!box) return t === o;
+    if ([...box.children].some(el => el.contains(t))) return false; const r = box.getBoundingClientRect();
+    const onY = box.scrollHeight > box.clientHeight + 2 && e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.right - 18 && e.clientX <= r.right + 1;
+    const onX = box.scrollWidth > box.clientWidth + 2 && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.bottom - 18 && e.clientY <= r.bottom + 1;
+    return !(onY || onX); };
+  let arm = false; o.onpointerdown = e => { arm = outside(e); }; o.onclick = e => { const go = arm && outside(e); arm = false; if (go) close(); }; return o; }
 const closeOv = () => $('#ov')._close && !$('#ov').hidden && $('#ov')._close();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOv(); });
 function viewImg(key, title, text, after, face) { SFX.paper(); const shot = face ? `<img class="vface" src="${face}" alt="">` : ''; ov(`<div class="viewer"><img src="${A[key]}" alt=""><div class="panel">${shot}<h2>${title}</h2><p class="sub">${text}</p><button class="btn" id="vx">Done</button></div></div>`); $('#vx').onclick = closeOv; after && after(); }
