@@ -2,7 +2,7 @@
 Open `index.html` in a browser. Keep the `assets/` folder next to it: all voices are ElevenLabs MP3s in `assets/audio/`. Works offline.
 
 ## Preview timeline (developers only)
-Not a player feature. Open `index.html?preview=1`. A **Preview only** bar fixes to the bottom. Drag the playhead, click a stage, or use ‹ › (and the left and right arrow keys) to walk the journey: intro, cold open, desk pick, how it works, handoff, case folder, Envelope A, the realization, Envelope B, a wrong accusation, a right accusation, Envelope C, file away, and the filed record. Each stop is a mid-journey snapshot, so the desk, board, or scene looks like someone is already there.
+Not a player feature. Open `index.html?preview=1`. A **Preview only** bar fixes to the bottom. Drag the playhead, click a stage, or use ‹ › (and the left and right arrow keys) to walk the journey: intro, cold open, desk pick, how it works, handoff, the closed case folder, the opened folder with a suggested review order, case folder (mid-investigation), Envelope A, the realization, Envelope B, a wrong accusation, a right accusation, Envelope C, file away, and the filed record. Each stop is a mid-journey snapshot, so the desk, board, or scene looks like someone is already there.
 
 **Play** advances through those stages with a short pause on each. **Pause** holds. **Stop** ends the walk and returns to the intro.
 
