@@ -17,6 +17,9 @@ body.th-d{--bg:#3E2C1F;--bar:rgba(255,250,242,.94);--barink:#2A221B;--ink:#2A221
 .seg i{position:absolute;top:1px;right:1px;background:#C8281E;color:#fff;font:700 11px Atkinson;font-style:normal;border-radius:999px;padding:2px 6px}
 .seg i.pop{animation:pop .5s}@keyframes pop{50%{transform:scale(1.5)}}
 .tb{min-height:42px;padding:0 12px;border-radius:10px;border:1.5px solid currentColor;background:transparent;font:700 14px Atkinson;white-space:nowrap}
+.voltop{display:flex;align-items:center;gap:4px}
+.voltop input[type=range]{width:92px;accent-color:#1F5E4E;cursor:pointer}
+@media (max-width:900px){.voltop input[type=range]{width:64px}}
 .dz{position:fixed;right:12px;top:72px;z-index:80;background:#fff;color:#1D1B18;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.35);padding:16px;width:350px}
 .dz h4{font:700 16px Atkinson;margin-bottom:6px}.dz label{display:block;font:700 12px Atkinson;text-transform:uppercase;letter-spacing:.06em;color:#7A7268;margin:12px 0 6px}
 .dz .row{display:flex;flex-wrap:wrap;gap:6px}.dz .row button{border:1.5px solid #D9D2C6;background:#fff;border-radius:9px;padding:7px 10px;font:700 13px Atkinson}
@@ -70,14 +73,18 @@ body.th-d{--bg:#3E2C1F;--bar:rgba(255,250,242,.94);--barink:#2A221B;--ink:#2A221
 .cardx{background:#FBFAF4;width:100%;padding:10px 12px;font:20px/1.15 Caveat;color:#1D2A55;box-shadow:0 6px 14px rgba(0,0,0,.35);background-image:repeating-linear-gradient(#FBFAF4 0 22px,#BFD0EA 22px 23px);border-top:4px solid #C8281E;pointer-events:none}
 .cardx b{display:block;font:16px ArchivoBlack,Arial;color:#1D1B18;margin-bottom:2px}
 #strings{position:absolute;inset:0;width:1280px;height:800px;pointer-events:none;z-index:1}
-#strings line{stroke:#B3141B;stroke-width:3.5;stroke-linecap:round;filter:drop-shadow(0 2px 1px rgba(0,0,0,.4))}
-#strings line.aha{stroke:#FF2A1F;stroke-width:6;stroke-dasharray:2000;animation:snap 1s ease-out forwards;filter:drop-shadow(0 0 8px #ff6a5a)}
+#strings .yarn{stroke:#B3141B;stroke-width:3.5;stroke-linecap:round;filter:drop-shadow(0 2px 1px rgba(0,0,0,.4));pointer-events:none}
+#strings .yarn.aha{stroke:#FF2A1F;stroke-width:6;stroke-dasharray:2000;animation:snap 1s ease-out forwards;filter:drop-shadow(0 0 8px #ff6a5a)}
+#strings .thread.sel .yarn,#strings .thread.hot .yarn{stroke:#F2C14E;stroke-width:6;filter:drop-shadow(0 0 6px #F2C14E)}
+#stringhits{position:absolute;inset:0;width:1280px;height:800px;pointer-events:none;z-index:4}
+#stringhits .hit{pointer-events:stroke;stroke:transparent;stroke-width:44;stroke-linecap:round;cursor:pointer}
 @keyframes snap{from{stroke-dashoffset:2000}to{stroke-dashoffset:0}}
-#pins{position:absolute;inset:0;z-index:2}
+#pins{position:absolute;inset:0;z-index:2;pointer-events:none}
+.pin{pointer-events:auto}
 #bempty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.9);padding:16px 22px;border-radius:12px;font:700 18px Atkinson;max-width:460px;text-align:center}
 .btools{position:absolute;left:14px;bottom:14px;display:flex;gap:10px;align-items:center;z-index:5}
 #ctip{background:rgba(17,17,17,.85);color:#fff;font:700 14px Atkinson;padding:8px 12px;border-radius:9px}#ctip:empty{display:none}
-#boardV.ahaing .pin:not(.hero){opacity:.18;filter:grayscale(1)}#boardV.ahaing #strings line:not(.aha){opacity:.15}
+#boardV.ahaing .pin:not(.hero){opacity:.18;filter:grayscale(1)}#boardV.ahaing #strings .yarn:not(.aha){opacity:.15}
 #boardV.ahaing #cork{filter:brightness(.45)}
 /* overlay */
 #ov{position:fixed;inset:64px 0 0 0;z-index:60;background:rgba(15,12,10,.62);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -100,7 +107,7 @@ body.th-d{--bg:#3E2C1F;--bar:rgba(255,250,242,.94);--barink:#2A221B;--ink:#2A221
 .it .bt button.alt{background:#EDE6DA;color:#1D1B18}
 .it.gone{animation:gone .4s forwards}@keyframes gone{to{opacity:0;transform:translateY(-30px) scale(.9)}}
 .allout{grid-column:1/-1;text-align:center;font:700 15px Atkinson;color:#4A443C;padding:20px}
-.viewer{display:flex;gap:20px;align-items:flex-start;justify-content:center}.viewer img{max-height:calc(100vh - 140px);max-width:62vw;border-radius:4px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.viewer{display:flex;gap:20px;align-items:flex-start;justify-content:center;pointer-events:none}.viewer > *{pointer-events:auto}.viewer img{max-height:calc(100vh - 140px);max-width:62vw;border-radius:4px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
 .viewer .panel{max-width:320px}
 /* player */
 .player{width:min(820px,100%);margin:0 auto;border-radius:28px;padding:22px;color:#fff;display:grid;grid-template-columns:300px 1fr;gap:20px}
@@ -117,6 +124,12 @@ body.th-d{--bg:#3E2C1F;--bar:rgba(255,250,242,.94);--barink:#2A221B;--ink:#2A221
 .ln{padding:8px 10px;border-radius:8px;font-size:15px;line-height:1.4;display:flex;gap:8px}.ln .who{font:700 11px Atkinson;letter-spacing:.06em;min-width:56px;opacity:.7;padding-top:3px}
 .ln em{opacity:.6;font-size:12.5px}.ln.cur{background:rgba(242,193,78,.25)}.ln.txt{opacity:.85}.ln .sv{margin-left:auto;border:none;background:#F2C14E;color:#1D1B18;border-radius:8px;font:700 12px Atkinson;padding:4px 8px;align-self:flex-start;white-space:nowrap}
 .ln .sv.done{background:#1F5E4E;color:#fff}.ln.key{outline:2px dashed #F2C14E}
+.volrow{display:flex;align-items:center;gap:8px;margin-top:10px}
+.volrow .vollab{font:700 11px Atkinson;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.volrow button{width:44px;min-height:40px;border:none;border-radius:10px;background:rgba(255,255,255,.14);color:inherit;font-size:18px;cursor:pointer}
+.player.tp .volrow button{background:rgba(0,0,0,.08)}
+.volrow input[type=range]{flex:1;height:28px;accent-color:#F2C14E;cursor:pointer}
+.player.tp .volrow input[type=range]{accent-color:#1F5E4E}
 .cred{font-size:11.5px;opacity:.6;margin-top:8px}
 /* envelope */
 .envw{position:relative;width:640px;max-width:90vw;margin:0 auto;text-align:center}
@@ -235,6 +248,7 @@ body.preview .aha-card{bottom:calc(6% + var(--pvh, 78px))}
   <div class="ttl"><b>The Vanishing of Clara Hale</b><span>Journey prototype · Case # 25-0412</span></div>
   <nav class="rail" id="rail" aria-label="Journey beats"></nav>
   <nav class="seg" id="seg" aria-label="View"><button data-v="desk" class="on">🗂 Desk</button><button data-v="board">📌 Board <i id="bbadge" hidden>0</i></button></nav>
+  <div class="voltop" title="Volume for interviews, voicemail, and voices"><button type="button" class="tb" data-volmute aria-label="Mute" aria-pressed="false">🔊</button><input type="range" data-vol min="0" max="100" step="1" value="100" aria-label="Volume"></div>
   <button class="tb" id="hintb">💡 Hint</button>
   <button class="tb" id="dzb" aria-haspopup="true">⚙ Prototype</button>
 </header>
@@ -249,8 +263,8 @@ body.preview .aha-card{bottom:calc(6% + var(--pvh, 78px))}
 </div>
 <main id="stage">
   <section id="deskV" class="view on"><div class="fit" id="desk"><img id="bare" alt=""><div id="spr"></div><div id="tod"></div><div id="glow"></div><div id="hots"></div><div id="fly"></div><div id="drawer" hidden><div class="dfront"><span>PINE HOLLOW CASE FILES</span><i></i></div></div></div></section>
-  <section id="boardV" class="view"><div class="fit" id="board"><img id="cork" alt=""><svg id="strings" viewBox="0 0 1280 800"></svg><div id="pins"></div><div id="bempty">The board is empty. Pin evidence from the case folder and it shows up here.</div></div>
-    <div class="btools"><button class="btn2" id="connectb">🧶 Connect two things</button><span id="ctip"></span></div></section>
+  <section id="boardV" class="view"><div class="fit" id="board"><img id="cork" alt=""><svg id="strings" viewBox="0 0 1280 800"></svg><div id="pins"></div><svg id="stringhits" viewBox="0 0 1280 800"></svg><div id="bempty">The board is empty. Pin evidence from the case folder and it shows up here.</div></div>
+    <div class="btools"><button class="btn2" id="connectb">🧶 Connect two things</button><button class="btn2" id="cutb" type="button" hidden>✂ Remove thread</button><span id="ctip"></span></div></section>
 <button type="button" id="whisper" class="whisper" hidden aria-live="polite"></button>
 </main>
 <aside id="side">
@@ -378,23 +392,32 @@ const OBJ1 = {q: 'Did Clara drive her own car to the Copper Lake trailhead that 
 let S; const T0 = Date.now();
 function fresh() { return {theme: localStorage.getItem('jp-theme') || 'b', beat: 'intro', meal: null, pulled: {}, board: {}, strings: [], notes: [], viewed: {}, played: {}, saved: {},
   obj1: 0, obj1wrong: 0, env: {A: 'hidden', B: 'hidden', C: 'hidden'}, real: false, tries: 0, hints: 0, mug: 0, bites: 0, lampOff: false, solved: false, assisted: false,
-  folderOnDesk: false, packed: false, stamped: false, filed: false, fresh: {}, voice: S ? S.voice : true, view: 'desk', sel: null, connect: false, rep: {}, t0: Date.now()}; }
+  folderOnDesk: false, packed: false, stamped: false, filed: false, fresh: {}, voice: S ? S.voice : true, view: 'desk', sel: null, connect: false, strSel: null, rep: {}, t0: Date.now()}; }
 S = fresh();
 // ---------------- save / resume ----------------
 // The whole case state is saved on this device; reopening the page lands you back at the desk, mid-case.
-const SAVE = 'jp-save-v2', TRANSIENT = ['sel', 'connect', 'fresh', '_sc'];
+const SAVE = 'jp-save-v2', TRANSIENT = ['sel', 'connect', 'strSel', 'fresh', '_sc'];
 // ?preview=1 is the developer journey scrubber (initPreview). It must not touch a real playthrough.
 const PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
 function save() { if (PREVIEW || !S || S.beat === 'intro') return; try { const o = {}; for (const k in S) if (!TRANSIENT.includes(k)) o[k] = S[k]; o.savedAt = Date.now(); localStorage.setItem(SAVE, JSON.stringify(o)); } catch (e) {} }
 function loadSave() { try { const o = JSON.parse(localStorage.getItem(SAVE) || 'null'); if (!o || !o.beat || o.beat === 'intro' || !BEATS.some(b => b[0] === o.beat)) return null; return Object.assign(fresh(), o, {sel: null, connect: false, fresh: {}}); } catch (e) { return null; } }
 function clearSave() { if (PREVIEW) return; try { localStorage.removeItem(SAVE); } catch (e) {} }
 // ---------------- sound ----------------
-let AC; const ac = () => AC || (AC = new (window.AudioContext || window.webkitAudioContext)());
+let AC, MASTER; const ac = () => AC || (AC = new (window.AudioContext || window.webkitAudioContext)());
+let VOL = 1, MUTED = false;
+try { const o = JSON.parse(localStorage.getItem('jp-vol') || 'null'); if (o && typeof o.v === 'number') { VOL = Math.max(0, Math.min(1, o.v)); MUTED = !!o.m || VOL === 0; } } catch (e) {}
+function master() { const c = ac(); if (!MASTER) { MASTER = c.createGain(); MASTER.connect(c.destination); } MASTER.gain.value = MUTED ? 0 : VOL; return MASTER; }
 function noise(dur, f = 2000, q = 1, vol = .3, type = 'bandpass', t0 = 0) { try { const c = ac(), n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * dur, c.sampleRate), d = b.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2); n.buffer = b; const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
-  const g = c.createGain(); g.gain.value = vol; n.connect(fl).connect(g).connect(c.destination); n.start(c.currentTime + t0); } catch (e) {} }
+  const g = c.createGain(); g.gain.value = vol; n.connect(fl).connect(g).connect(master()); n.start(c.currentTime + t0); } catch (e) {} }
 function tone(f, dur, vol = .15, type = 'sine', t0 = 0) { try { const c = ac(), o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f; const t = c.currentTime + t0;
-  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .05); } catch (e) {} }
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(master()); o.start(t); o.stop(t + dur + .05); } catch (e) {} }
+function volIcon() { if (MUTED || VOL <= 0) return '🔇'; if (VOL < .4) return '🔈'; if (VOL < .75) return '🔉'; return '🔊'; }
+function applyVol(a) { if (!a) return; try { a.volume = MUTED ? 0 : VOL; } catch (e) {} }
+function paintVol() { $$('[data-vol]').forEach(el => { el.value = String(Math.round(VOL * 100)); }); $$('[data-volmute]').forEach(b => { b.textContent = volIcon(); b.setAttribute('aria-pressed', MUTED ? 'true' : 'false'); b.setAttribute('aria-label', MUTED ? 'Unmute' : 'Mute'); }); }
+function setVol(v, muted) { VOL = Math.max(0, Math.min(1, Number.isFinite(v) ? v : 1)); MUTED = !!muted || VOL === 0; if (MASTER) MASTER.gain.value = MUTED ? 0 : VOL; applyVol(CUR_AUD); applyVol(LINE); try { localStorage.setItem('jp-vol', JSON.stringify({v: VOL, m: MUTED})); } catch (e) {} paintVol(); }
+document.addEventListener('input', e => { const el = e.target; if (!el.matches || !el.matches('[data-vol]')) return; const v = Number(el.value) / 100; setVol(v, v <= 0); });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-volmute]'); if (!b) return; if (MUTED) setVol(VOL > 0 ? VOL : .8, false); else setVol(VOL > 0 ? VOL : .8, true); });
 const SFX = {paper: () => noise(.22, 2600, .7, .25), pin: () => { tone(1900, .05, .08, 'square'); noise(.05, 4000, 1, .2); }, tear: () => { noise(.7, 3200, .6, .4, 'highpass'); },
   sting: () => { [196, 247, 294, 392, 494].forEach((f, i) => tone(f, 2.4 - i * .2, .12, 'triangle', i * .11)); tone(65, 1.6, .25, 'sine'); },
   ding: () => { tone(660, .4, .12); tone(990, .6, .12, 'sine', .12); }, stamp: () => { tone(70, .3, .4); noise(.15, 900, .8, .5, 'lowpass'); },
@@ -404,7 +427,7 @@ const SFX = {paper: () => noise(.22, 2600, .7, .25), pin: () => { tone(1900, .05
 // Every spoken character line is a bundled ElevenLabs MP3 (assets/audio/, see AU) played with an HTMLAudioElement.
 // There is deliberately no device text-to-speech fallback: a line without a sample is shown as text only.
 let LINE = null;
-function voice(k) { hush(); if (!S.voice || !k || !AU[k]) return null; const a = new Audio(AU[k]); a.preload = 'auto'; LINE = a; a.play().catch(() => {}); return a; }
+function voice(k) { hush(); if (!S.voice || !k || !AU[k]) return null; const a = new Audio(AU[k]); a.preload = 'auto'; applyVol(a); LINE = a; a.play().catch(() => {}); return a; }
 function hush() { if (LINE) { try { LINE.pause(); } catch (e) {} LINE = null; } }
 const ortiz = k => voice('ortiz/' + k);
 // ---------------- helpers ----------------
@@ -483,7 +506,15 @@ function deskClick(n) { SFX.click();
   if (n === 'lamp') { S.lampOff = !S.lampOff; SFX.click(); return render(); } }
 // ---------------- overlays ----------------
 function ov(html, onclose) { const o = $('#ov'); o.innerHTML = `<div class="back"><button class="btn2" id="ovx">← Put it back on the desk</button></div><div class="box">${html}</div>`; o.hidden = false;
-  const close = () => { o.hidden = true; o.innerHTML = ''; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close; return o; }
+  const close = () => { o.hidden = true; o.innerHTML = ''; o.onpointerdown = o.onclick = null; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close;
+  // Click the dimmed desk around the item to put it back. The press has to start and end out there,
+  // so a drag that begins on a list, pin, or tape control does not dismiss, and neither does the button.
+  const outside = e => { const t = e.target; if (!t || !t.closest || t.closest('.back')) return false; const box = o.querySelector('.box'); if (!box) return t === o;
+    if ([...box.children].some(el => el.contains(t))) return false; const r = box.getBoundingClientRect();
+    const onY = box.scrollHeight > box.clientHeight + 2 && e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.right - 18 && e.clientX <= r.right + 1;
+    const onX = box.scrollWidth > box.clientWidth + 2 && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.bottom - 18 && e.clientY <= r.bottom + 1;
+    return !(onY || onX); };
+  let arm = false; o.onpointerdown = e => { arm = outside(e); }; o.onclick = e => { const go = arm && outside(e); arm = false; if (go) close(); }; return o; }
 const closeOv = () => $('#ov')._close && !$('#ov').hidden && $('#ov')._close();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOv(); });
 function viewImg(key, title, text, after, face) { SFX.paper(); const shot = face ? `<img class="vface" src="${face}" alt="">` : ''; ov(`<div class="viewer"><img src="${A[key]}" alt=""><div class="panel">${shot}<h2>${title}</h2><p class="sub">${text}</p><button class="btn" id="vx">Done</button></div></div>`); $('#vx').onclick = closeOv; after && after(); }
@@ -515,11 +546,11 @@ function openPlayer(rid) { const L = recs(); if (!rid) return; const isB = S.the
   const av = r => A[FACE[r]] ? `<img class="av" src="${A[FACE[r]]}" alt="">` : (isB ? '🎙️' : '📼');
   const o = ov(`<div class="player ${isB ? 'ph' : 'tp'}"><div><div class="recs">${L.map(r => `<button data-r="${r}" class="${r === rid ? 'on' : ''}">${av(r)} ${META[r][0]}</button>`).join('')}</div>
     <div class="whohead">${A[FACE[rid]] ? `<img class="avbig" src="${A[FACE[rid]]}" alt="">` : ''}<div><h3>${META[rid][0]}</h3><div class="s">${META[rid][1]}</div></div></div><div class="wave" id="wave">${Array.from({length: 48}, (_, i) => `<i style="height:${15 + Math.abs(Math.sin(i * 1.7 + rid.length)) * 70 + (i * 37 % 13)}%"></i>`).join('')}</div>
-    <div class="keys"><button id="pp">▶ Play</button><button id="st">⏹ Stop</button><button id="rw">↺ 10s</button>${rid === 'marcy' ? '<button id="end">⏭ End</button>' : ''}</div><div class="cred" id="cred">🔊 ElevenLabs voices (real audio). ${rid === 'marcy' ? 'After the voiced excerpt the tape continues as text.' : rid === 'voicemail' ? '' : 'Voiced excerpt of the interview.'}</div></div>
+    <div class="keys"><button id="pp">▶ Play</button><button id="st">⏹ Stop</button><button id="rw">↺ 10s</button>${rid === 'marcy' ? '<button id="end">⏭ End</button>' : ''}</div><div class="volrow"><span class="vollab">Volume</span><button type="button" data-volmute aria-label="Mute">🔊</button><input type="range" data-vol min="0" max="100" step="1" value="100" aria-label="Volume"></div><div class="cred" id="cred">🔊 ElevenLabs voices (real audio). ${rid === 'marcy' ? 'After the voiced excerpt the tape continues as text.' : rid === 'voicemail' ? '' : 'Voiced excerpt of the interview.'}</div></div>
     <div class="tx" id="tx">${TR[rid].map((l, i) => `<div class="ln" data-i="${i}"><span class="who">${l.sp}</span><span>${l.tag ? `<em>[${esc(l.tag)}]</em> ` : ''}${esc(l.x)}</span></div>`).join('')}
     ${rid === 'marcy' ? `<div class="ln txt"><span class="who"></span><em>— voiced excerpt ends; transcript continues —</em></div>` + TR.marcy_more.map((l, i) => `<div class="ln txt${l.key ? ' key' : ''}"><span class="who">${l.sp}</span><span>${l.tag ? `<em>[${esc(l.tag)}]</em> ` : ''}${esc(l.x)}</span>${l.save ? `<button class="sv${S.saved.height ? ' done' : ''}" data-save="${esc(l.save)}">${S.saved.height ? '✓ In notes' : '☆ Save to notes'}</button>` : ''}</div>`).join('') : ''}</div></div>`);
   $$('[data-r]', o).forEach(b => b.onclick = () => { closeOv(); openPlayer(b.dataset.r); });
-  const au = new Audio(AU[rid]); au.preload = 'auto'; CUR_AUD = au; hush();
+  const au = new Audio(AU[rid]); au.preload = 'auto'; applyVol(au); CUR_AUD = au; hush(); paintVol();
   au.onerror = () => { $('#cred') && ($('#cred').textContent = '⚠️ Audio file not found next to index.html (assets/audio/). Transcript only.'); }; const pp = $('#pp'), lines = $$('#tx .ln[data-i]'), bars = $$('#wave i');
   pp.onclick = () => { if (au.paused) { au.play().catch(() => {}); S.played[rid] = 1; renderSide(); } else au.pause(); };
   au.onplay = () => pp.textContent = '❚❚ Pause'; au.onpause = () => pp.textContent = '▶ Play';
@@ -562,20 +593,32 @@ function renderBoard() { $('#cork').src = A.cork; const P = $('#pins'); P.innerH
     Object.assign(d.style, {left: p.x - w / 2 + 'px', top: p.y + 'px', width: w + 'px', transform: `rotate(${(id.length * 7 % 7) - 3}deg)`});
     const th = IT[id].th; const pinface = IT[id].face && IT[id].face !== th && A[IT[id].face] ? `<img class="pinface" src="${A[IT[id].face]}" alt="">` : ''; const snap = CARDS[id] && A[th] ? `<img class="snap" src="${A[th]}" alt="">` : ''; d.innerHTML = (CARDS[id] ? `<div class="cardx">${snap}<b>${CARDS[id][0]}</b>${CARDS[id][1]}</div>` : `<img src="${A[th]}" alt="">`) + pinface + `<span class="nm ${lc || ''}">${esc(lab)}</span>` + (id === 'marcy' && S.saved.height ? '<span class="tag2">5′2″</span>' : '') + (id === 'clara' ? '<span class="tag2">5′10″</span>' : '');
     P.appendChild(d); dragPin(d); }
-  S.fresh = {}; drawStrings(); $('#connectb').classList.toggle('on', S.connect); $('#connectb').textContent = S.connect ? '✕ Stop connecting' : '🧶 Connect two things'; $('#ctip').textContent = S.connect ? (S.sel ? 'Now tap the second thing.' : 'Tap the first thing.') : ''; }
+  S.fresh = {}; drawStrings(); $('#connectb').classList.toggle('on', S.connect); $('#connectb').textContent = S.connect ? '✕ Stop connecting' : '🧶 Connect two things';
+  const cut = $('#cutb'); if (cut) cut.hidden = !S.strSel; const nStr = S.strings.filter(([a, b]) => S.board[a] && S.board[b]).length;
+  $('#ctip').textContent = S.connect ? (S.sel ? 'Now tap the second thing.' : 'Tap the first thing.') : S.strSel ? 'Click Remove thread, or click the thread again to cancel.' : (nStr && !$('#boardV').classList.contains('ahaing')) ? 'Click a red thread to remove it.' : ''; }
 function pinPt(id) { const [, , w] = BP[id], p = S.board[id]; return [p.x, p.y + 4]; }
-function drawStrings() { const sv = $('#strings'); sv.innerHTML = S.strings.filter(([a, b]) => S.board[a] && S.board[b]).map(([a, b, aha]) => { const [x1, y1] = pinPt(a), [x2, y2] = pinPt(b); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${aha ? 'aha' : ''}"/>`; }).join(''); }
+function drawStrings() { const sv = $('#strings'), hits = $('#stringhits'); const live = S.strings.filter(([a, b]) => S.board[a] && S.board[b]); if (S.strSel && !live.some(s => [s[0], s[1]].sort().join('+') === S.strSel)) S.strSel = null;
+  const bits = live.map(([a, b, aha]) => { const [x1, y1] = pinPt(a), [x2, y2] = pinPt(b); const key = [a, b].sort().join('+'); const sel = S.strSel === key; const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1; const pad = Math.min(96, Math.max(0, (len - 70) / 2));
+    const lab = `Thread between ${BP[a][3]} and ${BP[b][3]}. Click to remove it.`;
+    return {key, a, b, yarn: `<g class="thread${aha ? ' aha' : ''}${sel ? ' sel' : ''}" data-key="${key}"><line class="yarn${aha ? ' aha' : ''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/></g>`,
+      hit: `<g class="thread${sel ? ' sel' : ''}" data-a="${a}" data-b="${b}" data-key="${key}" role="button" aria-label="${esc(lab)}"><line class="hit" x1="${x1 + dx / len * pad}" y1="${y1 + dy / len * pad}" x2="${x2 - dx / len * pad}" y2="${y2 - dy / len * pad}"/></g>`}; });
+  sv.innerHTML = bits.map(p => p.yarn).join(''); hits.innerHTML = bits.map(p => p.hit).join('');
+  $$('#stringhits .thread').forEach(g => { g.onclick = e => { e.stopPropagation(); pickThread(g.dataset.a, g.dataset.b); };
+    g.onmouseenter = () => { const y = sv.querySelector(`[data-key="${g.dataset.key}"]`); if (y) y.classList.add('hot'); };
+    g.onmouseleave = () => { const y = sv.querySelector(`[data-key="${g.dataset.key}"]`); if (y) y.classList.remove('hot'); }; }); }
+function pickThread(a, b) { const key = [a, b].sort().join('+'); S.strSel = S.strSel === key ? null : key; S.connect = false; S.sel = null; SFX.click(); renderBoard(); }
+function cutThread() { if (!S.strSel) return; const key = S.strSel; S.strings = S.strings.filter(s => [s[0], s[1]].sort().join('+') !== key); S.strSel = null; SFX.paper(); save(); renderBoard(); toast('✂ Thread removed.'); }
 function dragPin(d) { let st = null; d.onpointerdown = e => { st = {x: e.clientX, y: e.clientY, ox: S.board[d.dataset.id].x, oy: S.board[d.dataset.id].y, moved: false}; d.setPointerCapture(e.pointerId); d.style.zIndex = 5; };
   d.onpointermove = e => { if (!st) return; const dx = (e.clientX - st.x) / S._sc, dy = (e.clientY - st.y) / S._sc; if (Math.abs(dx) + Math.abs(dy) > 4) st.moved = true; if (!st.moved) return;
     const id = d.dataset.id, w = BP[id][2]; S.board[id].x = Math.max(w / 2, Math.min(1280 - w / 2, st.ox + dx)); S.board[id].y = Math.max(10, Math.min(700, st.oy + dy)); d.style.left = S.board[id].x - w / 2 + 'px'; d.style.top = S.board[id].y + 'px'; drawStrings(); };
   d.onpointerup = () => { const m = st && st.moved; st = null; d.style.zIndex = ''; if (!m) pinTap(d.dataset.id); else save(); }; }
-function pinTap(id) { if (!S.connect) { S.connect = true; S.sel = id; SFX.click(); return renderBoard(); }
+function pinTap(id) { S.strSel = null; if (!S.connect) { S.connect = true; S.sel = id; SFX.click(); return renderBoard(); }
   if (!S.sel) { S.sel = id; return renderBoard(); } if (S.sel === id) { S.sel = null; return renderBoard(); }
   const a = S.sel, b = id; S.sel = null; S.connect = false; const pair = [a, b].sort().join('+');
-  if (!S.strings.some(s => [s[0], s[1]].sort().join('+') === pair)) S.strings.push([a, b, false]); SFX.pin();
+  const tied = S.strings.some(s => [s[0], s[1]].sort().join('+') === pair); if (!tied) S.strings.push([a, b, false]); SFX.pin();
   if (pair === 'marcy+seat' && !S.real) { if (!S.saved.height) { renderBoard(); return toast("🤔 Something's there… but you don't know enough about Marcy yet. Play her tape to the end.", 3600); } return aha(a, b); }
   if ((pair === 'camera+seat' || pair === 'clara+seat') && !S.real) { renderBoard(); return toast('🧶 Close. The seat matters. Who was short enough to need it there?', 3200); }
-  renderBoard(); toast('🧶 String tied. Your own strings are just notes, so no breakthrough yet.', 2400); }
+  renderBoard(); toast(tied ? 'Those two are already tied.' : '🧶 String tied. Click that red thread to remove it.', tied ? 1800 : 2800); }
 async function aha(a, b) { S.real = true; const s = S.strings.find(s => [s[0], s[1]].sort().join('+') === [a, b].sort().join('+')); s[2] = true; setView('board'); renderBoard();
   const bv = $('#boardV'); bv.classList.add('ahaing'); $$('.pin').forEach(p => p.classList.toggle('hero', p.dataset.id === a || p.dataset.id === b));
   SFX.sting(); const f = document.createElement('div'); f.className = 'flash'; document.body.appendChild(f); setTimeout(() => f.remove(), 1200); await sleep(1100);
@@ -691,7 +734,10 @@ function renderWhisper(ns) { const el = $('#whisper'); if (!el) return; const sh
 function render() { document.body.className = 'th-' + S.theme + (PREVIEW ? ' preview' : ''); syncMeal(); renderDesk(); if (S.view === 'board') renderBoard(); renderSide(); fitAll(); }
 function setView(v) { S.view = v; $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); $('#deskV').classList.toggle('on', v === 'desk'); $('#boardV').classList.toggle('on', v === 'board'); if (v === 'board') renderBoard(); if (v !== 'board') { S.connect = false; S.sel = null; } fitAll(); }
 $$('#seg button').forEach(b => b.onclick = () => setView(b.dataset.v));
-$('#connectb').onclick = () => { S.connect = !S.connect; S.sel = null; renderBoard(); };
+$('#connectb').onclick = () => { S.connect = !S.connect; S.sel = null; S.strSel = null; renderBoard(); };
+$('#cutb').onclick = () => cutThread();
+$('#board').onclick = e => { if (e.target.closest('.pin') || e.target.closest('.thread')) return; if (!S.strSel) return; S.strSel = null; renderBoard(); };
+paintVol();
 $('#hintb').onclick = () => { S.hints++; const ns = nextStep(); toast('Ortiz: ' + (ns.w || ns.p), 4200); };
 $('#dzb').onclick = () => { $('#dz').hidden = !$('#dz').hidden; };
 $$('#dz [data-theme]').forEach(b => b.onclick = () => { S.theme = b.dataset.theme; localStorage.setItem('jp-theme', S.theme); prevSet = new Set(deskSet()); render(); });
