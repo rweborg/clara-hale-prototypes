@@ -1,0 +1,9 @@
+/* Faces extracted from journey/index.html so the style guide matches the player.
+   The player keeps its own embedded copies. Do not edit the outlines here. */
+@font-face{font-family:'Atkinson';src:url('fonts/atkinson-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Atkinson';src:url('fonts/atkinson-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Atkinson';src:url('fonts/atkinson-400-italic.woff2') format('woff2');font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:'Caveat';src:url('fonts/caveat-400700.woff2') format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:'CourierP';src:url('fonts/courierp-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'CourierP';src:url('fonts/courierp-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'ArchivoBlack';src:url('fonts/archivoblack-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
