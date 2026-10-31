@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journey design system · Clara Hale</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="patterns.css">
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <b>Journey design system</b>
+    <span>Clara Hale · patterns for the next case file</span>
+  </div>
+  <nav>
+    <a href="../index.html">Open the journey</a>
+    <a href="../../DESIGN_SYSTEM.md">Reuse guide</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <p class="lede">Shared tokens and pattern specimens for the Clara Hale journey. The live game still draws itself from <code>journey/index.html</code>. This page names each pattern and shows the markup a second case plugs into. Portrait and prop files are shown as stored. Grading them is a separate change.</p>
+
+  <ul class="toc">
+    <li><a href="#color">Color</a></li>
+    <li><a href="#type">Type</a></li>
+    <li><a href="#photo">Photos</a></li>
+    <li><a href="#materials">Materials</a></li>
+    <li><a href="#character">Character</a></li>
+    <li><a href="#evidence">Evidence</a></li>
+    <li><a href="#folder">Folder</a></li>
+    <li><a href="#envelope">Envelope</a></li>
+    <li><a href="#board">Board</a></li>
+    <li><a href="#hint">Next step</a></li>
+    <li><a href="#dismiss">Dismiss</a></li>
+    <li><a href="#album">Album cover</a></li>
+    <li><a href="#ambience">Ambience</a></li>
+    <li><a href="#volume">Volume</a></li>
+    <li><a href="#case">New case</a></li>
+    <li><a href="#preview">Preview</a></li>
+    <li><a href="#coverage">Coverage</a></li>
+  </ul>
+
+  <section id="color">
+    <h2>Color</h2>
+    <p>Daylight is the default desk. The kitchen theme swaps paper for wood and the accent for copper. Buttons stay pine in both. Gold marks the thing to do next. Red yarn is a theory. Gold yarn is the thread you are about to remove.</p>
+    <div class="grid">
+      <div class="swatch"><i style="background:var(--ds-paper)"></i><div><b>Paper</b><code>--ds-paper</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-ink)"></i><div><b>Ink</b><code>--ds-ink</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-pine)"></i><div><b>Pine</b><code>--ds-pine</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-copper)"></i><div><b>Copper</b><code>--ds-copper</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-gold)"></i><div><b>Gold</b><code>--ds-gold</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-alarm)"></i><div><b>Alarm</b><code>--ds-alarm</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-yarn)"></i><div><b>Yarn</b><code>--ds-yarn</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-wood)"></i><div><b>Wood</b><code>--ds-wood</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-env-a)"></i><div><b>Envelope A</b><code>--ds-env-a</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-env-b)"></i><div><b>Envelope B</b><code>--ds-env-b</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-env-c)"></i><div><b>Envelope C</b><code>--ds-env-c</code></div></div>
+      <div class="swatch"><i style="background:var(--ds-note-paper)"></i><div><b>Note paper</b><code>--ds-note-paper</code></div></div>
+    </div>
+  </section>
+
+  <section id="type">
+    <h2>Type</h2>
+    <p>Four faces, all already in the player. Atkinson for interface copy a tired player can read. Archivo Black for the case title. Courier for the folder inventory and the cold open. Caveat for notes the player writes.</p>
+    <div class="row">
+      <div>
+        <p class="ds-kicker">Pine Hollow Case Files · Case 1</p>
+        <p class="ds-display" style="margin:6px 0">The Vanishing of Clara Hale</p>
+        <p style="max-width:46ch">A woman is missing from a small Montana town. Listen, look, and work out what happened.</p>
+        <p class="ds-hand">Seat forward + Marcy 5′2″ → MARCY drove the car</p>
+        <p style="font:14px var(--ds-font-mono)">Case folder · HALE, Clara</p>
+      </div>
+      <div class="note">
+        <p class="live">Live families</p>
+        <p><code>Atkinson</code> UI · <code>ArchivoBlack</code> titles · <code>CourierP</code> inventory · <code>Caveat</code> notes. Tokens: <code>--ds-font-ui</code>, <code>--ds-font-display</code>, <code>--ds-font-mono</code>, <code>--ds-font-hand</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="photo">
+    <h2>Photo treatment</h2>
+    <p>Characters are real photographs: natural, a little rough, desaturated, still recognizable. Props (the folder, prints, the newspaper) look like objects on a desk, with ragged paper and soft shadows. Grade that look into the file. The player does not run a CSS filter over portraits, so a finished file is not filtered twice.</p>
+    <div class="photo-pair">
+      <figure>
+        <div class="ds-photo-frame"><img src="../assets/portraits/clara.jpg" alt="Clara Hale portrait, as stored"></div>
+        <figcaption>As stored. This is what the player shows.</figcaption>
+      </figure>
+      <figure>
+        <div class="ds-photo-frame is-treated"><img src="../assets/portraits/clara.jpg" alt="Clara Hale portrait with the stand-in grade"></div>
+        <figcaption>Stand-in grade: <code>.ds-photo-frame.is-treated</code>. Use it only while a file is still being graded.</figcaption>
+      </figure>
+    </div>
+    <p class="caption">Filter <code>--ds-photo-filter</code> (grayscale .22, saturate .7, contrast 1.05) plus grain at <code>--ds-photo-grain</code>. Crop with <code>object-position: center 16%</code> and a 4px radius, so the print looks cut, not like an app avatar.</p>
+  </section>
+
+  <section id="materials">
+    <h2>Desk, cork, folder</h2>
+    <p>Two desks share one case. Daylight is calm paper. The kitchen table is warm wood, and the lamp comes on with the evening. The cork is a photograph, not a flat brown. The open folder is manila with a spine shadow and two pages: a pale green inventory and a warm right-hand page of evidence.</p>
+    <div class="grid">
+      <div class="swatch"><i style="background:var(--ds-paper)"></i><div><b>Daylight desk</b><code>--ds-paper</code></div></div>
+      <div class="swatch"><i style="background:linear-gradient(var(--ds-wood),var(--ds-wood-side))"></i><div><b>Kitchen wood</b><code>--ds-wood</code></div></div>
+      <div class="swatch"><i style="background:linear-gradient(#b9844e,#8d5a32)"></i><div><b>Cork stand-in</b><code>photo in the player</code></div></div>
+      <div class="swatch"><i style="background:linear-gradient(var(--ds-manila-0),var(--ds-manila-1))"></i><div><b>Manila</b><code>--ds-manila-0</code></div></div>
+    </div>
+  </section>
+
+  <section id="character">
+    <h2>Character card</h2>
+    <div class="pair">
+      <div>
+        <p class="live">Specimen · live classes .talk, .bub</p>
+        <article class="ds-character">
+          <div class="ds-photo-frame"><img src="../assets/portraits/ortiz.jpg" alt="Detective Sam Ortiz"></div>
+          <div class="ds-bub">
+            <div class="who">Det. Sam Ortiz · Montana State Police</div>
+            <p>Start with the folder. Take out what you need.</p>
+          </div>
+        </article>
+      </div>
+      <div class="note">
+        <p>A head-and-shoulders still, tilted a couple of degrees, beside a paper speech bubble. The copper kicker is the speaker. The same crop is reused as a small face on a tape, a pin, and an evidence thumb (<code>.av</code>, <code>.pinface</code>, <code>.vface</code>).</p>
+<pre>&lt;div class="talk"&gt;
+  &lt;img src="assets/portraits/ortiz.jpg" alt="Det. Sam Ortiz"&gt;
+  &lt;div class="bub"&gt;
+    &lt;div class="who"&gt;Det. Sam Ortiz&lt;/div&gt;
+    &lt;div class="t"&gt;Start with the folder.&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="evidence">
+    <h2>Evidence card</h2>
+    <div class="pair">
+      <div class="row">
+        <article class="ds-evidence is-next">
+          <span class="ord">1</span>
+          <div class="th" style="background-image:url(../assets/evidence/newspaper.jpg)"></div>
+          <b>Newspaper: Pine Hollow Courier</b>
+          <em class="why">Suggested next</em>
+        </article>
+        <article class="ds-cardx">
+          <img src="../assets/evidence/dock-daniel.jpg" alt="Daniel at the dock">
+          <strong>DANIEL AT THE DOCK</strong>
+          3:52 PM. Boots in the shot. The time matters.
+        </article>
+      </div>
+      <div class="note">
+        <p class="live">Live classes .it and .cardx</p>
+        <p>Inside the folder, an evidence card is a small paper tile: thumb, name, and where it goes (desk or board). The suggested-next tile gets a warm outline. On the cork, a pinned note is lined paper with a red top rule and a slight tilt. The number is the review order, not a score.</p>
+<pre>&lt;div class="it up"&gt;
+  &lt;span class="ord"&gt;1&lt;/span&gt;
+  &lt;div class="th" style="background-image:url(...)"&gt;&lt;/div&gt;
+  &lt;b&gt;Case briefing (start here)&lt;/b&gt;
+  &lt;em class="why"&gt;Suggested next&lt;/em&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="folder">
+    <h2>Closed folder, then the review order</h2>
+    <p>The folder arrives closed. Opening it shows Ortiz’s suggested order: a nudge, not a lock. The first item still in the folder is marked “Suggested next.” Taken items stay on the left inventory, struck through.</p>
+    <div class="pair">
+      <div>
+        <p class="live">Click the folder. Click the dim desk around it to put it back.</p>
+        <button class="ds-folder-closed" type="button" data-open-folder>
+          <img src="../assets/evidence/folder-closed.webp" alt="Closed case folder, Hale, Clara">
+        </button>
+        <p class="caption">Live prop: <code>assets/evidence/folder-closed.webp</code>. Ragged edges belong in the photograph.</p>
+      </div>
+      <div class="note">
+        <p>Handoff leaves the folder shut and tells the player so. The side card and the whisper both say to open it and start with the briefing. The spread itself is <code>.fold</code>: manila, a spine, <code>.guide</code>, <code>.order</code>, and the tiles.</p>
+<pre>&lt;div class="fold"&gt;
+  &lt;div class="lp"&gt;
+    &lt;h3&gt;Case folder · HALE, Clara&lt;/h3&gt;
+    &lt;p class="guide"&gt;A suggested order. Not a rule.&lt;/p&gt;
+    &lt;ol class="order"&gt;
+      &lt;li class="now"&gt;Read this first&lt;/li&gt;
+      &lt;li&gt;Interviews&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/div&gt;
+  &lt;div class="rp"&gt;&lt;div class="items"&gt;…&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="envelope">
+    <h2>Envelope</h2>
+    <p>Three envelopes sit sealed until the case earns them. They are one physical envelope, recolored. A is the photo as shot. B shifts blue. C shifts green. The player tears along the dashed line, then the inside of A or B opens as a folder with its own review order. C is the wrap-up, not another pile of pins.</p>
+    <div class="ds-env-row">
+      <div class="ds-env"><div class="flap" role="img" aria-label="Envelope A, manila"></div><p>A · after Objective 1</p></div>
+      <div class="ds-env is-b"><div class="flap" role="img" aria-label="Envelope B, blue"></div><p>B · after the breakthrough</p></div>
+      <div class="ds-env is-c"><div class="flap" role="img" aria-label="Envelope C, green"></div><p>C · after the case is solved</p></div>
+    </div>
+    <p class="caption">Live class <code>.envw .e</code>. Filters: <code>--ds-env-b-filter</code>, <code>--ds-env-c-filter</code>.</p>
+  </section>
+
+  <section id="board">
+    <h2>Board pin and thread</h2>
+    <div class="pair">
+      <div>
+        <p class="live">Click the red thread. Then remove it, or click the cork to cancel.</p>
+        <div class="ds-board" id="board-specimen">
+          <svg viewBox="0 0 640 280">
+            <line id="yarn" class="ds-yarn" x1="120" y1="78" x2="360" y2="78" aria-hidden="true"></line>
+            <line id="yarnhit" class="ds-hit" x1="120" y1="78" x2="360" y2="78" role="button" tabindex="0" aria-label="Thread between Clara Hale and Marcy Tolliver. Click to remove it."></line>
+          </svg>
+          <div class="ds-pin" style="left:74px;top:48px">
+            <img src="../assets/portraits/clara.jpg" alt="">
+            <span class="nm x">Clara Hale · MISSING</span>
+          </div>
+          <div class="ds-pin" style="left:314px;top:48px;transform:rotate(2deg)">
+            <img src="../assets/portraits/marcy.jpg" alt="">
+            <span class="nm">Marcy · partner</span>
+          </div>
+        </div>
+        <div class="ds-board-tools">
+          <button class="ds-btn" type="button" id="cut-thread" hidden>✂ Remove thread</button>
+          <button class="ds-btn" type="button" id="retie" hidden>Tie it again</button>
+          <span id="board-tip"></span>
+        </div>
+      </div>
+      <div class="note">
+        <p>A pin is the photo, a red pushpin, and a name plate, rotated a few degrees. Yarn is <code>--ds-yarn</code>, 3.5px, round caps. The selected thread turns gold and thickens. Clicking it again, or clicking empty cork, cancels. Remove thread cuts it.</p>
+        <p>The wide invisible stroke is the hit target. The visible line does not have to catch the click by itself.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="hint">
+    <h2>Next-step hint</h2>
+    <div class="pair">
+      <div class="row">
+        <article class="ds-next">
+          <span class="ds-kicker">Ortiz</span>
+          <h3>Open the case folder</h3>
+          <p>It is closed on the desk. Take the briefing out first.</p>
+          <button class="ds-btn" type="button" data-open-folder>Open the folder</button>
+        </article>
+        <button class="ds-whisper" type="button" data-open-folder>
+          <span class="who">Ortiz</span>
+          <span class="line">The file is closed. Open it and start with the briefing.</span>
+        </button>
+      </div>
+      <div class="note">
+        <p class="live">Live: .card.next and #whisper</p>
+        <p>Two surfaces, one next step. The side card carries the title, a sentence, and a button. The whisper on the desk is the shorter line, and it stays hidden during the intro and the handoff. The Hint button in the top bar repeats the whisper as a toast. Copy comes from <code>nextStep()</code> for the current beat. A new case keeps both surfaces and writes its own lines.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="dismiss">
+    <h2>Overlay and click-outside</h2>
+    <p>Foreground things (the open folder, a photo, a tape, an envelope) sit on a dim, slightly blurred desk. Clicking that dim area puts the thing back. The press has to start and end out there, so a drag that begins on a list, a pin, or a tape control does not dismiss. The back button is its own control. Escape closes too.</p>
+    <button class="ds-btn-fill ds-btn" type="button" data-open-folder>Open the folder on the scrim</button>
+  </section>
+
+  <section id="album">
+    <h2>Album-cover opener</h2>
+    <p>The case opens like a record sleeve. The photograph is <code>CASE.cover</code>, a path or URL, painted by <code>paintCaseCover()</code>. It is not a path baked into the CSS. The picture is a little soft and covered by a dark scrim so the title stays readable.</p>
+    <div class="ds-album">
+      <div class="bg" style="background-image:url(../assets/covers/clara-hale.jpg)"></div>
+      <div class="veil" aria-hidden="true"></div>
+      <div class="copy">
+        <div class="ds-kicker" style="color:var(--ds-gold)">Pine Hollow Case Files · Case 1</div>
+        <h2>The Vanishing of<br>Clara Hale</h2>
+        <p class="lead">A woman is missing from a small Montana town. Listen to the interviews, look at the evidence, and work out what happened to Clara.</p>
+        <button class="ds-btn ds-btn-gold" type="button" id="album-begin">▶ Begin</button>
+      </div>
+    </div>
+<pre>&lt;!-- CASE.cover = "assets/covers/their-case.jpg" --&gt;
+&lt;div id="scene" class="album"&gt;
+  &lt;div class="album-bg"&gt;&lt;/div&gt;
+  &lt;div class="album-scrim"&gt;&lt;/div&gt;
+  &lt;div class="sc"&gt;
+    &lt;div class="kick"&gt;…&lt;/div&gt;
+    &lt;h1&gt;…&lt;/h1&gt;
+    &lt;p class="lead"&gt;…&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <section id="ambience">
+    <h2>Desk ambience</h2>
+    <p>The desk follows the player’s real clock. It changes the light, the mug, and what is sitting there to eat. It never gates the case, and it is not saved as progress. The prototype panel can preview a band without writing it.</p>
+    <div class="ds-amb-grid">
+      <div class="ds-amb"><b>Morning · 5–11</b><span>Coffee and a cherry danish.</span></div>
+      <div class="ds-amb"><b>Daytime · 11–5</b><span>Same tray. The lamp stays off.</span></div>
+      <div class="ds-amb is-evening"><b>Evening · 5–9</b><span>Chinese takeout. The lamp comes on.</span></div>
+      <div class="ds-amb is-night"><b>Night · 9–5</b><span>Takeout still. Lamp on.</span></div>
+    </div>
+    <p style="margin-top:14px"><span class="ds-day"><span>🌤</span> Case 25-0412 · Open <small>Morning · 9:12 AM</small></span></p>
+  </section>
+
+  <section id="volume">
+    <h2>Volume</h2>
+    <p>One level for interview tapes, the voicemail, and Ortiz. The slim control sits in the top bar. The same control sits in the tape player. Mute and the slider stay in sync. In the game this is remembered on this device (<code>localStorage</code> key <code>jp-vol</code>). This page does not write that key.</p>
+    <div class="row">
+      <div class="ds-voltop" title="Volume for interviews, voicemail, and voices">
+        <button class="ds-mute" type="button" data-guide-mute aria-label="Mute"></button>
+        <input type="range" data-guide-vol min="0" max="100" step="1" value="100" aria-label="Volume">
+        <span data-vol-readout>100%</span>
+      </div>
+      <div style="flex:1;min-width:240px">
+        <div class="ds-volrow">
+          <span class="ds-vollab">Volume</span>
+          <button class="ds-mute" type="button" data-guide-mute aria-label="Mute"></button>
+          <input type="range" data-guide-vol min="0" max="100" step="1" value="100" aria-label="Volume">
+        </div>
+        <p class="caption">Live hooks: <code>[data-vol]</code> and <code>[data-volmute]</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="case">
+    <h2>Plugging in a second case</h2>
+    <p>The opener the player reads today is a small object: <code>title</code>, <code>kick</code>, <code>lead</code>, <code>cover</code>. Everything else sits beside it. Author the next file in the shape in <code>case.contract.js</code>, then map it onto those tables. The full field list and the copy-this checklist are in the <a href="../../DESIGN_SYSTEM.md">reuse guide</a>.</p>
+    <table>
+      <thead><tr><th>Put the file here</th><th>Point the case at it</th></tr></thead>
+      <tbody>
+        <tr><td><code>assets/covers/&lt;case&gt;.jpg</code></td><td><code>CASE.cover</code></td></tr>
+        <tr><td><code>assets/portraits/&lt;id&gt;.jpg</code></td><td><code>portraits</code> in the contract, <code>A.p_*</code> in the player</td></tr>
+        <tr><td><code>assets/evidence/…</code></td><td>thumbs and props, including the closed folder</td></tr>
+        <tr><td><code>assets/audio/…</code></td><td>tapes and Ortiz. The player’s <code>AU</code> map.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="preview">
+    <h2>Preview timeline</h2>
+    <div class="callout">
+      <b>Developer preview</b>
+      <code>?preview=1</code> fixes a scrubber to the bottom of the journey so someone can walk the beats. It does not read or write a real playthrough. Leave it out of a new case file, and leave it out of the player patterns above. It stays in <code>journey/index.html</code> as its own tool.
+    </div>
+  </section>
+
+  <section id="coverage">
+    <h2>What this pass covers</h2>
+    <table>
+      <thead><tr><th>In the system</th><th>Still one-off in the player</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Tokens for color, type, space, elevation, materials, and the photo spec. The player’s existing color variables read those tokens.</td>
+          <td>Component CSS still lives in <code>index.html</code>. This folder mirrors it. It does not replace it.</td>
+        </tr>
+        <tr>
+          <td>Specimens for the character card, evidence card, closed and open folder, envelope, pin and thread, next-step hint, scrim, album opener, ambience, and volume.</td>
+          <td>Tape-player chrome, the report, the reveal, the drawer, the stamp, and the rank card.</td>
+        </tr>
+        <tr>
+          <td>The case-file shape: title, kick, lead, cover, portraits, evidence, envelopes, review order, beats.</td>
+          <td>Hotspot maps, pin coordinates, and the embedded desk and cork photos. Hint sentences inside <code>nextStep()</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+    <footer>Style guide for the journey prototype. Patterns are named so a second case can follow them. Image files in <code>assets/</code> were not regenerated here.</footer>
+  </section>
+</main>
+
+<div id="scrim" class="ds-scrim" hidden>
+  <div class="back"><button class="ds-back" type="button">← Put it back on the desk</button></div>
+  <div class="sheet" role="dialog" aria-label="Case folder">
+    <div class="ds-fold">
+      <div class="lp">
+        <h3>Case folder · HALE, Clara</h3>
+        <p class="ds-guide">A suggested order from Ortiz. Not a rule. Interviews first, then the photos, then places and papers.</p>
+        <ol class="ds-order">
+          <li class="now">Read this first</li>
+          <li>Interviews</li>
+          <li>Photos</li>
+          <li>Places and papers</li>
+        </ol>
+        <ul class="ds-inv">
+          <li class="now"><span class="n">1</span> Case briefing (start here)</li>
+          <li><span class="n">2</span> Recording: Clara's voicemail</li>
+          <li><span class="n">3</span> Tape: Daniel Hale interview</li>
+        </ul>
+      </div>
+      <div class="rp">
+        <div class="ds-items">
+          <article class="ds-evidence is-next">
+            <span class="ord">1</span>
+            <div class="th" style="background-image:url(../assets/portraits/ortiz.jpg)"></div>
+            <b>Case briefing (start here)</b>
+            <em class="why">Suggested next</em>
+          </article>
+          <article class="ds-evidence">
+            <span class="ord">2</span>
+            <div class="th" style="background-image:url(../assets/portraits/clara.jpg)"></div>
+            <b>Recording: Clara's voicemail, 9:12 PM</b>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast" hidden role="status"></div>
+<script src="guide.js"></script>
+</body>
+</html>

@@ -1,6 +1,9 @@
 # Clara Hale: full-journey clickthrough prototype
 Open `index.html` in a browser. Keep the `assets/` folder next to it: all voices are ElevenLabs MP3s in `assets/audio/`. Works offline.
 
+## Design system
+Tokens, pattern specimens, and the case-file contract live in [`design-system/`](design-system/). Open `design-system/index.html` for the style guide. The reuse guide is [`../DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md). The player links `design-system/tokens.css` for color and keeps the same hexes as fallbacks. Pattern classes in the guide mirror the live rules. They are not a second copy of the game. `?preview=1` (below) is a developer scrubber, not one of those patterns.
+
 ## Preview timeline (developers only)
 Not a player feature. Open `index.html?preview=1`. A **Preview only** bar fixes to the bottom. Drag the playhead, click a stage, or use ‹ › (and the left and right arrow keys) to walk the journey: intro, cold open, desk pick, how it works, handoff, the closed case folder, the opened folder with a suggested review order, case folder (mid-investigation), Envelope A, the realization, Envelope B, a wrong accusation, a right accusation, Envelope C, file away, and the filed record. Each stop is a mid-journey snapshot, so the desk, board, or scene looks like someone is already there.
 

@@ -1,0 +1,131 @@
+/* Clara Hale journey — design tokens.
+   Source of truth for color, type, space, elevation, and material.
+   journey/index.html maps its variables onto these and keeps the same
+   hex as a fallback, so a missing stylesheet does not change the game.
+
+   Photo treatment is a spec. The player shows portrait and prop files
+   as stored. Grade those files. Use .ds-photo only as a stand-in while
+   a file is still being graded (that work is in flight on another branch).
+*/
+
+:root {
+  /* Ink and paper — daylight desk */
+  --ds-ink: #1D1B18;
+  --ds-ink-soft: #4A443C;
+  --ds-dim: #6B645B;
+  --ds-muted: #7A7268;
+  --ds-paper: #ECE7DF;
+  --ds-card: #fff;
+  --ds-side: #F7F4EF;
+  --ds-bar: rgba(255,255,255,.92);
+  --ds-sheet: #FBFAF4;
+
+  /* Pine (actions), copper (Ortiz), gold (the next thing), alarm, yarn */
+  --ds-pine: #1F5E4E;
+  --ds-copper: #B4562E;
+  --ds-gold: #F2C14E;
+  --ds-alarm: #C8281E;
+  --ds-alarm-deep: #B3261E;
+  --ds-yarn: #B3141B;
+  --ds-yarn-hot: #FF2A1F;
+  --ds-yarn-glow: #FF6A5A;
+
+  /* Envelopes. A is the manila photo. B and C are hue shifts of that photo. */
+  --ds-env-a: #B83A2E;
+  --ds-env-b: #2E5C9A;
+  --ds-env-c: #2F7A4A;
+  --ds-env-b-filter: hue-rotate(195deg) saturate(.9);
+  --ds-env-c-filter: hue-rotate(110deg);
+
+  /* Notes and the open folder */
+  --ds-note-paper: #FFF6B8;
+  --ds-note-rule: #C9D7EE;
+  --ds-note-ink: #2B3A67;
+  --ds-note-ink-strong: #0D1B4A;
+  --ds-manila-0: #F4E6CF;
+  --ds-manila-1: #E4CCAA;
+  --ds-manila-now: #8A3B12;
+  --ds-folder-left: #E5F2EF;
+  --ds-folder-right: #FBFAF6;
+  --ds-guide: #F4E4C4;
+  --ds-spine: rgba(80,52,24,.22);
+
+  /* Scene, album opener, scrim */
+  --ds-scene: #0E0D0C;
+  --ds-scene-ink: #F3EEE6;
+  --ds-album: #0B1018;
+  --ds-scrim: rgba(15,12,10,.62);
+  --ds-scrim-blur: 5px;
+
+  /* Kitchen-table desk. Applied by body.th-d in the player. */
+  --ds-wood: #3E2C1F;
+  --ds-wood-side: #4A3424;
+  --ds-wood-card: #FFF9F0;
+  --ds-wood-ink: #2A221B;
+  --ds-wood-dim: #7A6A5A;
+  --ds-wood-bar: rgba(255,250,242,.94);
+
+  /* Type. Files live in fonts/ for the style guide.
+     The player embeds the same faces and calls them by these family names. */
+  --ds-font-ui: Atkinson, "Atkinson Hyperlegible", Arial, sans-serif;
+  --ds-font-display: ArchivoBlack, "Arial Black", Impact, sans-serif;
+  --ds-font-hand: Caveat, "Segoe Script", cursive;
+  --ds-font-mono: CourierP, "Courier New", ui-monospace, monospace;
+
+  --ds-fs-kicker: 12px;
+  --ds-fs-whisper: 15px;
+  --ds-fs-body: 15px;
+  --ds-fs-ui: 16px;
+  --ds-fs-title: 20px;
+  --ds-fs-display: 44px;
+  --ds-fs-hand: 22px;
+  --ds-lh-body: 1.45;
+  --ds-track-kicker: .08em;
+  --ds-track-whisper: .16em;
+
+  /* Space. The desk stage is a fixed 1280×800 fit into the window. */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 22px;
+  --ds-space-6: 28px;
+  --ds-rail: 64px;
+  --ds-side-w: 340px;
+  --ds-desk-w: 1280px;
+  --ds-desk-h: 800px;
+
+  --ds-radius-sheet: 4px;
+  --ds-radius-control: 10px;
+  --ds-radius-btn: 12px;
+  --ds-radius-card: 14px;
+  --ds-radius-pill: 999px;
+
+  /* Elevation */
+  --ds-elev-1: 0 2px 8px rgba(0,0,0,.1);
+  --ds-elev-card: 0 8px 24px rgba(0,0,0,.12);
+  --ds-elev-prop: 0 6px 14px rgba(0,0,0,.35);
+  --ds-elev-pop: 0 20px 50px rgba(0,0,0,.35);
+  --ds-elev-overlay: 0 30px 60px rgba(0,0,0,.4);
+  --ds-elev-folder: 0 28px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(90,60,30,.16);
+
+  /* Portrait and prop treatment.
+     Rough, natural, desaturated real photos. Color stays recognizable.
+     Grain sits on top at low opacity. object-position keeps eyes in frame
+     when a tall crop cuts a head-and-shoulders still. */
+  --ds-photo-filter: grayscale(.22) saturate(.7) contrast(1.05);
+  --ds-photo-grain: .16;
+  --ds-prop-filter: saturate(.88) contrast(1.04);
+  --ds-portrait-position: center 16%;
+  --ds-portrait-radius: 4px;
+
+  /* Stack. Documented so new overlays land in the same band.
+     The player still writes the numbers directly. */
+  --ds-z-top: 50;
+  --ds-z-overlay: 60;
+  --ds-z-back: 70;
+  --ds-z-pop: 80;
+  --ds-z-scene: 90;
+  --ds-z-toast: 99;
+  --ds-z-preview: 140;
+}
