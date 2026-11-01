@@ -83,7 +83,8 @@
   --ds-track-kicker: .08em;
   --ds-track-whisper: .16em;
 
-  /* Space. The desk stage is a fixed 1280×800 fit into the window. */
+  /* Space. The desk stage is a fixed 1280×800 surface.
+     Wide windows fit the whole surface. Narrow windows show a closer slice and pan. */
   --ds-space-1: 4px;
   --ds-space-2: 8px;
   --ds-space-3: 12px;

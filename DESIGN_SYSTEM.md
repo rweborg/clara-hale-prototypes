@@ -51,7 +51,7 @@ A newline in `CASE.title` is a real line break on the album cover. Clara’s tit
 
 Two kinds of card, on purpose.
 
-**Chrome cards** hold the interface: the next-step card, progress, notes. White (or `--ds-wood-card` on the kitchen desk), 14px radius, padding 16px, shadow `--ds-elev-card`. The side column is 340px (`--ds-side-w`) on a paper or wood ground.
+**Chrome cards** hold the interface: the next-step card, progress, notes. White (or `--ds-wood-card` on the kitchen desk), 14px radius, padding 16px, shadow `--ds-elev-card`. The side column is 340px (`--ds-side-w`) on a paper or wood ground. On a narrow window it becomes the bottom sheet in [Phones and tablets](#phones-and-tablets).
 
 **Evidence cards** are paper. Inside the folder (`.it`) they are small tiles: 10px radius, a 74px thumb, the name, and desk / board buttons. The suggested-next tile (`.it.up`) gets a warm outline (`#C4A15A`) and a cream fill. On the cork (`.cardx`) a note is lined paper, a red rule on top, Caveat handwriting, tilted.
 
@@ -75,7 +75,7 @@ A pin (`.pin`) is the print, a red pushpin (radial highlight, `--ds-alarm` body)
 
 Yarn (`#strings .yarn`) is `--ds-yarn` (`#B3141B`), 3.5px, round caps, a short drop shadow. The breakthrough thread goes hot (`--ds-yarn-hot`, thicker, drawn on). The thread under the pointer, or the one you have selected, turns gold and thickens (`--ds-gold`).
 
-The clickable part is a wide transparent stroke (`#stringhits`, about 44px in the player). The visible line does not have to catch the click by itself.
+The clickable part is a wide transparent stroke (`#stringhits`, about 44px in the player). The visible line does not have to catch the click by itself. On a small screen that stroke grows so the finger still has about 48px to hit.
 
 ### Desk materials and ambience
 
@@ -130,7 +130,7 @@ On the board:
 2. Click the same thread again, or click empty cork, to cancel.
 3. **Remove thread** cuts it (`cutThread()`), with a short toast: “Thread removed.”
 
-While nothing is selected and at least one thread is up, the tip is “Click a red thread to remove it.” Connecting two pins tells the player they can remove that thread the same way.
+While nothing is selected and at least one thread is up, the tip is “Click a red thread to remove it.” Connecting two pins tells the player they can remove that thread the same way. Under 900px wide, or with a coarse pointer, those lines say Tap. The gesture is the same.
 
 ### Album-cover case opener
 
@@ -168,6 +168,35 @@ Two surfaces, one next step, both filled from `nextStep()` for the current beat.
 Examples once the folder has landed: title “Open the case folder”, whisper “The file is closed. Open it and start with the briefing.”
 
 Hint sentences are still written inside `nextStep()`, not stored on `CASE`. Keep the two surfaces. Write new lines for the new beats.
+
+## Phones and tablets
+
+The case plays on the same 1280×800 desk and cork. A wide window still fits that whole surface. A phone does not shrink it until the pins and the folder label disappear. It shows a closer slice, and the player drags to look around.
+
+### What changes with the window
+
+| Window | Layout |
+| --- | --- |
+| Wide (the fit scale is at least 0.7) | Side column, 340px. The whole desk fits. No pan control. |
+| Narrow, and tall enough (under 900px wide, over 500px tall) | Bottom sheet. Collapsed, it keeps Ortiz’s next step and the button that does it. **Notes and progress** opens the day line, the objectives, and the notes. |
+| Short (under 500px tall, such as a phone on its side) | The sheet is hidden so the desk can use the height. **Case** in the top bar opens it. A tap on the desk puts it away. **Hint** comes back, because the next card is not on screen. |
+
+**Whole desk** / **Whole board** frames the entire surface. **Look closer** returns to the slice (the folder on the desk, the middle of the cork). A pinch does the same zoom. Dragging only pans while the surface is bigger than the stage. A drag that starts on a pin, a thread, or a tape control does not pan, and a drag that starts on a desk object does not also open it.
+
+The top bar drops the case title and the beat rail. Desk, Board, volume, and Prototype stay. Under 560px the words hide and the icons remain, each at least 44px. The beat rail is still in ⚙ Prototype.
+
+### Reading and touching
+
+- Open folder stacks its two pages under 680px. The list is the top page; the cards scroll underneath. Under 480px the cards are one column, with a taller thumb.
+- Evidence, the tape player, the newspaper, and the report go to one column. Body type stays at least 15px. The album title uses `clamp(30px, 8vw, 40px)`.
+- Desk tags scale up so they stay near 13px on the close-up. Name plates on the cork do the same when the slice is below 0.8.
+- Ambience tags (the mug, the lamp) show without a hover. Nothing the case needs is hover-only.
+- Thread hits stay about 48px under the finger. **Remove thread** is a real button.
+- An envelope still tears by a drag. **Or tap here to tear it in one go** is the finger path.
+- Click-outside still needs the press to start and end on the dim desk, not on a scrollbar. The back button (“Put it back on the desk”) is the easy target, with scrim padding around the item.
+- Volume is the same control: a 44px mute button and a slider in the top bar, and the row inside the tape player. `jp-vol` and `jp-save-v2` are unchanged.
+
+The `?preview=1` scrubber is still a developer tool. On a narrow window it sits under the sheet, a little shorter. It is not part of the case.
 
 ## Preview timeline
 
