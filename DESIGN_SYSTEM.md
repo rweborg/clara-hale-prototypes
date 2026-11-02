@@ -53,7 +53,7 @@ Two kinds of card, on purpose.
 
 **Chrome cards** hold the interface: the next-step card, progress, notes. White (or `--ds-wood-card` on the kitchen desk), 14px radius, padding 16px, shadow `--ds-elev-card`. The side column is 340px (`--ds-side-w`) on a paper or wood ground. On a narrow window it becomes the bottom sheet in [Phones and tablets](#phones-and-tablets).
 
-**Evidence cards** are paper. Inside the folder (`.it`) they are small tiles: 10px radius, a 74px thumb, the name, and desk / board buttons. A person thumb (`.th.face`) is positioned at `center 12%`, not the vertical middle, so a short wide tile keeps the eyes and forehead instead of the chin. Taller frames (a tape face, a pin, the talk portrait) still use `--ds-portrait-position` (`center 16%`). A scene thumb stays centered. The background shorthand on `.it .th` must not reset that position to `center`. The suggested-next tile (`.it.up`) gets a warm outline (`#C4A15A`) and a cream fill. On the cork (`.cardx`) a note is lined paper, a red rule on top, Caveat handwriting, tilted.
+**Evidence cards** are paper. Inside the folder (`.it`) they are small tiles: 10px radius, a 74px thumb, the name, and desk / board buttons. A person thumb (`.th.face`) is positioned at `center 12%`, not the vertical middle, so a short wide tile keeps the eyes and forehead instead of the chin. Taller frames (a tape face, a pin, the talk portrait) still use `--ds-portrait-position` (`center 16%`). A document or prop thumb (`.th.doc`: the briefing, the newspaper, an index card, the police report, the map, the ledger, a sticky) is `center top`, so the tile shows the masthead or the heading instead of the middle of the page. The background shorthand on `.it .th` must not reset either position to `center`. The suggested-next tile (`.it.up`) gets a warm outline (`#C4A15A`) and a cream fill. On the cork (`.cardx`) a note is lined paper, a red rule on top, Caveat handwriting, tilted.
 
 The number on a tile is its place in the review order, not a score.
 
@@ -109,6 +109,16 @@ Foreground items (open folder, a photograph, a tape, an envelope, the report) si
 - The pointer-down and the click both have to land outside the item. A drag that starts on a list, a pin, or a tape control does not dismiss.
 - The scrollbar of a scrolling panel is not “outside.”
 - The style guide demos this on the folder specimen. Live function: `ov()` in `journey/index.html`.
+- A look opened from a folder card (`#peek`) sits above that scrim. Escape closes the look first, then the folder. See [Look before you take it out](#look-before-you-take-it-out).
+
+### Look before you take it out
+
+Tapping a card in the open folder — anywhere except **Put on desk** / **Pin to board** — opens a preview over the folder (`#peek`). The page, photo, or note is there to read. The same two decisions sit on the preview and on the card.
+
+- **Back to the folder**, a tap on the dim margin, or Escape closes the preview and leaves the item in the folder.
+- Looking does not pull the item, does not mark a page viewed, and does not play a tape. The desk viewer (`viewImg`) is still what marks the briefing, the newspaper, and the ledger as read.
+- A tape preview shows the person and says to put it on the desk to play it. The transcript stays on the recorder.
+- The preview uses the larger print when the case has one (`news_big`, `ledger_big`, `report_big`). The image is the whole sheet, scrolled from the top, so the masthead is what you see first. A document thumb uses the same top edge (`.th.doc`).
 
 ### Volume
 
@@ -188,6 +198,7 @@ The top bar drops the case title and the beat rail. Desk, Board, volume, and Pro
 ### Reading and touching
 
 - Open folder stacks its two pages under 680px. The list is the top page; the cards scroll underneath. Under 480px the cards are one column, with a taller thumb.
+- Tapping a folder card opens the in-folder preview. **Put on desk** and **Pin to board** stay on the card and on the preview, each at least 44px. **Back to the folder** closes the preview without taking the item out.
 - Evidence, the tape player, the newspaper, and the report go to one column. Body type stays at least 15px. The album title uses `clamp(30px, 8vw, 40px)`.
 - Desk tags scale up so they stay near 13px on the close-up. Name plates on the cork do the same when the slice is below 0.8.
 - Ambience tags (the mug, the lamp) show without a hover. Nothing the case needs is hover-only.

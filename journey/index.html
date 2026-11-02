@@ -100,8 +100,9 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 .fold .lp li{list-style:none;font:13.5px CourierP,monospace;padding:3px 0;border-bottom:1px dashed rgba(0,0,0,.15);display:flex;gap:6px}
 .fold .lp li.out{opacity:.5;text-decoration:line-through}.fold .lp li.out:before{content:'✓';color:var(--ds-pine,#1F5E4E);font-weight:700}.fold .guide{font:14.5px/1.4 Atkinson;color:#3A3028;background:var(--ds-guide,#F4E4C4);border-radius:8px;padding:8px 10px;margin:0 0 8px}.fold .order{margin:0 0 8px 18px;padding:0;font:13.5px/1.45 Atkinson;color:#3A3028}.fold .order li{display:list-item;list-style:decimal;border:none;padding:1px 0;font:13.5px/1.45 Atkinson}.fold .order .now{font-weight:700;color:#8A3B12}.fold .order .done{opacity:.5;text-decoration:line-through}.fold .inv .n{display:inline-grid;place-items:center;min-width:16px;height:16px;border-radius:50%;background:var(--ds-ink,#1D1B18);color:#fff;font:700 10px Atkinson;margin-right:2px;flex:none}.fold .inv li.now{font-weight:700}.grp{grid-column:1/-1;font:700 11px Atkinson;letter-spacing:.08em;text-transform:uppercase;color:#7A6248;margin-top:2px}.it{position:relative}.it .ord{position:absolute;z-index:1;left:12px;top:12px;width:22px;height:22px;border-radius:50%;background:var(--ds-ink,#1D1B18);color:#fff;font:700 12px Atkinson;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.35)}.it.up{outline:2px solid #C4A15A;background:#FFF8EA}.it .why{font:12.5px Atkinson;color:#8A5A2A}.th{position:relative;background-position:center 18%}.th .inset{position:absolute;right:4px;bottom:4px;width:36px;height:44px;object-fit:cover;object-position:var(--ds-portrait-position,center 16%);border:2px solid #fff;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.35)}.vface{width:100%;height:156px;object-fit:cover;object-position:var(--ds-portrait-position,center 16%);border-radius:8px;margin-bottom:10px;display:block}.cardx .snap{width:100%;height:86px;object-fit:cover;object-position:center 28%;border-radius:2px;margin:0 0 6px;display:block}.pin .pinface{position:absolute;right:-8px;top:6px;width:48px;height:60px;object-fit:cover;object-position:var(--ds-portrait-position,center 16%);border:2px solid #fff;border-radius:2px;box-shadow:0 3px 8px rgba(0,0,0,.4);z-index:3}.recs button{display:flex;align-items:center;gap:8px}.av{width:32px;height:40px;object-fit:cover;object-position:var(--ds-portrait-position,center 16%);border-radius:3px;flex:none}.whohead{display:flex;gap:12px;align-items:center;margin-bottom:4px}.avbig{width:68px;height:86px;object-fit:cover;object-position:var(--ds-portrait-position,center 16%);border-radius:4px;flex:none}.whohead .s{margin:2px 0 0}#whisper{position:absolute;right:18px;bottom:18px;z-index:8;max-width:270px;text-align:left;cursor:pointer;background:rgba(251,248,242,.95);color:var(--ds-ink,#1D1B18);border:none;border-left:3px solid var(--ds-copper,#B4562E);border-radius:12px;padding:8px 12px 10px;box-shadow:0 10px 24px rgba(40,24,8,.18);animation:fadein .4s}#whisper .who{display:block;font:700 10px Atkinson;letter-spacing:.16em;text-transform:uppercase;color:var(--ds-copper,#B4562E)}#whisper .line{display:block;font:15px/1.35 Atkinson;margin-top:2px}#whisper:hover{filter:brightness(1.04)}.next .btn{min-height:42px;background:transparent;color:var(--ds-pine,#1F5E4E);border:1.5px solid var(--ds-pine,#1F5E4E)}.next .btn:hover{background:var(--ds-pine,#1F5E4E);color:#fff;filter:none}
 .items{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.it{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:8px;display:flex;flex-direction:column;gap:6px;animation:lift .3s both}
-.it .th{height:74px;border-radius:6px;background-color:#EEE;background-repeat:no-repeat;background-size:cover;background-position:center;display:grid;place-items:center;font-size:34px}.it .th.face{background-position:center 12%}
+.it{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:8px;display:flex;flex-direction:column;gap:6px;animation:lift .3s both;cursor:pointer}
+.it .th{height:74px;border-radius:6px;background-color:#EEE;background-repeat:no-repeat;background-size:cover;background-position:center;display:grid;place-items:center;font-size:34px}.it .th.face{background-position:center 12%}.it .th.doc{background-position:center top}
+.it .bt{cursor:default}
 .it b{font:700 13.5px Atkinson;line-height:1.2}.it .bt{display:flex;gap:6px;margin-top:auto}
 .it .bt button{flex:1;min-height:38px;border:none;border-radius:8px;font:700 12.5px Atkinson;background:var(--ds-pine,#1F5E4E);color:#fff}
 .it .bt button.alt{background:#EDE6DA;color:var(--ds-ink,#1D1B18)}
@@ -109,6 +110,27 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 .allout{grid-column:1/-1;text-align:center;font:700 15px Atkinson;color:#4A443C;padding:20px}
 .viewer{display:flex;gap:20px;align-items:flex-start;justify-content:center;pointer-events:none}.viewer > *{pointer-events:auto}.viewer img{max-height:calc(100vh - 140px);max-width:62vw;border-radius:4px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
 .viewer .panel{max-width:320px}
+/* In-folder look. Sits over #ov so closing it returns to the open folder. */
+#peek{position:fixed;z-index:80;left:0;right:0;bottom:0;top:var(--bar-h);background:rgba(15,12,10,.72);display:flex;justify-content:center;align-items:stretch;padding:10px 12px 12px}
+#peek[hidden]{display:none !important}
+#peek .peekbox{width:min(720px,100%);max-height:100%;margin:0 auto;display:flex;flex-direction:column;background:#FBFAF6;border-radius:12px;overflow:hidden;box-shadow:0 28px 60px rgba(0,0,0,.45)}
+#peek .peekbar{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-bottom:1px solid rgba(0,0,0,.08);flex:none}
+#peek .peekbar h2{margin:0;flex:1;font:700 16px/1.25 Atkinson;min-width:0}
+#peek .peekbar .btn2{flex:none;min-height:44px}
+#peek .peekscroll{flex:1;min-height:120px;overflow:auto;-webkit-overflow-scrolling:touch;background:#E7E0D4;display:flex;justify-content:center;align-items:flex-start}
+#peek .shot{max-width:100%;width:auto;height:auto;display:block;object-fit:contain;object-position:center top}
+#peek .shot.doc{width:100%}
+#peek .shot.face{width:min(320px,86%);margin:12px auto;object-position:var(--ds-portrait-position,center 16%)}
+#peek .peekcard{margin:16px;background:#FBFAF4;padding:16px 18px 20px;border-top:4px solid var(--ds-alarm,#C8281E);background-image:repeating-linear-gradient(#FBFAF4 0 28px,#BFD0EA 28px 29px);color:#1D2A55;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+#peek .peekcard b{display:block;font:700 15px Atkinson;letter-spacing:.04em;margin-bottom:8px}
+#peek .peekcard p{font:26px/1.3 Caveat,cursive;margin:0}
+#peek .peekemoji{font-size:72px;text-align:center;padding:36px 16px;width:100%;background:#FBFAF6}
+#peek .peekfoot{flex:none;padding:10px 12px 12px;background:#fff;border-top:1px solid rgba(0,0,0,.08)}
+#peek .peekfoot .sub,#peek .peekfoot .cap{font:15px/1.4 Atkinson;color:#4A443C;margin:0 0 8px}
+#peek .peekfoot .cap b{font-weight:700}
+#peek .peekfoot .bt{display:flex;gap:8px;flex-wrap:wrap}
+#peek .peekfoot .bt button{flex:1;min-width:140px;min-height:44px;border:none;border-radius:8px;font:700 14px Atkinson;background:var(--ds-pine,#1F5E4E);color:#fff}
+#peek .peekfoot .bt button.alt{background:#EDE6DA;color:var(--ds-ink,#1D1B18)}
 /* player */
 .player{width:min(820px,100%);margin:0 auto;border-radius:28px;padding:22px;color:#fff;display:grid;grid-template-columns:300px 1fr;gap:20px}
 .player.ph{background:#121316;border:10px solid #2B2D31;box-shadow:0 30px 60px rgba(0,0,0,.6)}
@@ -232,7 +254,7 @@ body.preview{--pvh:78px}body.preview .fold{height:min(620px,calc(100vh - 250px))
 .pv-btns button:focus-visible,.pv-tick:focus-visible{outline:2px solid var(--ds-pine,#1F5E4E);outline-offset:2px}
 body.preview #stage{bottom:var(--pvh,78px)}
 body.preview #side{bottom:var(--pvh,78px)}
-body.preview #ov{bottom:var(--pvh,78px)}
+body.preview #ov,body.preview #peek{bottom:var(--pvh,78px)}
 body.preview #scene{bottom:var(--pvh,78px)}
 body.preview #toast{bottom:calc(var(--pvh, 78px) + 18px)}
 body.preview .aha-card{bottom:calc(6% + var(--pvh, 78px))}
@@ -265,6 +287,7 @@ html.can-pan #desk,html.can-pan #board{cursor:grab}
   #dz{top:calc(var(--bar-h) + env(safe-area-inset-top) + 8px);right:8px;width:min(420px,calc(100vw - 16px));max-height:calc(100dvh - var(--bar-h) - 24px);overflow:auto}
   #dz .row button{min-height:44px}
   #ov{top:calc(var(--bar-h) + env(safe-area-inset-top));padding:76px 12px calc(18px + env(safe-area-inset-bottom));align-items:flex-start;overflow:auto;-webkit-overflow-scrolling:touch}
+  #peek{top:calc(var(--bar-h) + env(safe-area-inset-top));padding:10px 12px calc(12px + env(safe-area-inset-bottom))}
   .back{left:8px;top:calc(var(--bar-h) + env(safe-area-inset-top) + 8px)}
   .back .btn2{min-height:44px;max-width:calc(100vw - 24px)}
   #toast{left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);bottom:calc(var(--dock,0px) + 12px + env(safe-area-inset-bottom))}
@@ -345,6 +368,9 @@ html.can-pan #desk,html.can-pan #board{cursor:grab}
   .items{grid-template-columns:1fr}
   .it .th{height:104px}
   .it .bt{flex-direction:column}
+  #peek .peekbar{flex-direction:column;align-items:stretch}
+  #peek .peekbar .btn2{width:100%}
+  #peek .peekfoot .bt{flex-direction:column}
 }
 @media (max-width:560px){
   .top .lbl{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -386,6 +412,7 @@ html.can-pan #desk,html.can-pan #board{cursor:grab}
   </div>
 </aside>
 <div id="ov" hidden></div>
+<div id="peek" hidden></div>
 <div id="scene" hidden></div>
 <div id="toast" hidden></div>
 
@@ -757,8 +784,8 @@ function deskClick(n) { SFX.click();
     S.bites++; SFX.bite(); toast(['🥡 Lo mein from the Golden Dragon on Main.', '🥡 Still warm.', '🥡 Chopsticks in one hand, case notes in the other.', '🥡 Last bite. There\'s a fortune cookie in the bag.'][S.bites - 1]); return render(); }
   if (n === 'lamp') { S.lampOff = !S.lampOff; SFX.click(); return render(); } }
 // ---------------- overlays ----------------
-function ov(html, onclose) { const o = $('#ov'); o.innerHTML = `<div class="back"><button class="btn2" id="ovx">← Put it back on the desk</button></div><div class="box">${html}</div>`; o.hidden = false;
-  const close = () => { o.hidden = true; o.innerHTML = ''; o.onpointerdown = o.onclick = null; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close;
+function ov(html, onclose) { closePeek(); const o = $('#ov'); o.innerHTML = `<div class="back"><button class="btn2" id="ovx">← Put it back on the desk</button></div><div class="box">${html}</div>`; o.hidden = false;
+  const close = () => { closePeek(); o.hidden = true; o.innerHTML = ''; o.onpointerdown = o.onclick = null; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close;
   // Click the dimmed desk around the item to put it back. The press has to start and end out there,
   // so a drag that begins on a list, pin, or tape control does not dismiss, and neither does the button.
   const outside = e => { const t = e.target; if (!t || !t.closest || t.closest('.back')) return false; const box = o.querySelector('.box'); if (!box) return t === o;
@@ -769,10 +796,29 @@ function ov(html, onclose) { const o = $('#ov'); o.innerHTML = `<div class="back
     return !(onY || onX); };
   let arm = false; o.onpointerdown = e => { arm = outside(e); }; o.onclick = e => { const go = arm && outside(e); arm = false; if (go) close(); }; return o; }
 const closeOv = () => $('#ov')._close && !$('#ov').hidden && $('#ov')._close();
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOv(); });
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if ($('#peek') && !$('#peek').hidden) { closePeek(); return; } closeOv(); });
 function viewImg(key, title, text, after, face) { SFX.paper(); const shot = face ? `<img class="vface" src="${face}" alt="">` : ''; ov(`<div class="viewer"><img src="${A[key]}" alt=""><div class="panel">${shot}<h2>${title}</h2><p class="sub">${text}</p><button class="btn" id="vx">Done</button></div></div>`); $('#vx').onclick = closeOv; after && after(); }
 const FACE_TH = {p_clara: 1, p_daniel: 1, p_marcy: 1, p_ortiz: 1, p_reed: 1, p_jesse: 1, p_dunn: 1, dock_daniel: 1, camera_still: 1};
-function thumb(id) { const it = IT[id], t = it.th; const inset = it.face && A[it.face] && it.face !== t ? `<img class="inset" src="${A[it.face]}" alt="">` : ''; const face = FACE_TH[t] ? ' face' : ''; return A[t] ? `<div class="th${face}" style="background-image:url(${A[t]})">${inset}</div>` : `<div class="th${face}">${inset || t}</div>`; }
+// Larger print for the in-folder look, when the case has one. The thumb stays the small file.
+const PEEK_BIG = {news: 'news_big', bag: 'ledger_big', report: 'report_big'};
+function thumb(id) { const it = IT[id], t = it.th; const inset = it.face && A[it.face] && it.face !== t ? `<img class="inset" src="${A[it.face]}" alt="">` : ''; const face = FACE_TH[t] ? ' face' : ''; const doc = !face && A[t] ? ' doc' : ''; return A[t] ? `<div class="th${face}${doc}" style="background-image:url(${A[t]})">${inset}</div>` : `<div class="th">${inset || t}</div>`; }
+function closePeek() { const el = $('#peek'); if (!el || el.hidden) return; el.hidden = true; el.innerHTML = ''; el.onclick = null; }
+function peekItem(id, onTake) { const it = IT[id]; if (!it) return; SFX.paper(); const key = PEEK_BIG[id] && A[PEEK_BIG[id]] ? PEEK_BIG[id] : it.th; const src = A[key]; const portrait = /^p_/.test(key);
+  let body;
+  if (src) body = `<div class="peekscroll"><img class="shot ${portrait ? 'face' : 'doc'}" src="${src}" alt="${esc(it.n)}"></div>`;
+  else if (CARDS[id]) body = `<div class="peekscroll"><div class="peekcard"><b>${esc(CARDS[id][0])}</b><p>${esc(CARDS[id][1])}</p></div></div>`;
+  else body = `<div class="peekscroll"><div class="peekemoji">${esc(it.th)}</div></div>`;
+  const cap = src && CARDS[id] ? `<p class="cap"><b>${esc(CARDS[id][0])}</b> ${esc(CARDS[id][1])}</p>` : '';
+  const tape = it.rec ? '<p class="sub">Put it on the desk to play the tape.</p>' : '';
+  const desk = it.dest !== 'board' ? '<button type="button" data-to="desk">🗂 Put on desk</button>' : '';
+  const board = it.dest !== 'desk' ? `<button type="button" data-to="board" class="${it.dest === 'both' ? 'alt' : ''}">📌 Pin to board</button>` : '';
+  const el = $('#peek');
+  el.innerHTML = `<div class="peekbox" role="dialog" aria-modal="true" aria-label="${esc(it.n)}"><div class="peekbar"><button type="button" class="btn2" id="peekx">← Back to the folder</button><h2>${esc(it.n)}</h2></div>${body}<div class="peekfoot">${cap}${tape}<div class="bt">${desk}${board}</div></div></div>`;
+  el.hidden = false;
+  const sc = el.querySelector('.peekscroll'); if (sc) sc.scrollTop = 0;
+  $('#peekx').onclick = e => { e.stopPropagation(); closePeek(); };
+  $$('.peekfoot button', el).forEach(b => b.onclick = e => { e.stopPropagation(); onTake(id, b.dataset.to); });
+  el.onclick = e => { if (e.target === el) closePeek(); }; }
 function openFolder(src) { SFX.paper(); const title = {folder: 'Case folder · HALE, Clara', envA: 'Inside Envelope A', envB: 'Inside Envelope B'}[src];
   const blurb = {folder: 'A suggested order from Ortiz. Not a rule. Interviews first, then the photos, then places and papers.', envA: 'Play Marcy\'s interview first. Then her photo and the camera still.', envB: 'One page. Take the phone ping out and pin it.'}[src];
   const draw = () => { const rev = reviewOf(src), left = rev.ids.filter(i => !S.pulled[i]), nxt = left[0];
@@ -782,7 +828,9 @@ function openFolder(src) { SFX.paper(); const title = {folder: 'Case folder · H
       items += `<div class="it${i === nxt ? ' up' : ''}" data-id="${i}"><span class="ord">${m.n}</span>${thumb(i)}<b>${esc(IT[i].n)}</b>${i === nxt ? '<em class="why">Suggested next</em>' : ''}<div class="bt">${IT[i].dest !== 'board' ? '<button data-to="desk">🗂 Put on desk</button>' : ''}${IT[i].dest !== 'desk' ? `<button data-to="board" class="${IT[i].dest === 'both' ? 'alt' : ''}">📌 Pin to board</button>` : ''}</div></div>`; }
     o.querySelector('.fold').innerHTML = `<div class="lp"><h3>${title}</h3><p class="guide">${blurb}</p><ol class="order">${steps}</ol><p style="font-size:12.5px;color:#6B645B;margin-bottom:6px">${pulledFrom(src)} of ${rev.ids.length} taken out.</p><ul class="inv">${rev.ids.map(i => `<li class="${S.pulled[i] ? 'out' : i === nxt ? 'now' : ''}"><span class="n">${rev.meta[i].n}</span>${esc(IT[i].n)}</li>`).join('')}</ul></div>
     <div class="rp"><div class="items">${items || '<div class="allout">✓ Everything is out of here.<br><br><button class="btn" id="fdone">Back to the desk</button></div>'}</div></div>`;
-    $$('.it button', o).forEach(b => b.onclick = () => { const id = b.closest('.it').dataset.id; b.closest('.it').classList.add('gone'); setTimeout(() => { pull(id, b.dataset.to); draw(); }, 320); });
+    const take = (id, to) => { const card = $(`.it[data-id="${id}"]`, o); if (card && card.classList.contains('gone')) return; closePeek(); if (card) card.classList.add('gone'); setTimeout(() => { pull(id, to); draw(); }, card ? 320 : 0); };
+    $$('.it button', o).forEach(b => b.onclick = e => { e.stopPropagation(); take(b.closest('.it').dataset.id, b.dataset.to); });
+    $$('.it', o).forEach(card => { card.onpointerdown = e => { card._px = e.clientX; card._py = e.clientY; }; card.onclick = e => { if (e.target.closest('button')) return; if (card._px != null && Math.hypot(e.clientX - card._px, e.clientY - card._py) > 10) return; peekItem(card.dataset.id, take); }; });
     const fd = $('#fdone'); if (fd) fd.onclick = closeOv; };
   const o = ov(`<div class="fold"></div>`); draw(); }
 function pull(id, to) { S.pulled[id] = 1; S.fresh[id] = 1;
@@ -1071,7 +1119,7 @@ function addNote(t, cls) { if (!t || S.notes.some(n => n.t === t)) return; S.not
 function previewResetChrome() {
   hush();
   if (CUR_AUD) { try { CUR_AUD.pause(); } catch (e) {} CUR_AUD = null; }
-  const o = $('#ov'); if (o) { o.hidden = true; o.innerHTML = ''; o._close = null; }
+  closePeek(); const o = $('#ov'); if (o) { o.hidden = true; o.innerHTML = ''; o._close = null; }
   unscene();
   $$('.aha-card, .flash').forEach(e => e.remove());
   const bv = $('#boardV'); if (bv) bv.classList.remove('ahaing');
