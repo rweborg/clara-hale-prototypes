@@ -2,7 +2,7 @@
 
 This is the reuse guide for the journey prototype (`journey/`). The visual specimens live in [`journey/design-system/index.html`](journey/design-system/index.html). Open that page when you want to see a pattern. Read this file when you are adding another case.
 
-The live game still draws itself from `journey/index.html`. This pass extracts the language those screens already use so the next case file can follow it. Portrait and prop images are graded elsewhere. Do not regenerate them as part of adopting this system. Point at the files. Let that other pass replace the pixels.
+The live game still draws itself from `journey/index.html`. This pass extracts the language those screens already use so the next case file can follow it. Portraits and person-bearing evidence are regenerated when their source in the file changes. Keep the same paths the player already loads.
 
 ## Where things live
 
@@ -24,7 +24,9 @@ Ordinary players should be able to read this as a case file, not as a poster and
 
 Characters are real photographs. The locked look is rough and natural: a little grain, a little softness, desaturated, with color still recognizable (hair, a coat, a flannel). Not illustration, and not a beauty-retouched studio shot.
 
-- Crop head and shoulders. When a frame is taller than the face, use `object-position: center 16%` (`--ds-portrait-position`).
+Every photo answers who gave it to the detective, and how. That provenance sets the place, the light, the framing, and the paper. The taxonomy is family snapshot, school picture, phone print, workplace or directory ID, newspaper, missing-person flyer, CCTV, scene still, and a mug shot only when that person was actually booked. Clara’s cast is not booked: Clara is a family snapshot from the Harvest Festival booth (her sister’s album), Ortiz and Deputy Dunn are county ID photos, Pastor Reed is a church-directory photo, Daniel and Marcy are phone candids, and Jesse is a yearbook picture. The recipe is written up in the [case photo provenance canvas](https://cursor.com/canvas/store-a0de2b96-6112-43d9-a6c2-fd1593f7d7f0/a26c9fc1-b943-4ca6-b96a-9cf33afd3203). Do not use a seamless gray backdrop, and do not invent a second face for the same person.
+
+- Crop head and shoulders, forehead and eyes in frame. When a frame is taller than the face, use `object-position: center 16%` (`--ds-portrait-position`).
 - Radius stays at 4px (`--ds-portrait-radius`) so a print looks cut, not like an app avatar.
 - On the board, tilt the print a few degrees, add the red pushpin, and a name plate.
 - Props (closed folder, newspaper, dock photo, ledger) are photographs of physical things. Ragged paper and uneven edges belong in the file. Do not mask them into perfect cards.
