@@ -95,7 +95,7 @@ Ambience follows the player’s real clock and never gates the case. It is not s
 | 5–9 | Evening. Chinese takeout. Lamp on. |
 | 9–5 | Night. Takeout. Lamp on. |
 
-Sips and bites are cosmetic. They do not unlock evidence.
+Sips and bites are cosmetic. They do not unlock evidence. Desk props can be dragged to a new spot on the 1280×800 surface. A short tap still opens the folder, the briefing, a tape, or anything else that was tappable. The new spot is `S.place` and is saved with the case.
 
 ## Interaction patterns that stay
 
@@ -113,7 +113,7 @@ Foreground items (open folder, a photograph, a tape, an envelope, the report) si
 
 ### Look before you take it out
 
-The card body is a `button.look` (the thumb, the name, and “Suggested next”). Pressing it opens a preview over the folder (`#peek`). **Put on desk** and **Pin to board** are separate buttons, so they take the item out and do not open the preview. The page, photo, or note is there to read. The same two decisions sit on the preview.
+The whole evidence tile (`.it`) opens a preview over the folder (`#peek`), including the thumb, the name, and “Suggested next.” A row in the left list does the same while that item is still inside. **Put on desk** and **Pin to board** (`.bt button`) stay separate, so they take the item out and do not open the preview. The press does not arm the folder’s click-outside dismiss. `#peek` sits above the folder (`z-index: 220`) until **Back to the folder**, the dim margin, or Escape. The page, photo, or note is there to read. An index card also prints its handwritten lines in type. The same two decisions sit on the preview.
 
 - **Back to the folder**, a tap on the dim margin, or Escape closes the preview and leaves the item in the folder.
 - Looking does not pull the item, does not mark a page viewed, and does not play a tape. The desk viewer (`viewImg`) is still what marks the briefing, the newspaper, and the ledger as read.
@@ -191,7 +191,7 @@ The case plays on the same 1280×800 desk and cork. A wide window still fits tha
 | Narrow, and tall enough (under 900px wide, over 500px tall) | Bottom sheet. Collapsed, it keeps Ortiz’s next step and the button that does it. **Notes and progress** opens the day line, the objectives, and the notes. |
 | Short (under 500px tall, such as a phone on its side) | The sheet is hidden so the desk can use the height. **Case** in the top bar opens it. A tap on the desk puts it away. **Hint** comes back, because the next card is not on screen. |
 
-**Whole desk** / **Whole board** frames the entire surface. **Look closer** returns to the slice (the folder on the desk, the middle of the cork). A pinch does the same zoom. Dragging only pans while the surface is bigger than the stage. A drag that starts on a pin, a thread, or a tape control does not pan, and a drag that starts on a desk object does not also open it.
+**Whole desk** / **Whole board** frames the entire surface. **Look closer** returns to the slice (the folder on the desk, the middle of the cork). A pinch does the same zoom. Dragging empty desk pans while the surface is bigger than the stage. A drag that starts on a pin, a thread, or a tape control does not pan. A drag on a desk prop moves that prop and does not open it; a short tap still opens it. The offset is saved on this device in `jp-save-v2` as `place` (hotspot name to `[dx, dy]` in desk pixels). It does not change the case.
 
 The top bar drops the case title and the beat rail. Desk, Board, volume, and Prototype stay. Under 560px the words hide and the icons remain, each at least 44px. The beat rail is still in ⚙ Prototype.
 
