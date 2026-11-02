@@ -53,7 +53,7 @@ Two kinds of card, on purpose.
 
 **Chrome cards** hold the interface: the next-step card, progress, notes. White (or `--ds-wood-card` on the kitchen desk), 14px radius, padding 16px, shadow `--ds-elev-card`. The side column is 340px (`--ds-side-w`) on a paper or wood ground. On a narrow window it becomes the bottom sheet in [Phones and tablets](#phones-and-tablets).
 
-**Evidence cards** are paper. Inside the folder (`.it`) they are small tiles: 10px radius, a 74px thumb, the name, and desk / board buttons. The suggested-next tile (`.it.up`) gets a warm outline (`#C4A15A`) and a cream fill. On the cork (`.cardx`) a note is lined paper, a red rule on top, Caveat handwriting, tilted.
+**Evidence cards** are paper. Inside the folder (`.it`) they are small tiles: 10px radius, a 74px thumb, the name, and desk / board buttons. A person thumb (`.th.face`) is positioned at `center 12%`, not the vertical middle, so a short wide tile keeps the eyes and forehead instead of the chin. Taller frames (a tape face, a pin, the talk portrait) still use `--ds-portrait-position` (`center 16%`). A scene thumb stays centered. The background shorthand on `.it .th` must not reset that position to `center`. The suggested-next tile (`.it.up`) gets a warm outline (`#C4A15A`) and a cream fill. On the cork (`.cardx`) a note is lined paper, a red rule on top, Caveat handwriting, tilted.
 
 The number on a tile is its place in the review order, not a score.
 
