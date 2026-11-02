@@ -113,7 +113,7 @@ Foreground items (open folder, a photograph, a tape, an envelope, the report) si
 
 ### Look before you take it out
 
-Tapping a card in the open folder — anywhere except **Put on desk** / **Pin to board** — opens a preview over the folder (`#peek`). The page, photo, or note is there to read. The same two decisions sit on the preview and on the card.
+The card body is a `button.look` (the thumb, the name, and “Suggested next”). Pressing it opens a preview over the folder (`#peek`). **Put on desk** and **Pin to board** are separate buttons, so they take the item out and do not open the preview. The page, photo, or note is there to read. The same two decisions sit on the preview.
 
 - **Back to the folder**, a tap on the dim margin, or Escape closes the preview and leaves the item in the folder.
 - Looking does not pull the item, does not mark a page viewed, and does not play a tape. The desk viewer (`viewImg`) is still what marks the briefing, the newspaper, and the ledger as read.
