@@ -28,12 +28,12 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 .view{position:absolute;inset:0;display:none;overflow:hidden}.view.on{display:block}
 .fit{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0}
 #desk{overflow:hidden}#bare,#cork{position:absolute;inset:0;width:1280px;height:800px;display:block}
-#spr>img{position:absolute;display:block;pointer-events:none;transition:opacity .5s}
+#spr>img{position:absolute;display:block;pointer-events:auto;transition:opacity .5s}
 #spr>img.in{animation:land .55s cubic-bezier(.2,.8,.3,1.2)}
 @keyframes land{0%{opacity:0;transform:translateY(-40px) scale(1.08) rotate(-2deg);filter:drop-shadow(0 30px 30px rgba(0,0,0,.4))}100%{opacity:1}}
 #tod,#glow{position:absolute;inset:0;pointer-events:none;transition:background 1.4s,opacity 1.4s}
 #tod{mix-blend-mode:multiply}#glow{mix-blend-mode:screen}
-.hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s;cursor:grab;touch-action:none}.hot:active{cursor:grabbing}
+.hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s;pointer-events:none}.hot .tag{pointer-events:auto;cursor:grab;touch-action:none}#spr>img{cursor:grab}#spr>img:active,.hot .tag:active{cursor:grabbing}
 .hot:hover,.hot:focus-visible{outline-color:rgba(255,200,60,.95);box-shadow:0 0 0 6px rgba(255,200,60,.25)}
 .hot.pulse{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 12px rgba(242,193,78,.55);outline-color:rgba(242,193,78,.95)}}
@@ -530,7 +530,7 @@ const SOL = [["Clara found out her partner had been skimming from the bakery. Th
 const OBJ1 = {q: 'Did Clara drive her own car to the Copper Lake trailhead that night?', o: ['Yes. She drove there, then walked to the lake.', 'No. She walked up the lake path from the festival; someone else drove her car there later.', 'The car was towed there the next morning.'], a: 1};
 // ---------------- state ----------------
 let S; const T0 = Date.now();
-function fresh() { return {theme: localStorage.getItem('jp-theme') || 'b', beat: 'intro', meal: null, pulled: {}, board: {}, place: {}, strings: [], notes: [], viewed: {}, played: {}, saved: {},
+function fresh() { return {theme: localStorage.getItem('jp-theme') || 'b', beat: 'intro', meal: null, pulled: {}, board: {}, place: {}, stack: [], strings: [], notes: [], viewed: {}, played: {}, saved: {},
   obj1: 0, obj1wrong: 0, env: {A: 'hidden', B: 'hidden', C: 'hidden'}, real: false, tries: 0, hints: 0, mug: 0, bites: 0, lampOff: false, solved: false, assisted: false,
   folderOnDesk: false, packed: false, stamped: false, filed: false, fresh: {}, voice: S ? S.voice : true, view: 'desk', sel: null, connect: false, strSel: null, rep: {}, t0: Date.now()}; }
 S = fresh();
@@ -547,22 +547,32 @@ let AC, MASTER; const ac = () => AC || (AC = new (window.AudioContext || window.
 let VOL = 1, MUTED = false;
 try { const o = JSON.parse(localStorage.getItem('jp-vol') || 'null'); if (o && typeof o.v === 'number') { VOL = Math.max(0, Math.min(1, o.v)); MUTED = !!o.m || VOL === 0; } } catch (e) {}
 function master() { const c = ac(); if (!MASTER) { MASTER = c.createGain(); MASTER.connect(c.destination); } MASTER.gain.value = MUTED ? 0 : VOL; return MASTER; }
-function noise(dur, f = 2000, q = 1, vol = .3, type = 'bandpass', t0 = 0) { try { const c = ac(), n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * dur, c.sampleRate), d = b.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2); n.buffer = b; const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
-  const g = c.createGain(); g.gain.value = vol; n.connect(fl).connect(g).connect(master()); n.start(c.currentTime + t0); } catch (e) {} }
-function tone(f, dur, vol = .15, type = 'sine', t0 = 0) { try { const c = ac(), o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f; const t = c.currentTime + t0;
-  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(master()); o.start(t); o.stop(t + dur + .05); } catch (e) {} }
+function softNoise(dur, freq, peak, attack) { try { const c = ac(), n = c.createBufferSource(), len = Math.max(1, Math.ceil(c.sampleRate * dur)), b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; n.buffer = b; const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = freq; fl.Q.value = .6;
+  const g = c.createGain(), t = c.currentTime, pk = Math.max(.0002, peak); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(pk, t + attack); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  n.connect(fl).connect(g).connect(master()); n.start(t); n.stop(t + dur + .02); } catch (e) {} }
+function softTone(freq, dur, peak, attack, type) { try { const c = ac(), o = c.createOscillator(), g = c.createGain(); o.type = type || 'sine'; o.frequency.value = freq; const t = c.currentTime, pk = Math.max(.0002, peak);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(pk, t + Math.max(.008, attack)); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(master()); o.start(t); o.stop(t + dur + .02); } catch (e) {} }
 function volIcon() { if (MUTED || VOL <= 0) return '🔇'; if (VOL < .4) return '🔈'; if (VOL < .75) return '🔉'; return '🔊'; }
 function applyVol(a) { if (!a) return; try { a.volume = MUTED ? 0 : VOL; } catch (e) {} }
 function paintVol() { $$('[data-vol]').forEach(el => { el.value = String(Math.round(VOL * 100)); }); $$('[data-volmute]').forEach(b => { b.textContent = volIcon(); b.setAttribute('aria-pressed', MUTED ? 'true' : 'false'); b.setAttribute('aria-label', MUTED ? 'Unmute' : 'Mute'); }); }
 function setVol(v, muted) { VOL = Math.max(0, Math.min(1, Number.isFinite(v) ? v : 1)); MUTED = !!muted || VOL === 0; if (MASTER) MASTER.gain.value = MUTED ? 0 : VOL; applyVol(CUR_AUD); applyVol(LINE); try { localStorage.setItem('jp-vol', JSON.stringify({v: VOL, m: MUTED})); } catch (e) {} paintVol(); }
 document.addEventListener('input', e => { const el = e.target; if (!el.matches || !el.matches('[data-vol]')) return; const v = Number(el.value) / 100; setVol(v, v <= 0); });
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-volmute]'); if (!b) return; if (MUTED) setVol(VOL > 0 ? VOL : .8, false); else setVol(VOL > 0 ? VOL : .8, true); });
-const SFX = {paper: () => noise(.22, 2600, .7, .25), pin: () => { tone(1900, .05, .08, 'square'); noise(.05, 4000, 1, .2); }, tear: () => { noise(.7, 3200, .6, .4, 'highpass'); },
-  sting: () => { [196, 247, 294, 392, 494].forEach((f, i) => tone(f, 2.4 - i * .2, .12, 'triangle', i * .11)); tone(65, 1.6, .25, 'sine'); },
-  ding: () => { tone(660, .4, .12); tone(990, .6, .12, 'sine', .12); }, stamp: () => { tone(70, .3, .4); noise(.15, 900, .8, .5, 'lowpass'); },
-  drawer: () => { noise(.9, 400, .5, .35, 'lowpass'); tone(90, .2, .3, 'sine', .85); }, sip: () => noise(.35, 700, 3, .25), bite: () => { [0, .09, .2].forEach(t => noise(.06, 3000, .8, .35, 'bandpass', t)); },
-  click: () => tone(1200, .03, .05, 'square'), buzz: () => tone(140, .25, .12, 'sawtooth')};
+const SFX = {
+  paper: () => { softNoise(.24, 720, .05, .035); softTone(170, .18, .028, .025); },
+  slide: () => { softNoise(.3, 340, .045, .05); softTone(110, .22, .022, .04); },
+  pin: () => { softTone(230, .14, .035, .01); softNoise(.1, 480, .028, .015); },
+  tear: () => softNoise(.48, 620, .04, .06),
+  sting: () => { [196, 247, 311, 392].forEach((f, i) => softTone(f, 1.15, .03, .05, 'triangle')); softTone(98, 1.25, .032, .06); },
+  ding: () => { softTone(392, .5, .034, .025); softTone(523, .62, .03, .04); },
+  stamp: () => { softTone(88, .24, .05, .012); softNoise(.18, 260, .035, .015); },
+  drawer: () => { softNoise(.75, 220, .042, .07); softTone(78, .42, .026, .09); },
+  sip: () => { softNoise(.3, 400, .04, .045); softTone(210, .2, .018, .035); },
+  bite: () => { softTone(140, .14, .036, .012); softNoise(.12, 460, .03, .018); softTone(96, .16, .024, .03); },
+  click: () => softTone(200, .1, .026, .01),
+  buzz: () => softTone(146, .32, .03, .035)
+};
 // ---------------- voice: ElevenLabs samples only ----------------
 // Every spoken character line is a bundled ElevenLabs MP3 (assets/audio/, see AU) played with an HTMLAudioElement.
 // There is deliberately no device text-to-speech fallback: a line without a sample is shown as text only.
@@ -658,7 +668,7 @@ function bindStagePan() {
   const pts = new Map(); let drag = null, pinch = null;
   stage.addEventListener('pointerdown', e => {
     if (e.button != null && e.button !== 0) return;
-    if (e.target.closest('.pin, .thread, .btools, #whisper, #reframe, .hot, a, input, textarea')) return;
+    if (e.target.closest('.pin, .thread, .btools, #whisper, #reframe, .hot, #spr img, a, input, textarea')) return;
     if (sheetOverlay() && document.body.classList.contains('sheet-open')) { sheetOpen(false); stage.dataset.dismiss = '1'; return; }
     pts.set(e.pointerId, {x: e.clientX, y: e.clientY});
     const cam = viewCam[viewKey()];
@@ -733,15 +743,40 @@ const MUGS = ['mug_full', 'mug_half', 'mug_empty'], TAKEOUTS = ['takeout_full', 
 let prevSet = new Set();
 function hotForSprite(k) { if (k === 'envA' || k === 'envB' || k === 'envC') return 'env'; if (MUGS.includes(k)) return 'mug'; if (TAKEOUTS.includes(k)) return 'takeout'; return k; }
 function placeOff(name) { const p = S.place && S.place[name]; return p ? [p[0] || 0, p[1] || 0] : [0, 0]; }
-function clampOff(name, dx, dy) { const H = HOT[S.theme][name]; if (!H) return [dx, dy]; const cx = Math.max(48, Math.min(1232, H[0] + dx)), cy = Math.max(36, Math.min(760, H[1] + dy)); return [cx - H[0], cy - H[1]]; }
-function applyPlace(name) { const off = placeOff(name), D = CFG.desk[S.theme], H = HOT[S.theme][name], b = $(`.hot[data-name="${name}"]`);
-  if (b && H) { b.style.left = (H[0] + off[0] - H[2] / 2) + 'px'; b.style.top = (H[1] + off[1] - H[3] / 2) + 'px'; }
-  $$('#spr img').forEach(im => { if (hotForSprite(im.dataset.k) !== name) return; const d = D.spr[im.dataset.k]; if (!d) return; im.style.left = (d.x + off[0]) + 'px'; im.style.top = (d.y + off[1]) + 'px'; }); }
+const CROP = {};
+function stackZ(name) { const i = (S.stack || []).indexOf(name); return i < 0 ? 1 : 2 + i; }
+function bringFront(name) { if (!S.stack) S.stack = []; S.stack = S.stack.filter(n => n !== name); S.stack.push(name); }
+function propBox(name) { const D = CFG.desk[S.theme], keys = name === 'mug' ? MUGS : name === 'takeout' ? TAKEOUTS : name === 'env' ? ['envA', 'envB', 'envC'] : [name];
+  for (const k of keys) { const im = $(`#spr img[data-spr="${k}"]`); const crop = CROP[k], d = D.spr[k]; if (!d) continue; if (crop && !crop.full) return {x: d.x + crop.x, y: d.y + crop.y, w: crop.w, h: crop.h}; if (im || crop) return {x: d.x, y: d.y, w: d.w, h: d.h}; }
+  const H = HOT[S.theme][name]; return H ? {x: H[0] - H[2] / 2, y: H[1] - H[3] / 2, w: H[2], h: H[3]} : {x: 0, y: 0, w: 80, h: 80}; }
+function clampOff(name, dx, dy) { const b = propBox(name); const x = Math.max(12 - b.w + 56, Math.min(1280 - 56, b.x + dx)), y = Math.max(12 - b.h + 40, Math.min(800 - 40, b.y + dy)); return [x - b.x, y - b.y]; }
+function measureCrop(im) { const key = im.dataset.spr || im.dataset.k; if (!key || CROP[key] || !im.naturalWidth) return;
+  const d = CFG.desk[S.theme].spr[key]; if (!d || d.w < 900) { CROP[key] = {full: true}; return; }
+  try { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext('2d', {willReadFrequently: true}); g.drawImage(im, 0, 0);
+    const {data, width, height} = g.getImageData(0, 0, c.width, c.height); let minx = width, miny = height, maxx = 0, maxy = 0, any = false;
+    for (let i = 3; i < data.length; i += 16) { if (data[i] > 128) { const p = (i - 3) / 4, x = p % width, y = (p / width) | 0; any = true; if (x < minx) minx = x; if (y < miny) miny = y; if (x > maxx) maxx = x; if (y > maxy) maxy = y; } }
+    CROP[key] = any ? {x: Math.max(0, minx - 2), y: Math.max(0, miny - 2), w: Math.min(width, maxx - minx + 8), h: Math.min(height, maxy - miny + 8)} : {full: true};
+  } catch (e) { CROP[key] = {full: true}; } }
+function layoutSprite(im) { const key = im.dataset.spr || im.dataset.k, hot = im.dataset.hot || hotForSprite(key), d = CFG.desk[S.theme].spr[key]; if (!d) return; const off = placeOff(hot), crop = CROP[key];
+  im.style.zIndex = String(2 + stackZ(hot)); im.style.position = 'absolute'; im.style.maxWidth = 'none';
+  if (crop && !crop.full) { im.style.objectFit = 'none'; im.style.objectPosition = `${-crop.x}px ${-crop.y}px`; im.style.width = crop.w + 'px'; im.style.height = crop.h + 'px'; im.style.left = (d.x + crop.x + off[0]) + 'px'; im.style.top = (d.y + crop.y + off[1]) + 'px'; im.style.visibility = 'visible'; return; }
+  im.style.objectFit = ''; im.style.objectPosition = ''; im.style.visibility = crop ? 'visible' : 'hidden'; im.style.left = (d.x + off[0]) + 'px'; im.style.top = (d.y + off[1]) + 'px'; im.style.width = d.w + 'px'; im.style.height = d.h + 'px'; }
+function prepSprite(im) { if (!im.complete || !im.naturalWidth) return; measureCrop(im); layoutSprite(im); }
+function applyPlace(name) { const off = placeOff(name), H = HOT[S.theme][name], b = $(`.hot[data-name="${name}"]`);
+  if (b && H) { b.style.left = (H[0] + off[0] - H[2] / 2) + 'px'; b.style.top = (H[1] + off[1] - H[3] / 2) + 'px'; b.style.zIndex = String(40 + stackZ(name)); }
+  $$('#spr img').forEach(im => { if ((im.dataset.hot || hotForSprite(im.dataset.k)) !== name) return; layoutSprite(im); }); }
+function shiftedBox(name) { const b = propBox(name), o = placeOff(name); return {x: b.x + o[0], y: b.y + o[1], w: b.w, h: b.h}; }
+function separateProp(name) { if (!S.place) return; for (let n = 0; n < 3; n++) { const a = shiftedBox(name); let hit = false;
+  for (const other of Object.keys(HOT[S.theme])) { if (other === name) continue; if (!$(`.hot[data-name="${other}"]`) && !$(`#spr img[data-hot="${other}"]`)) continue; const b = shiftedBox(other);
+    const ix = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)), iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+    if (ix * iy > .4 * Math.min(a.w * a.h, b.w * b.h)) { hit = true; break; } }
+  if (!hit) return; const cur = placeOff(name), room = 1280 - (a.x + a.w), nudge = room > 80 ? 90 : -Math.max(90, Math.min(180, a.w * .6));
+  S.place[name] = clampOff(name, cur[0] + nudge, cur[1] + 24); } }
 function renderDesk() {
   const th = S.theme, D = CFG.desk[th], set = deskSet(); $('#bare').src = D.bare;
   const spr = $('#spr'); spr.innerHTML = '';
   for (const k of ZORD[th]) { const key = k === 'mug' ? MUGS[S.mug] : k === 'takeout' ? takeoutKey() : k; if (!set.has(key)) continue; const d = D.spr[key]; const im = document.createElement('img');
-    im.src = d.src; im.dataset.k = k; const soff = placeOff(hotForSprite(k)); Object.assign(im.style, {left: (d.x + soff[0]) + 'px', top: (d.y + soff[1]) + 'px', width: d.w + 'px', height: d.h + 'px'});
+    im.src = d.src; im.dataset.k = k; im.dataset.spr = key; im.dataset.hot = hotForSprite(k); im.addEventListener('load', () => prepSprite(im)); layoutSprite(im); if (im.complete) prepSprite(im);
     if (d.rot) im.style.transform = `rotate(${d.rot}deg)`;
     if (!prevSet.has(key) && !MUGS.includes(key) && !(TAKEOUTS.includes(key) && TAKEOUTS.some(t => prevSet.has(t))) && S.beat !== 'intro') im.classList.add('in');
     if (k === 'danish' && S.bites) biteMask(im, k, S.bites);
@@ -759,7 +794,7 @@ function renderDesk() {
   // hotspots
   const hots = $('#hots'); hots.innerHTML = ''; const H = HOT[th], ns = nextStep();
   const add = (name, label, em, amb) => { const h = H[name]; if (!h) return; const b = document.createElement('button'); b.className = 'hot' + (amb ? ' amb' : ''); b.dataset.name = name; const hoff = placeOff(name);
-    Object.assign(b.style, {left: (h[0] + hoff[0] - h[2] / 2) + 'px', top: (h[1] + hoff[1] - h[3] / 2) + 'px', width: h[2] + 'px', height: h[3] + 'px', transform: `rotate(${h[4]}deg)`});
+    Object.assign(b.style, {left: (h[0] + hoff[0] - h[2] / 2) + 'px', top: (h[1] + hoff[1] - h[3] / 2) + 'px', width: h[2] + 'px', height: h[3] + 'px', transform: `rotate(${h[4]}deg)`, zIndex: String(40 + stackZ(name))});
     if (ns.pulse === name) b.classList.add('pulse');
     b.innerHTML = `<span class="tag${ns.pulse === name ? ' go' : ''}${amb ? ' sm' : ''}" style="transform:translateX(-50%) rotate(${-h[4]}deg) scale(var(--tag-sc,1));transform-origin:center bottom">${label}${em ? `<em>${em}</em>` : ''}</span>`;
     b.onclick = () => { if (b.dataset.draglock === '1') { b.dataset.draglock = ''; return; } deskClick(name); }; hots.appendChild(b); };
@@ -773,23 +808,27 @@ function renderDesk() {
   if (S.stamped && !S.filed && set.has('folder') && !$('#stampel')) drawStamp(true);
   if (set.has('lamp')) add('lamp', S.lampOff ? '💡 Lamp on' : '💡 Lamp off', null, true);
 }
+function dragTarget(e) { const el = e.target && e.target.closest && (e.target.closest('#spr img') || e.target.closest('.hot')); if (!el) return null; const name = el.dataset.hot || el.dataset.name; if (!name) return null; const hot = el.classList && el.classList.contains('hot') ? el : $(`.hot[data-name="${name}"]`); return {name, hot, el}; }
 function bindDeskDrag() { if (bindDeskDrag.done) return; bindDeskDrag.done = true; const desk = $('#desk'); if (!desk) return; let st = null;
-  desk.addEventListener('pointerdown', e => { const hot = e.target.closest && e.target.closest('.hot'); if (!hot || (e.button != null && e.button !== 0)) return; if (hot.dataset.draglock === '1') hot.dataset.draglock = ''; st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hot.dataset.name, moved: false, hot}; hot.setPointerCapture(e.pointerId); });
-  desk.addEventListener('pointermove', e => { if (!st || st.id !== e.pointerId) return; const sdx = e.clientX - st.x, sdy = e.clientY - st.y; if (!st.moved && Math.hypot(sdx, sdy) < 10) return; if (!st.moved) { st.moved = true; const o = placeOff(st.name); st.ox = o[0]; st.oy = o[1]; } const sc = S._sc || 1; if (!S.place) S.place = {}; S.place[st.name] = clampOff(st.name, st.ox + sdx / sc, st.oy + sdy / sc); applyPlace(st.name); });
-  const end = e => { if (!st || st.id !== e.pointerId) return; const moved = st.moved, hot = st.hot; st = null; if (!moved) return; save(); if (hot) hot.dataset.draglock = '1'; };
-  desk.addEventListener('pointerup', end); desk.addEventListener('pointercancel', end);
-  desk.addEventListener('click', e => { const hot = e.target.closest && e.target.closest('.hot'); if (!hot || hot.dataset.draglock !== '1') return; e.preventDefault(); e.stopPropagation(); hot.dataset.draglock = ''; }, true);
+  desk.addEventListener('pointerdown', e => { const hit = dragTarget(e); if (!hit || (e.button != null && e.button !== 0)) return; if (hit.hot && hit.hot.dataset.draglock === '1') hit.hot.dataset.draglock = ''; bringFront(hit.name); applyPlace(hit.name); st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hit.name, moved: false, hot: hit.hot, el: hit.el}; });
+  const same = e => st && (e.pointerType === 'mouse' || e.pointerId == null || e.pointerId === st.id);
+  const move = e => { if (!same(e)) return; const sdx = e.clientX - st.x, sdy = e.clientY - st.y; if (!st.moved && Math.hypot(sdx, sdy) < 10) return; if (!st.moved) { st.moved = true; const o = placeOff(st.name); st.ox = o[0]; st.oy = o[1]; } const sc = S._sc || 1; if (!S.place) S.place = {}; S.place[st.name] = clampOff(st.name, st.ox + sdx / sc, st.oy + sdy / sc); applyPlace(st.name); };
+  const end = e => { if (!same(e)) return; const moved = st.moved, hot = st.hot, name = st.name; st = null; if (!moved) return; separateProp(name); applyPlace(name); SFX.slide(); save(); if (hot) hot.dataset.draglock = '1'; };
+  document.addEventListener('pointermove', move, true);
+  document.addEventListener('pointerup', end, true);
+  document.addEventListener('pointercancel', end, true);
+  desk.addEventListener('click', e => { const hit = dragTarget(e); if (!hit) return; const locked = hit.hot && hit.hot.dataset.draglock === '1'; if (locked) { e.preventDefault(); e.stopPropagation(); hit.hot.dataset.draglock = ''; return; } if (e.target.closest && e.target.closest('#spr img')) { e.preventDefault(); e.stopPropagation(); deskClick(hit.name); } }, true);
 }
 bindDeskDrag();
 function biteMask(im, k, n) { const spots = [[92, 32], [88, 70], [55, 96]]; const g = spots.slice(0, n).map(([x, y]) => `radial-gradient(circle at ${x}% ${y}%, transparent 17%, #000 17.5%)`).join(',');
   im.style.webkitMaskImage = im.style.maskImage = g; im.style.webkitMaskComposite = 'source-in'; im.style.maskComposite = 'intersect'; }
 function recs() { return RECS.filter(([, it]) => S.pulled[it]).map(([r]) => r); }
-function deskClick(n) { SFX.click();
+function deskClick(n) {
   if (n === 'folder') { if (S.beat === 'file') return fileStep(); return openFolder('folder'); }
   if (n === 'briefing') return viewImg('instructions', 'Case briefing', 'From Det. Sam Ortiz. <b>Objective 1:</b> Where did Clara go Saturday night, and did she drive there herself?', () => { S.viewed.briefing = 1; note('Objective 1: where did Clara go? Did she drive?'); render(); }, A.p_ortiz);
   if (n === 'news') return viewImg('news_big', 'The Pine Hollow Courier', 'Monday edition. "Local Baker Missing After Harvest Festival." Clara is on the front page.', () => { S.viewed.news = 1; }, A.p_clara);
   if (n === 'bag') return viewImg('ledger_big', 'Evidence bag: the bakery ledger', "Clara's big green ledger. Eleven pages, September and October, have been cut out. Clara kept the books. Who ran the register?", () => { S.viewed.bag = 1; note('Ledger: 11 pages missing (Sep–Oct)'); });
-  if (n === 'device') return openPlayer(recs().includes('marcy') && !S.played.marcy ? 'marcy' : recs().find(r => !S.played[r]) || recs()[0]);
+  if (n === 'device') { SFX.click(); return openPlayer(recs().includes('marcy') && !S.played.marcy ? 'marcy' : recs().find(r => !S.played[r]) || recs()[0]); }
   if (n === 'pad') return openNotes();
   if (n === 'env') { const r = 'ABC'.split('').find(L => S.env[L] === 'ready'); if (r) return openEnv(r); SFX.buzz(); const s = 'ABC'.split('').find(L => S.env[L] === 'sealed');
     return toast(`🔒 Envelope ${s} is sealed. ${s === 'A' ? 'It opens when you solve Objective 1.' : s === 'B' ? 'It opens after your first breakthrough.' : 'It holds the wrap-up. It opens when the case is solved.'}`); }
@@ -907,7 +946,7 @@ function openEnv(L) { const items = {A: 5, B: 1}[L]; const o = ov(`<div class="e
     $('.envw', o).innerHTML = `<img class="opened" src="${A.env_open}" style="${L === 'B' ? 'filter:hue-rotate(195deg)' : ''}" alt=""><p>Envelope ${L} is open. ${items} new ${items > 1 ? 'items' : 'item'} inside.</p><button class="btn gold" id="takeout" style="max-width:320px;margin:14px auto 0">Take ${items > 1 ? 'them' : 'it'} out →</button>`;
     note(L === 'A' ? 'Envelope A: Marcy tape, lantern, seat, camera' : 'Envelope B: phone ping'); $('#takeout').onclick = () => { closeOv(); openFolder('env' + L); }; renderSide(); };
   e.onpointerdown = ev => { x0 = ev.clientX; e.setPointerCapture(ev.pointerId); };
-  e.onpointermove = ev => { if (x0 == null) return; const p = Math.max(0, (ev.clientX - x0) / e.clientWidth); tr.style.width = Math.min(100, p * 100) + '%'; if (p > .03 && !e._s) { e._s = 1; noise(.3, 3000, .6, .2, 'highpass'); } if (p > .8) fin(); };
+  e.onpointermove = ev => { if (x0 == null) return; const p = Math.max(0, (ev.clientX - x0) / e.clientWidth); tr.style.width = Math.min(100, p * 100) + '%'; if (p > .03 && !e._s) { e._s = 1; softNoise(.18, 520, .03, .02); } if (p > .8) fin(); };
   e.onpointerup = () => { x0 = null; e._s = 0; if (!done) tr.style.width = '0'; }; $('#tap1').onclick = fin; }
 // ---------------- objective 1 ----------------
 function openObj() { const o = ov(`<div class="panel" style="max-width:720px;margin:0 auto"><div class="next"><span class="k">Objective 1 of 3</span></div><h2>${OBJ1.q}</h2><p class="sub">Pick one. A wrong answer doesn't end anything. Ortiz pushes back and you get a hint.</p>
