@@ -33,7 +33,7 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 @keyframes land{0%{opacity:0;transform:translateY(-40px) scale(1.08) rotate(-2deg);filter:drop-shadow(0 30px 30px rgba(0,0,0,.4))}100%{opacity:1}}
 #tod,#glow{position:absolute;inset:0;pointer-events:none;transition:background 1.4s,opacity 1.4s}
 #tod{mix-blend-mode:multiply}#glow{mix-blend-mode:screen}
-.hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s}
+.hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s;cursor:grab;touch-action:none}.hot:active{cursor:grabbing}
 .hot:hover,.hot:focus-visible{outline-color:rgba(255,200,60,.95);box-shadow:0 0 0 6px rgba(255,200,60,.25)}
 .hot.pulse{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 12px rgba(242,193,78,.55);outline-color:rgba(242,193,78,.95)}}
@@ -762,7 +762,7 @@ function renderDesk() {
     Object.assign(b.style, {left: (h[0] + hoff[0] - h[2] / 2) + 'px', top: (h[1] + hoff[1] - h[3] / 2) + 'px', width: h[2] + 'px', height: h[3] + 'px', transform: `rotate(${h[4]}deg)`});
     if (ns.pulse === name) b.classList.add('pulse');
     b.innerHTML = `<span class="tag${ns.pulse === name ? ' go' : ''}${amb ? ' sm' : ''}" style="transform:translateX(-50%) rotate(${-h[4]}deg) scale(var(--tag-sc,1));transform-origin:center bottom">${label}${em ? `<em>${em}</em>` : ''}</span>`;
-    b.onclick = () => deskClick(name); hots.appendChild(b); };
+    b.onclick = () => { if (b.dataset.draglock === '1') { b.dataset.draglock = ''; return; } deskClick(name); }; hots.appendChild(b); };
   if (set.has('folder')) { const left = SRC.folder.length - pulledFrom('folder'); const shut = S.beat === 'build' && !S.pulled.briefing; add('folder', '📁 Case folder', S.stamped ? 'CLOSED' : shut ? 'closed' : left ? left + ' inside' : 'empty'); }
   if (set.has('briefing')) add('briefing', '📄 Case briefing'); if (set.has('device')) add('device', th === 'b' ? '📱 Phone · recordings' : '📼 Tape recorder', recs().length + (recs().length > 1 ? ' tapes' : ' tape'));
   if (set.has('bag')) add('bag', '🔍 Evidence bag'); if (set.has('news')) add('news', '📰 Newspaper'); if (set.has('pad')) add('pad', '✏️ My notes', null, !S.notes.length);
@@ -774,9 +774,9 @@ function renderDesk() {
   if (set.has('lamp')) add('lamp', S.lampOff ? '💡 Lamp on' : '💡 Lamp off', null, true);
 }
 function bindDeskDrag() { if (bindDeskDrag.done) return; bindDeskDrag.done = true; const desk = $('#desk'); if (!desk) return; let st = null;
-  desk.addEventListener('pointerdown', e => { const hot = e.target.closest && e.target.closest('.hot'); if (!hot || (e.button != null && e.button !== 0)) return; st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hot.dataset.name, moved: false, hot}; hot.setPointerCapture(e.pointerId); });
+  desk.addEventListener('pointerdown', e => { const hot = e.target.closest && e.target.closest('.hot'); if (!hot || (e.button != null && e.button !== 0)) return; if (hot.dataset.draglock === '1') hot.dataset.draglock = ''; st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hot.dataset.name, moved: false, hot}; hot.setPointerCapture(e.pointerId); });
   desk.addEventListener('pointermove', e => { if (!st || st.id !== e.pointerId) return; const sdx = e.clientX - st.x, sdy = e.clientY - st.y; if (!st.moved && Math.hypot(sdx, sdy) < 10) return; if (!st.moved) { st.moved = true; const o = placeOff(st.name); st.ox = o[0]; st.oy = o[1]; } const sc = S._sc || 1; if (!S.place) S.place = {}; S.place[st.name] = clampOff(st.name, st.ox + sdx / sc, st.oy + sdy / sc); applyPlace(st.name); });
-  const end = e => { if (!st || st.id !== e.pointerId) return; const moved = st.moved, hot = st.hot; st = null; if (!moved) return; save(); if (hot) { hot.dataset.draglock = '1'; setTimeout(() => { hot.dataset.draglock = ''; }, 80); } };
+  const end = e => { if (!st || st.id !== e.pointerId) return; const moved = st.moved, hot = st.hot; st = null; if (!moved) return; save(); if (hot) hot.dataset.draglock = '1'; };
   desk.addEventListener('pointerup', end); desk.addEventListener('pointercancel', end);
   desk.addEventListener('click', e => { const hot = e.target.closest && e.target.closest('.hot'); if (!hot || hot.dataset.draglock !== '1') return; e.preventDefault(); e.stopPropagation(); hot.dataset.draglock = ''; }, true);
 }
