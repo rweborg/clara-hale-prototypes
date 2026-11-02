@@ -33,7 +33,7 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 @keyframes land{0%{opacity:0;transform:translateY(-40px) scale(1.08) rotate(-2deg);filter:drop-shadow(0 30px 30px rgba(0,0,0,.4))}100%{opacity:1}}
 #tod,#glow{position:absolute;inset:0;pointer-events:none;transition:background 1.4s,opacity 1.4s}
 #tod{mix-blend-mode:multiply}#glow{mix-blend-mode:screen}
-.hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s;pointer-events:none}.hot .tag{pointer-events:auto;cursor:grab;touch-action:none}#spr>img{cursor:grab}#spr>img:active,.hot .tag:active{cursor:grabbing}
+.hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s;pointer-events:auto;cursor:grab;touch-action:none}.hot .tag{pointer-events:auto;cursor:grab;touch-action:none}#spr>img{cursor:grab;touch-action:none}#spr>img:active,.hot:active{cursor:grabbing}
 .hot:hover,.hot:focus-visible{outline-color:rgba(255,200,60,.95);box-shadow:0 0 0 6px rgba(255,200,60,.25)}
 .hot.pulse{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 12px rgba(242,193,78,.55);outline-color:rgba(242,193,78,.95)}}
@@ -770,8 +770,10 @@ function separateProp(name) { if (!S.place) return; for (let n = 0; n < 3; n++) 
   for (const other of Object.keys(HOT[S.theme])) { if (other === name) continue; if (!$(`.hot[data-name="${other}"]`) && !$(`#spr img[data-hot="${other}"]`)) continue; const b = shiftedBox(other);
     const ix = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)), iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
     if (ix * iy > .4 * Math.min(a.w * a.h, b.w * b.h)) { hit = true; break; } }
-  if (!hit) return; const cur = placeOff(name), room = 1280 - (a.x + a.w), nudge = room > 80 ? 90 : -Math.max(90, Math.min(180, a.w * .6));
-  S.place[name] = clampOff(name, cur[0] + nudge, cur[1] + 24); } }
+  if (!hit) return; const cur = placeOff(name), b = shiftedBox(otherOf(name, a)); const pushX = a.x + a.w / 2 >= (b ? b.x + b.w / 2 : a.x) ? 48 : -48;
+  S.place[name] = clampOff(name, cur[0] + pushX, cur[1] + (a.y >= (b ? b.y : a.y) ? 28 : -28)); } }
+function otherOf(name, a) { let best = null, bestA = 0; for (const other of Object.keys(HOT[S.theme])) { if (other === name) continue; if (!$(`.hot[data-name="${other}"]`) && !$(`#spr img[data-hot="${other}"]`)) continue; const b = shiftedBox(other);
+  const ix = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)), iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)); const area = ix * iy; if (area > bestA) { bestA = area; best = b; } } return best; }
 function renderDesk() {
   const th = S.theme, D = CFG.desk[th], set = deskSet(); $('#bare').src = D.bare;
   const spr = $('#spr'); spr.innerHTML = '';
@@ -810,10 +812,10 @@ function renderDesk() {
 }
 function dragTarget(e) { const el = e.target && e.target.closest && (e.target.closest('#spr img') || e.target.closest('.hot')); if (!el) return null; const name = el.dataset.hot || el.dataset.name; if (!name) return null; const hot = el.classList && el.classList.contains('hot') ? el : $(`.hot[data-name="${name}"]`); return {name, hot, el}; }
 function bindDeskDrag() { if (bindDeskDrag.done) return; bindDeskDrag.done = true; const desk = $('#desk'); if (!desk) return; let st = null;
-  desk.addEventListener('pointerdown', e => { const hit = dragTarget(e); if (!hit || (e.button != null && e.button !== 0)) return; if (hit.hot && hit.hot.dataset.draglock === '1') hit.hot.dataset.draglock = ''; bringFront(hit.name); applyPlace(hit.name); st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hit.name, moved: false, hot: hit.hot, el: hit.el}; });
+  desk.addEventListener('pointerdown', e => { const hit = dragTarget(e); if (!hit || (e.button != null && e.button !== 0)) return; if (hit.hot && hit.hot.dataset.draglock === '1') hit.hot.dataset.draglock = ''; bringFront(hit.name); applyPlace(hit.name); st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hit.name, moved: false, hot: hit.hot, el: hit.el}; try { hit.el.setPointerCapture(e.pointerId); } catch (err) {} });
   const same = e => st && (e.pointerType === 'mouse' || e.pointerId == null || e.pointerId === st.id);
   const move = e => { if (!same(e)) return; const sdx = e.clientX - st.x, sdy = e.clientY - st.y; if (!st.moved && Math.hypot(sdx, sdy) < 10) return; if (!st.moved) { st.moved = true; const o = placeOff(st.name); st.ox = o[0]; st.oy = o[1]; } const sc = S._sc || 1; if (!S.place) S.place = {}; S.place[st.name] = clampOff(st.name, st.ox + sdx / sc, st.oy + sdy / sc); applyPlace(st.name); };
-  const end = e => { if (!same(e)) return; const moved = st.moved, hot = st.hot, name = st.name; st = null; if (!moved) return; separateProp(name); applyPlace(name); SFX.slide(); save(); if (hot) hot.dataset.draglock = '1'; };
+  const end = e => { if (!same(e)) return; const moved = st.moved, hot = st.hot, name = st.name, el = st.el, pid = st.id; st = null; try { if (el && el.releasePointerCapture) el.releasePointerCapture(pid); } catch (err) {} if (!moved) return; separateProp(name); applyPlace(name); SFX.slide(); save(); if (hot) hot.dataset.draglock = '1'; };
   document.addEventListener('pointermove', move, true);
   document.addEventListener('pointerup', end, true);
   document.addEventListener('pointercancel', end, true);
