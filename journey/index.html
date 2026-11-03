@@ -397,7 +397,7 @@ html.can-pan #desk,html.can-pan #board{cursor:grab}
   <label>Save</label><div class="row"><button id="newb">↺ Start the case over</button></div>
 </div>
 <main id="stage">
-  <section id="deskV" class="view on"><div class="fit" id="desk"><img id="bare" alt=""><div id="spr"></div><div id="tod"></div><div id="glow"></div><div id="hots"></div><div id="fly"></div><div id="drawer" hidden><div class="dfront"><span>PINE HOLLOW CASE FILES</span><i></i></div></div></div></section>
+  <section id="deskV" class="view on"><div class="fit" id="desk"><img id="bare" alt="" draggable="false"><div id="spr"></div><div id="tod"></div><div id="glow"></div><div id="hots"></div><div id="fly"></div><div id="drawer" hidden><div class="dfront"><span>PINE HOLLOW CASE FILES</span><i></i></div></div></div></section>
   <section id="boardV" class="view"><div class="fit" id="board"><img id="cork" alt=""><svg id="strings" viewBox="0 0 1280 800"></svg><div id="pins"></div><svg id="stringhits" viewBox="0 0 1280 800"></svg><div id="bempty">The board is empty. Pin evidence from the case folder and it shows up here.</div></div>
     <div class="btools"><button class="btn2" id="connectb">🧶 Connect two things</button><button class="btn2" id="cutb" type="button" hidden>✂ Remove thread</button><span id="ctip"></span></div></section>
 <button type="button" id="whisper" class="whisper" hidden aria-live="polite"></button>
@@ -778,7 +778,7 @@ function renderDesk() {
   const th = S.theme, D = CFG.desk[th], set = deskSet(); $('#bare').src = D.bare;
   const spr = $('#spr'); spr.innerHTML = '';
   for (const k of ZORD[th]) { const key = k === 'mug' ? MUGS[S.mug] : k === 'takeout' ? takeoutKey() : k; if (!set.has(key)) continue; const d = D.spr[key]; const im = document.createElement('img');
-    im.src = d.src; im.dataset.k = k; im.dataset.spr = key; im.dataset.hot = hotForSprite(k); im.addEventListener('load', () => prepSprite(im)); layoutSprite(im); if (im.complete) prepSprite(im);
+    im.draggable = false; im.src = d.src; im.dataset.k = k; im.dataset.spr = key; im.dataset.hot = hotForSprite(k); im.addEventListener('load', () => prepSprite(im)); layoutSprite(im); if (im.complete) prepSprite(im);
     if (d.rot) im.style.transform = `rotate(${d.rot}deg)`;
     if (!prevSet.has(key) && !MUGS.includes(key) && !(TAKEOUTS.includes(key) && TAKEOUTS.some(t => prevSet.has(t))) && S.beat !== 'intro') im.classList.add('in');
     if (k === 'danish' && S.bites) biteMask(im, k, S.bites);
@@ -818,10 +818,14 @@ function bindDeskDrag() { if (bindDeskDrag.done) return; bindDeskDrag.done = tru
   desk.addEventListener('pointerdown', e => { tapToken++; swallowClick = false; const hit = dragTarget(e); if (!hit || (e.button != null && e.button !== 0)) return; if (hit.hot && hit.hot.dataset.draglock === '1') hit.hot.dataset.draglock = ''; bringFront(hit.name); applyPlace(hit.name); st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hit.name, moved: false, hot: hit.hot, el: hit.el}; try { hit.el.setPointerCapture(e.pointerId); } catch (err) {} });
   const same = e => st && (e.pointerType === 'mouse' || e.pointerId == null || e.pointerId === st.id);
   const move = e => { if (!same(e)) return; const sdx = e.clientX - st.x, sdy = e.clientY - st.y; if (!st.moved && Math.hypot(sdx, sdy) < 10) return; if (!st.moved) { st.moved = true; const o = placeOff(st.name); st.ox = o[0]; st.oy = o[1]; } const sc = S._sc || 1; if (!S.place) S.place = {}; S.place[st.name] = clampOff(st.name, st.ox + sdx / sc, st.oy + sdy / sc); applyPlace(st.name); };
-  const end = e => { if (!same(e)) return; const moved = st.moved, hot = st.hot, name = st.name, el = st.el, pid = st.id, touch = e.pointerType === 'touch'; st = null; try { if (el && el.releasePointerCapture) el.releasePointerCapture(pid); } catch (err) {} if (!moved) { if (touch && e.type !== 'pointercancel') { const token = ++tapToken; setTimeout(() => { if (token === tapToken) deskClick(name); }, 0); } return; } if (overFolder(e, name) && deskBackIds(name).length) { swallowClick = true; if (hot) hot.dataset.draglock = '1'; setTimeout(() => returnToFolder(name), 0); return; } if (overFolder(e, name)) swallowClick = true; separateProp(name); applyPlace(name); SFX.slide(); save(); if (hot) hot.dataset.draglock = '1'; };
+  const commit = e => { const moved = st.moved, hot = st.hot, name = st.name, el = st.el, pid = st.id, touch = e.pointerType === 'touch'; st = null; try { if (el && el.releasePointerCapture) el.releasePointerCapture(pid); } catch (err) {} if (!moved) { if (touch && e.type !== 'pointercancel') { const token = ++tapToken; setTimeout(() => { if (token === tapToken) deskClick(name); }, 0); } return; } if (overFolder(e, name) && deskBackIds(name).length) { swallowClick = true; if (hot) hot.dataset.draglock = '1'; setTimeout(() => returnToFolder(name), 0); return; } if (overFolder(e, name)) swallowClick = true; separateProp(name); applyPlace(name); SFX.slide(); save(); if (hot) hot.dataset.draglock = '1'; };
+  const end = e => { if (!same(e)) return; if (e.type === 'pointercancel' && st.moved && !e.clientX && !e.clientY) { st.hold = true; return; } commit(e); };
   document.addEventListener('pointermove', move, true);
   document.addEventListener('pointerup', end, true);
   document.addEventListener('pointercancel', end, true);
+  // A desktop drag that starts on a photograph becomes a native image drag. The pointer is then cancelled at 0,0 and the real release arrives on dragend, so the folder test never sees the drop.
+  document.addEventListener('dragstart', e => { if (e.target.closest && e.target.closest('#desk')) e.preventDefault(); }, true);
+  document.addEventListener('dragend', e => { if (!st || !st.hold) return; commit({clientX: e.clientX, clientY: e.clientY, pointerType: 'mouse', pointerId: st.id, type: 'dragend'}); }, true);
   desk.addEventListener('click', e => { tapToken++; if (swallowClick) { swallowClick = false; e.preventDefault(); e.stopPropagation(); return; } const hit = dragTarget(e); if (!hit) return; const locked = hit.hot && hit.hot.dataset.draglock === '1'; if (locked) { e.preventDefault(); e.stopPropagation(); hit.hot.dataset.draglock = ''; return; } if (e.target.closest && e.target.closest('#spr img')) { e.preventDefault(); e.stopPropagation(); deskClick(hit.name); } }, true);
 }
 bindDeskDrag();
