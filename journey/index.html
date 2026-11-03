@@ -748,21 +748,22 @@ const CROP = {};
 function stackZ(name) { const i = (S.stack || []).indexOf(name); return i < 0 ? 1 : 2 + i; }
 function bringFront(name) { if (!S.stack) S.stack = []; S.stack = S.stack.filter(n => n !== name); S.stack.push(name); }
 function propBox(name) { const D = CFG.desk[S.theme], keys = name === 'mug' ? MUGS : name === 'takeout' ? TAKEOUTS : name === 'env' ? ['envA', 'envB', 'envC'] : [name];
-  for (const k of keys) { const im = $(`#spr img[data-spr="${k}"]`); const crop = CROP[k], d = D.spr[k]; if (!d) continue; if (crop && !crop.full) return {x: d.x + crop.x, y: d.y + crop.y, w: crop.w, h: crop.h}; if (im || crop) return {x: d.x, y: d.y, w: d.w, h: d.h}; }
+  for (const k of keys) { const im = $(`#spr img[data-spr="${k}"]`); const crop = CROP[S.theme + ':' + k], d = D.spr[k]; if (!d) continue; if (crop && !crop.full) return {x: d.x + crop.x, y: d.y + crop.y, w: crop.w, h: crop.h}; if (im || crop) return {x: d.x, y: d.y, w: d.w, h: d.h}; }
   const H = HOT[S.theme][name]; return H ? {x: H[0] - H[2] / 2, y: H[1] - H[3] / 2, w: H[2], h: H[3]} : {x: 0, y: 0, w: 80, h: 80}; }
 function clampOff(name, dx, dy) { const b = propBox(name); const x = Math.max(12 - b.w + 56, Math.min(1280 - 56, b.x + dx)), y = Math.max(12 - b.h + 40, Math.min(800 - 40, b.y + dy)); return [x - b.x, y - b.y]; }
-function measureCrop(im) { const key = im.dataset.spr || im.dataset.k; if (!key || CROP[key] || !im.naturalWidth) return;
-  const d = CFG.desk[S.theme].spr[key]; if (!d || d.w < 900) { CROP[key] = {full: true}; return; }
+function cropId(im) { const key = im && (im.dataset.spr || im.dataset.k); return key ? (im.dataset.theme || S.theme) + ':' + key : ''; }
+function measureCrop(im) { if (!im.isConnected || (im.dataset.theme && im.dataset.theme !== S.theme)) return; const key = im.dataset.spr || im.dataset.k, id = cropId(im); if (!id || CROP[id] || !im.naturalWidth) return;
+  const d = CFG.desk[S.theme].spr[key]; if (!d || d.w < 900) { CROP[id] = {full: true}; return; }
   try { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext('2d', {willReadFrequently: true}); g.drawImage(im, 0, 0);
     const {data, width, height} = g.getImageData(0, 0, c.width, c.height); let minx = width, miny = height, maxx = 0, maxy = 0, any = false;
     for (let i = 3; i < data.length; i += 16) { if (data[i] > 128) { const p = (i - 3) / 4, x = p % width, y = (p / width) | 0; any = true; if (x < minx) minx = x; if (y < miny) miny = y; if (x > maxx) maxx = x; if (y > maxy) maxy = y; } }
-    CROP[key] = any ? {x: Math.max(0, minx - 2), y: Math.max(0, miny - 2), w: Math.min(width, maxx - minx + 8), h: Math.min(height, maxy - miny + 8)} : {full: true};
-  } catch (e) { CROP[key] = {full: true}; } }
-function layoutSprite(im) { const key = im.dataset.spr || im.dataset.k, hot = im.dataset.hot || hotForSprite(key), d = CFG.desk[S.theme].spr[key]; if (!d) return; const off = placeOff(hot), crop = CROP[key];
+    CROP[id] = any ? {x: Math.max(0, minx - 2), y: Math.max(0, miny - 2), w: Math.min(width, maxx - minx + 8), h: Math.min(height, maxy - miny + 8)} : {full: true};
+  } catch (e) { CROP[id] = {full: true}; } }
+function layoutSprite(im) { const key = im.dataset.spr || im.dataset.k, hot = im.dataset.hot || hotForSprite(key), d = CFG.desk[S.theme].spr[key]; if (!d) return; const off = placeOff(hot), crop = CROP[cropId(im)];
   im.style.zIndex = String(2 + stackZ(hot)); im.style.position = 'absolute'; im.style.maxWidth = 'none';
   if (crop && !crop.full) { im.style.objectFit = 'none'; im.style.objectPosition = `${-crop.x}px ${-crop.y}px`; im.style.width = crop.w + 'px'; im.style.height = crop.h + 'px'; im.style.left = (d.x + crop.x + off[0]) + 'px'; im.style.top = (d.y + crop.y + off[1]) + 'px'; im.style.visibility = 'visible'; return; }
   im.style.objectFit = ''; im.style.objectPosition = ''; im.style.visibility = crop ? 'visible' : 'hidden'; im.style.left = (d.x + off[0]) + 'px'; im.style.top = (d.y + off[1]) + 'px'; im.style.width = d.w + 'px'; im.style.height = d.h + 'px'; }
-function prepSprite(im) { if (!im.complete || !im.naturalWidth) return; measureCrop(im); layoutSprite(im); fitHot(im.dataset.hot || hotForSprite(im.dataset.spr || im.dataset.k)); }
+function prepSprite(im) { if (!im.isConnected || !im.complete || !im.naturalWidth) return; measureCrop(im); layoutSprite(im); fitHot(im.dataset.hot || hotForSprite(im.dataset.spr || im.dataset.k)); }
 function applyPlace(name) { const off = placeOff(name), H = HOT[S.theme][name], b = $(`.hot[data-name="${name}"]`);
   if (b && H) { b.style.left = (H[0] + off[0] - H[2] / 2) + 'px'; b.style.top = (H[1] + off[1] - H[3] / 2) + 'px'; b.style.width = H[2] + 'px'; b.style.height = H[3] + 'px'; b.style.zIndex = String(40 + stackZ(name)); }
   $$('#spr img').forEach(im => { if ((im.dataset.hot || hotForSprite(im.dataset.k)) !== name) return; layoutSprite(im); });
@@ -831,7 +832,7 @@ function renderDesk() {
   const th = S.theme, D = CFG.desk[th], set = deskSet(); $('#bare').src = D.bare;
   const spr = $('#spr'); spr.innerHTML = '';
   for (const k of ZORD[th]) { const key = k === 'mug' ? MUGS[S.mug] : k === 'takeout' ? takeoutKey() : k; if (!set.has(key)) continue; const d = D.spr[key]; const im = document.createElement('img');
-    im.draggable = false; im.src = d.src; im.dataset.k = k; im.dataset.spr = key; im.dataset.hot = hotForSprite(k); im.addEventListener('load', () => prepSprite(im)); layoutSprite(im); if (im.complete) prepSprite(im);
+    im.draggable = false; im.src = d.src; im.dataset.k = k; im.dataset.spr = key; im.dataset.theme = th; im.dataset.hot = hotForSprite(k); im.addEventListener('load', () => prepSprite(im)); layoutSprite(im); if (im.complete) prepSprite(im);
     if (d.rot) im.style.transform = `rotate(${d.rot}deg)`;
     if (!prevSet.has(key) && !MUGS.includes(key) && !(TAKEOUTS.includes(key) && TAKEOUTS.some(t => prevSet.has(t))) && S.beat !== 'intro') im.classList.add('in');
     if (k === 'danish' && S.bites) biteMask(im, k, S.bites);
