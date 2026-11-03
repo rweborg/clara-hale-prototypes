@@ -37,7 +37,7 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 .hot:hover,.hot:focus-visible{outline-color:rgba(255,200,60,.95);box-shadow:0 0 0 6px rgba(255,200,60,.25)}
 .hot.pulse{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 12px rgba(242,193,78,.55);outline-color:rgba(242,193,78,.95)}}
-.tag{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);white-space:nowrap;background:rgba(17,17,17,.82);color:#fff;font:700 15px Atkinson;padding:7px 13px;border-radius:999px;display:flex;gap:7px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
+.tag{position:absolute;left:50%;top:calc(100% + 6px);transform:translateX(-50%);transform-origin:center top;white-space:nowrap;background:rgba(17,17,17,.82);color:#fff;font:700 15px Atkinson;padding:7px 13px;border-radius:999px;display:flex;gap:7px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
 .tag em{font-style:normal;font-weight:400;opacity:.85;font-size:13px;border-left:1px solid rgba(255,255,255,.35);padding-left:7px}
 .tag.go{background:var(--ds-gold,#F2C14E);color:var(--ds-ink,#1D1B18)}.tag.sm{font-size:13px;padding:5px 10px}
 .hot.amb .tag{opacity:0;transition:opacity .2s}.hot.amb:hover .tag,.hot.amb:focus-visible .tag{opacity:1}
@@ -280,8 +280,8 @@ html.can-pan #desk,html.can-pan #board{cursor:grab}
   .voltop input[type=range]{width:100%;min-width:48px;max-width:92px;height:44px}
   #stage{position:relative;flex:1 1 auto;top:auto;right:auto;bottom:auto;left:auto;width:auto;min-height:0;min-width:0;touch-action:none;overflow:hidden}
   body.preview #stage{bottom:auto}
-  #whisper{left:8px;right:auto;bottom:auto;top:8px;max-width:min(250px,calc(100% - 128px))}
-  #boardV.on ~ #whisper{top:8px;bottom:auto;left:8px;right:auto;max-width:min(240px,calc(100% - 128px))}
+  #whisper{left:8px;right:8px;top:auto;bottom:8px;max-width:none}
+  #boardV.on ~ #whisper{left:8px;right:8px;top:auto;bottom:72px;max-width:none}
   .btools{left:8px;right:8px;bottom:8px;flex-wrap:wrap}
   #ctip{flex:1 0 100%;font-size:13px;line-height:1.35}
   .btools .btn2{min-height:44px}
@@ -649,6 +649,7 @@ function fitAll() {
   const base = baseScale(st, active), fit = fitScale(st);
   const fitted = 1280 * activeSc <= st.width + 20 && 800 * activeSc <= st.height + 20;
   const canZoom = base > fit + 0.04;
+  if (typeof seatTags === 'function') seatTags();
   document.documentElement.classList.toggle('can-pan', canZoom && !fitted);
   const rf = $('#reframe');
   if (rf) {
@@ -761,10 +762,62 @@ function layoutSprite(im) { const key = im.dataset.spr || im.dataset.k, hot = im
   im.style.zIndex = String(2 + stackZ(hot)); im.style.position = 'absolute'; im.style.maxWidth = 'none';
   if (crop && !crop.full) { im.style.objectFit = 'none'; im.style.objectPosition = `${-crop.x}px ${-crop.y}px`; im.style.width = crop.w + 'px'; im.style.height = crop.h + 'px'; im.style.left = (d.x + crop.x + off[0]) + 'px'; im.style.top = (d.y + crop.y + off[1]) + 'px'; im.style.visibility = 'visible'; return; }
   im.style.objectFit = ''; im.style.objectPosition = ''; im.style.visibility = crop ? 'visible' : 'hidden'; im.style.left = (d.x + off[0]) + 'px'; im.style.top = (d.y + off[1]) + 'px'; im.style.width = d.w + 'px'; im.style.height = d.h + 'px'; }
-function prepSprite(im) { if (!im.complete || !im.naturalWidth) return; measureCrop(im); layoutSprite(im); }
+function prepSprite(im) { if (!im.complete || !im.naturalWidth) return; measureCrop(im); layoutSprite(im); fitHot(im.dataset.hot || hotForSprite(im.dataset.spr || im.dataset.k)); }
 function applyPlace(name) { const off = placeOff(name), H = HOT[S.theme][name], b = $(`.hot[data-name="${name}"]`);
-  if (b && H) { b.style.left = (H[0] + off[0] - H[2] / 2) + 'px'; b.style.top = (H[1] + off[1] - H[3] / 2) + 'px'; b.style.zIndex = String(40 + stackZ(name)); }
-  $$('#spr img').forEach(im => { if ((im.dataset.hot || hotForSprite(im.dataset.k)) !== name) return; layoutSprite(im); }); }
+  if (b && H) { b.style.left = (H[0] + off[0] - H[2] / 2) + 'px'; b.style.top = (H[1] + off[1] - H[3] / 2) + 'px'; b.style.width = H[2] + 'px'; b.style.height = H[3] + 'px'; b.style.zIndex = String(40 + stackZ(name)); }
+  $$('#spr img').forEach(im => { if ((im.dataset.hot || hotForSprite(im.dataset.k)) !== name) return; layoutSprite(im); });
+  fitHot(name); }
+function fitHot(name) { const b = $(`.hot[data-name="${name}"]`); if (!b) return;
+  const imgs = $$('#spr img').filter(im => (im.dataset.hot || hotForSprite(im.dataset.k)) === name && im.style.visibility !== 'hidden');
+  let L = Infinity, T = Infinity, R = -Infinity, B = -Infinity, deg = null;
+  for (const im of imgs) { const x = parseFloat(im.style.left), y = parseFloat(im.style.top), w = parseFloat(im.style.width), h = parseFloat(im.style.height); if (!isFinite(x) || !(w > 0) || !(h > 0)) continue; L = Math.min(L, x); T = Math.min(T, y); R = Math.max(R, x + w); B = Math.max(B, y + h); const m = /rotate\(([-\d.]+)deg\)/.exec(im.style.transform || ''); if (m && deg == null) deg = parseFloat(m[1]); }
+  if (!isFinite(L) || R - L > 900 || B - T > 700) { seatTags(); return; }
+  b.style.left = L + 'px'; b.style.top = T + 'px'; b.style.width = (R - L) + 'px'; b.style.height = (B - T) + 'px';
+  b.style.transform = `rotate(${deg || 0}deg)`;
+  const tag = b.querySelector('.tag'); if (tag) tag.dataset.rot = String(-(deg || 0));
+  seatTags(); }
+function seatTags() { const desk = $('#desk'); if (!desk || seatTags.busy) return; seatTags.busy = true; try { seatTagsNow(); } finally { seatTags.busy = false; } }
+function seatTagsNow() { const desk = $('#desk');
+  const sc = S._sc || 1, dr = desk.getBoundingClientRect(), tagSc = parseFloat(getComputedStyle(desk).getPropertyValue('--tag-sc')) || 1;
+  const toD = r => ({l: (r.left - dr.left) / sc, t: (r.top - dr.top) / sc, r: (r.right - dr.left) / sc, b: (r.bottom - dr.top) / sc});
+  const sprites = $$('#spr img').filter(im => im.style.visibility !== 'hidden' && im.offsetWidth > 0 && im.offsetWidth < 900).map(im => Object.assign(toD(im.getBoundingClientRect()), {hot: im.dataset.hot}));
+  const items = $$('.hot').map(b => { const tag = b.querySelector('.tag'); if (!tag || !(b.offsetWidth > 0)) return null; const box = toD(b.getBoundingClientRect()); return {b, tag, box, name: b.dataset.name, rot: tag.dataset.rot || '0'}; }).filter(Boolean).sort((a, c) => a.box.t - c.box.t);
+  const placed = [];
+  const area = box => Math.max(1, (box.r - box.l) * (box.b - box.t));
+  const overlap = (a, b) => { const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t); return ox > 1 && oy > 1 ? ox * oy : 0; };
+  for (const it of items) {
+    const tagW = (it.tag.offsetWidth || 120) * tagSc, tagH = (it.tag.offsetHeight || 32) * tagSc, gap = 6;
+    let best = null;
+    for (let dy = -tagH - gap; dy <= (it.box.b - it.box.t) + tagH + gap; dy += 16) for (let dx = -tagW - gap; dx <= (it.box.r - it.box.l) + tagW + gap; dx += 24) {
+      const box = {l: Math.max(8, Math.min(1272 - tagW, it.box.l + dx)), t: it.box.t + dy, r: 0, b: 0}; box.r = box.l + tagW; box.b = box.t + tagH;
+      const cx = Math.max(it.box.l, Math.min(it.box.r, (box.l + box.r) / 2)), cy = Math.max(it.box.t, Math.min(it.box.b, (box.t + box.b) / 2));
+      let score = Math.hypot((box.l + box.r) / 2 - cx, (box.t + box.b) / 2 - cy) * 0.35;
+      if (box.t < 4 || box.b > 796 || box.l < 4 || box.r > 1276) score += 5000;
+      for (const sp of sprites) { const o = overlap(box, sp); if (o) score += (sp.hot === it.name ? 9000 : 5000) * o / area(box); }
+      for (const p of placed) { const o = overlap(box, p); if (o) score += 900 * o / area(box); }
+      if (!best || score < best.score) best = {box, score};
+    }
+    placed.push(best.box); it.tagW = tagW;
+  }
+  for (let pass = 0; pass < 6; pass++) for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+    const A = placed[i], B = placed[j], ox = Math.min(A.r, B.r) - Math.max(A.l, B.l), oy = Math.min(A.b, B.b) - Math.max(A.t, B.t);
+    if (ox <= 2 || oy <= 2) continue;
+    for (const [idx, other, dir] of [[j, A, 1], [j, A, -1], [i, B, -1], [i, B, 1]]) {
+      const src = placed[idx], delta = dir > 0 ? other.r - src.l + 8 : src.r - other.l + 8;
+      const box = {l: src.l + dir * delta, t: src.t, r: src.r + dir * delta, b: src.b};
+      if (box.l < 8 || box.r > 1272) continue;
+      if (sprites.some(sp => overlap(box, sp) > 0)) continue;
+      if (placed.some((p, k) => k !== idx && overlap(box, p) > 0)) continue;
+      placed[idx] = box; break;
+    }
+  }
+  items.forEach((it, i) => {
+    const box = placed[i], cx = (it.box.l + it.box.r) / 2, dx = (box.l + it.tagW / 2) - cx;
+    it.tag.style.transform = `translateX(calc(-50% + ${dx.toFixed(1)}px)) rotate(${it.rot}deg) scale(var(--tag-sc,1))`;
+    it.tag.style.top = (box.t - it.box.t).toFixed(1) + 'px';
+    it.tag.style.bottom = 'auto';
+    it.tag.style.transformOrigin = 'center top';
+  }); }
 function shiftedBox(name) { const b = propBox(name), o = placeOff(name); return {x: b.x + o[0], y: b.y + o[1], w: b.w, h: b.h}; }
 function separateProp(name) { if (!S.place) return; for (let n = 0; n < 3; n++) { const a = shiftedBox(name); let hit = false;
   for (const other of Object.keys(HOT[S.theme])) { if (other === name) continue; if (!$(`.hot[data-name="${other}"]`) && !$(`#spr img[data-hot="${other}"]`)) continue; const b = shiftedBox(other);
@@ -798,7 +851,7 @@ function renderDesk() {
   const add = (name, label, em, amb) => { const h = H[name]; if (!h) return; const b = document.createElement('button'); b.className = 'hot' + (amb ? ' amb' : ''); b.dataset.name = name; const hoff = placeOff(name);
     Object.assign(b.style, {left: (h[0] + hoff[0] - h[2] / 2) + 'px', top: (h[1] + hoff[1] - h[3] / 2) + 'px', width: h[2] + 'px', height: h[3] + 'px', transform: `rotate(${h[4]}deg)`, zIndex: String(40 + stackZ(name))});
     if (ns.pulse === name) b.classList.add('pulse');
-    b.innerHTML = `<span class="tag${ns.pulse === name ? ' go' : ''}${amb ? ' sm' : ''}" style="transform:translateX(-50%) rotate(${-h[4]}deg) scale(var(--tag-sc,1));transform-origin:center bottom">${label}${em ? `<em>${em}</em>` : ''}</span>`;
+    b.innerHTML = `<span class="tag${ns.pulse === name ? ' go' : ''}${amb ? ' sm' : ''}" style="transform:translateX(-50%) rotate(${-h[4]}deg) scale(var(--tag-sc,1))">${label}${em ? `<em>${em}</em>` : ''}</span>`;
     b.onclick = () => { if (b.dataset.draglock === '1') { b.dataset.draglock = ''; return; } deskClick(name); }; hots.appendChild(b); };
   if (set.has('folder')) { const left = SRC.folder.length - pulledFrom('folder'); const shut = S.beat === 'build' && !S.pulled.briefing; add('folder', '📁 Case folder', S.stamped ? 'CLOSED' : shut ? 'closed' : left ? left + ' inside' : 'empty'); }
   if (set.has('briefing')) add('briefing', '📄 Case briefing'); if (set.has('device')) add('device', th === 'b' ? '📱 Phone · recordings' : '📼 Tape recorder', recs().length + (recs().length > 1 ? ' tapes' : ' tape'));
@@ -809,10 +862,11 @@ function renderDesk() {
   if (TAKEOUTS.some(t => set.has(t))) add('takeout', S.bites >= 4 ? '🥠 Fortune cookie' : '🥡 Take a bite', null, true);
   if (S.stamped && !S.filed && set.has('folder') && !$('#stampel')) drawStamp(true);
   if (set.has('lamp')) add('lamp', S.lampOff ? '💡 Lamp on' : '💡 Lamp off', null, true);
+  $$('.hot').forEach(b => fitHot(b.dataset.name));
 }
 function dragTarget(e) { const el = e.target && e.target.closest && (e.target.closest('#spr img') || e.target.closest('.hot')); if (!el) return null; const name = el.dataset.hot || el.dataset.name; if (!name) return null; const hot = el.classList && el.classList.contains('hot') ? el : $(`.hot[data-name="${name}"]`); return {name, hot, el}; }
 function deskBackIds(name) { if (name === 'briefing' || name === 'bag' || name === 'news') return S.pulled[name] ? [name] : []; if (name === 'device') return Object.keys(IT).filter(id => IT[id].spr === 'device' && S.pulled[id]); return []; }
-function overFolder(e, name) { if (name === 'folder' || !S.folderOnDesk || S.filed || S.packed || S.beat === 'file') return false; return [$(`.hot[data-name="folder"]`), $(`#spr img[data-hot="folder"]`)].filter(Boolean).some(el => { const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom; }); }
+function overFolder(e, name) { if (name === 'folder' || !S.folderOnDesk || S.filed || S.packed || S.beat === 'file') return false; const hot = $(`.hot[data-name="folder"]`); return [hot, $(`#spr img[data-hot="folder"]`), hot && $('.tag', hot)].filter(Boolean).some(el => { const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom; }); }
 function returnToFolder(name) { const ids = deskBackIds(name); if (!ids.length) return false; for (const id of ids) { delete S.pulled[id]; if (S.fresh) delete S.fresh[id]; if (S.board) delete S.board[id]; if (id === 'news') S.newsOn = ''; } if (S.strings) S.strings = S.strings.filter(s => !ids.includes(s[0]) && !ids.includes(s[1])); if (S.place) delete S.place[name]; if (S.stack) S.stack = S.stack.filter(n => n !== name); const bb = $('#bbadge'), n = Object.keys(S.board || {}).length; if (bb) { bb.hidden = !n; if (n) bb.textContent = n; } const label = ids.length === 1 ? IT[ids[0]].n.replace(/^[^:]*: /, '') : ids.length + ' tapes'; SFX.paper(); toast('📁 Back in the folder: ' + label, 2000); render(); save(); return true; }
 function bindDeskDrag() { if (bindDeskDrag.done) return; bindDeskDrag.done = true; const desk = $('#desk'); if (!desk) return; let st = null, swallowClick = false, tapToken = 0;
   desk.addEventListener('pointerdown', e => { tapToken++; swallowClick = false; const hit = dragTarget(e); if (!hit || (e.button != null && e.button !== 0)) return; if (hit.hot && hit.hot.dataset.draglock === '1') hit.hot.dataset.draglock = ''; bringFront(hit.name); applyPlace(hit.name); st = {id: e.pointerId, x: e.clientX, y: e.clientY, name: hit.name, moved: false, hot: hit.hot, el: hit.el}; try { hit.el.setPointerCapture(e.pointerId); } catch (err) {} });
@@ -994,7 +1048,7 @@ function drawStrings() { const sv = $('#strings'), hits = $('#stringhits'); cons
 function pickThread(a, b) { const key = [a, b].sort().join('+'); S.strSel = S.strSel === key ? null : key; S.connect = false; S.sel = null; SFX.click(); renderBoard(); }
 function cutThread() { if (!S.strSel) return; const key = S.strSel; S.strings = S.strings.filter(s => [s[0], s[1]].sort().join('+') !== key); S.strSel = null; SFX.paper(); save(); renderBoard(); toast('✂ Thread removed.'); }
 function dragPin(d) { let st = null; d.onpointerdown = e => { st = {x: e.clientX, y: e.clientY, ox: S.board[d.dataset.id].x, oy: S.board[d.dataset.id].y, moved: false}; d.setPointerCapture(e.pointerId); d.style.zIndex = 5; };
-  d.onpointermove = e => { if (!st) return; const dx = (e.clientX - st.x) / S._sc, dy = (e.clientY - st.y) / S._sc; if (Math.abs(dx) + Math.abs(dy) > 4) st.moved = true; if (!st.moved) return;
+  d.onpointermove = e => { if (!st) return; const sdx = e.clientX - st.x, sdy = e.clientY - st.y; if (!st.moved && Math.hypot(sdx, sdy) < 10) return; st.moved = true; const dx = sdx / (S._sc || 1), dy = sdy / (S._sc || 1);
     const id = d.dataset.id, w = BP[id][2]; S.board[id].x = Math.max(w / 2, Math.min(1280 - w / 2, st.ox + dx)); S.board[id].y = Math.max(10, Math.min(700, st.oy + dy)); d.style.left = S.board[id].x - w / 2 + 'px'; d.style.top = S.board[id].y + 'px'; drawStrings(); };
   d.onpointerup = () => { const m = st && st.moved; st = null; d.style.zIndex = ''; if (!m) pinTap(d.dataset.id); else save(); }; }
 function pinTap(id) { S.strSel = null; if (!S.connect) { S.connect = true; S.sel = id; SFX.click(); return renderBoard(); }
