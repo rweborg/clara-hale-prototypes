@@ -21,6 +21,20 @@ const RANK = COPY.rank || {}, REPORTC = COPY.report || {};
 const DET = PACK.detective || 'Detective';
 const A = Object.assign({}, CFG.A, PACK.art), TR = PACK.transcripts, esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
+// Art is served with a one-year immutable cache, so its URL has to change when
+// the art does. Every local path gets the build version appended once, here.
+{
+  const V = (window.APP_BUILD && window.APP_BUILD.version) || '0';
+  const bust = u => (typeof u === 'string' && u && !u.startsWith('data:') && !/^https?:/.test(u))
+    ? u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(V) : u;
+  for (const theme of Object.values(CFG.desk)) {
+    theme.bare = bust(theme.bare);
+    for (const spr of Object.values(theme.spr || {})) spr.src = bust(spr.src);
+  }
+  for (const k of Object.keys(A)) A[k] = bust(A[k]);
+  for (const k of Object.keys(AU)) AU[k] = bust(AU[k]);
+}
+
 // Fill the page chrome from the brand and the case, so neither needs an edit here.
 const BRAND = window.PRODUCT || {name: 'The Case Desk', company: ''};
 {
