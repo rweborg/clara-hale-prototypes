@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
 """
-_build/fix_prop_shadows.py — repair the desk prop sprites.
+_build/fix_prop_shadows.py — strip the baked cast shadow from the desk props.
 
 The props were exported with a pure-black cast shadow (rgb 0,0,0, up to 217
-alpha). Two problems:
+alpha), far larger than the prop itself — the mug's covered five times its own
+area. The player crops each sprite to its opaque bounds, so that shadow was cut
+mid-gradient and read as a hard-edged dark rectangle on the desk. Softening it
+only made a lighter rectangle.
 
-  1. It was far too large. The mug's shadow covered five times the mug's area.
-  2. The player crops each sprite to its opaque area, so the shadow was cut off
-     mid-gradient and read as a hard-edged dark rectangle on the desk.
+So this removes it outright:
 
-This script does two things:
+  * Anything neutral (no chroma) and dark, at less than full opacity, is shadow.
+    Full opacity is never shadow: the kitchen mug's coffee is dark and neutral
+    but opaque, and an earlier colour-based pass destroyed it.
+  * One boundary layer around the removed area goes too, which takes the hard
+    edge where the shadow met the prop.
+  * The crop box and a matching hit box are measured and written into CFG.
 
-  * Tames the shadow: every shadow pixel is scaled to 22% alpha. Pixels near the
-    prop stay darker, which reads as a contact shadow. Anything the prop itself
-    is made of is protected by opacity (alpha >= 240), not colour — the kitchen
-    mug is dark, and protecting by colour destroyed it.
-  * Bakes the crop box (prop + its now-subtle shadow) and a separate hit box
-    (the prop alone) into CFG, so the desk can show the soft shadow without the
-    shadow stealing clicks from the next prop.
+The props have no shadow of their own after this; the soft shadow is a CSS
+drop-shadow on #spr > img, which follows the cutout's silhouette and is not
+clipped by the crop.
 
     python3 _build/fix_prop_shadows.py [--dry-run]
 
-Idempotent-ish: re-running tames an already-tamed shadow further, so restore the
-art from git first if you need to start over (`git checkout -- assets/desk`).
+Restore the art first if you need to start over: git checkout -- assets/desk
 """
 
 import json
@@ -36,34 +37,31 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLAYER = os.path.join(ROOT, 'app', 'player.js')
 
-SCALE = 0.22        # shadow opacity multiplier
-PROTECT_PX = 1      # ring of pixels around an opaque core that keeps its alpha
 CROP_LO = 6         # alpha floor when measuring the crop box
 CROP_FRAC = 0.06    # ignore rows/columns below this fraction of the busiest
 
 
-def tame(path, dry=False):
-    """Scale the black cast shadow down without touching the prop itself."""
+def strip(path, dry=False, grow_px=2):
+    """Remove the black cast shadow, including the hard edge against the prop."""
     im = Image.open(path).convert('RGBA')
     a = np.array(im).astype(np.int16)
     r, g, b, alpha = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
     mx = np.maximum(np.maximum(r, g), b)
     mn = np.minimum(np.minimum(r, g), b)
 
-    neutral_dark = (mx - mn <= 7) & (mx <= 70) & (alpha > 0)
-    core = (alpha >= 240).astype(np.uint8) * 255
-    protect = np.array(
-        Image.fromarray(core, 'L').filter(ImageFilter.MaxFilter(PROTECT_PX * 2 + 1))
+    blackish = (mx - mn <= 7) & (mx <= 70) & (alpha > 0)
+    shadow = blackish & (alpha < 240)          # opaque dark pixels are the prop
+    grown = np.array(
+        Image.fromarray((shadow * 255).astype(np.uint8), 'L')
+        .filter(ImageFilter.MaxFilter(grow_px * 2 + 1))
     ) > 0
-
-    shadow = neutral_dark & ~protect
-    new_alpha = np.where(shadow, alpha.astype(np.float32) * SCALE, alpha.astype(np.float32))
+    remove = grown & blackish
 
     out = a.astype(np.uint8).copy()
-    out[..., 3] = np.clip(new_alpha, 0, 255).astype(np.uint8)
+    out[..., 3] = np.where(remove, 0, alpha)
     if not dry:
         Image.fromarray(out, 'RGBA').save(path, 'WEBP', quality=92, method=6)
-    return int(shadow.sum())
+    return int(remove.sum())
 
 
 def boxes(path):
@@ -100,7 +98,7 @@ def main():
                 continue
             full = os.path.join(ROOT, path)
             if path.startswith('assets/desk/') and path not in done:
-                total += tame(full, dry)
+                total += strip(full, dry)
                 done.add(path)
             crop, hit = boxes(full)
             if crop:
@@ -111,7 +109,7 @@ def main():
         out = json.dumps(conf, ensure_ascii=False, separators=(',', ':'))
         open(PLAYER, 'w', encoding='utf-8').write(src[:m.start(1)] + out + src[m.end(1):])
 
-    print(f'sprites tamed: {len(done)}  shadow pixels scaled: {total:,}')
+    print(f'sprites stripped: {len(done)}  shadow pixels removed: {total:,}')
     print('CFG crop + hit boxes ' + ('measured (dry run)' if dry else 'written'))
 
 
