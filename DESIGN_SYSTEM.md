@@ -1,6 +1,6 @@
-# Clara Hale journey — design system
+# The Case Desk — design system
 
-This is the reuse guide for the journey prototype (`journey/`). The visual specimens live in [`journey/design-system/index.html`](journey/design-system/index.html). Open that page when you want to see a pattern. Read this file when you are adding another case.
+A NextSteps.llc product. This is the reuse guide for the journey prototype (`journey/`). The visual specimens live in [`journey/design-system/index.html`](journey/design-system/index.html). Open that page when you want to see a pattern. Read this file when you are adding another case.
 
 The live game still draws itself from `journey/index.html`. This pass extracts the language those screens already use so the next case file can follow it. Portraits and person-bearing evidence are regenerated when their source in the file changes. Keep the same paths the player already loads.
 
@@ -11,8 +11,11 @@ The live game still draws itself from `journey/index.html`. This pass extracts t
 | `journey/design-system/tokens.css` | Color, type, space, elevation, materials, photo spec. The player links this. |
 | `journey/design-system/patterns.css` | Specimens (`ds-` classes). The game does not link this file, so the guide cannot restyle the desk. |
 | `journey/design-system/index.html` | Style guide. Each pattern is named, shown, and paired with the markup the player uses. |
-| `journey/design-system/case.contract.js` | The case-file shape. Copy `CASE_CONTRACT_BLANK`. The player does not load this file. |
-| `journey/index.html` | The game. Component CSS and the Clara content tables still live here. |
+| `journey/design-system/case.contract.js` | The original sketch of the case-file shape. Superseded: the real contract is `journey/_build/README.md` plus `validate.js`, and `journey/cases/clara-hale/case.js` is the reference implementation. |
+| `journey/app/player.js` | The engine: desk, board, tapes, envelopes, the report, save and resume. Case-neutral — it reads `CASE_PACK` and never mentions Clara. |
+| `journey/app/player.css` | The component rules, moved out of the document so they can be reviewed. |
+| `journey/cases/<id>/case.js` | One case: cast, evidence, board layout, report, transcripts, hint lines, and the state seeds for jump and preview. |
+| `journey/index.html` | A case-neutral shell: the markup, the case loader, and script order. |
 
 Serve the repo (or `journey/`) over HTTP before opening the style guide, so `assets/` portraits resolve.
 
@@ -270,16 +273,24 @@ Clara’s portraits today: `clara`, `daniel`, `dunn`, `jesse`, `marcy`, `ortiz`,
 
 ### What to copy
 
-1. Copy `CASE_CONTRACT_BLANK` and fill it. Keep Clara’s object in the player until the new case is ready to replace the tables.
-2. Add the cover, portraits, evidence stills, and audio under the folders above. Grade portraits and props to the photo spec. Do not restyle them as flat UI.
-3. Set `CASE.title`, `CASE.kick`, `CASE.lead`, and `CASE.cover` in `journey/index.html`.
-4. Map evidence into `IT` (name, thumb, face, dest, sprite, rec) and `SRC` (which ids start in the folder, Envelope A, Envelope B).
-5. Map `review` into `REVIEW`. Group titles should read like a handoff (“1 · Read this first”), not like a menu.
-6. Map `beats` into `BEATS`.
-7. Give board items a spot in `BP`: center x, top y, width, label, on the 1280×800 cork.
-8. Write `nextStep()` lines for the new beats. Keep the side card, the whisper, and the Hint button.
-9. Keep click-outside dismiss, the shared volume control, and click-a-thread-to-remove.
-10. Open the style guide and check the new cover against the album specimen, and the new folder against the closed-folder specimen, before calling the case done.
+```bash
+node _build/new-case.js my-case --title "The Lighthouse Keeper"
+node _build/validate.js my-case
+node _build/smoke.js
+```
+
+1. The scaffold writes `cases/my-case/case.js` already wired to the placeholders, so it loads at `?case=my-case` and passes the validator on day one. Replace the TODOs.
+2. Add the cover, portraits, evidence stills, and audio, then point `case.cover` and `art` at them. Grade portraits and props to the photo spec. Do not restyle them as flat UI.
+3. Fill the `case` block: `title`, `kick`, `lead`, `cover`.
+4. Fill `evidence` (one row per movable item) and `sources` (which ids start in the folder, Envelope A, Envelope B).
+5. Fill `review` with the handoff order. Group titles should read like a handoff ("1 · Read this first"), not a menu.
+6. Fill `board` with a spot per board item: center x, top y, width, label, on the 1280×800 cork.
+7. Fill `report`, `proof`, `solution`, and `objective1`. The validator checks that every answer is one of its own options.
+8. Write `steps(G)` for the new beats. Keep the side card, the whisper, and the Hint button.
+9. Write `seed(beat, G)` so jump-to-beat and the preview scrubber fill in sensible state.
+10. Run `validate.js`, then `smoke.js`, then open the style guide and check the new cover against the album specimen and the new folder against the closed-folder specimen.
+
+Keep click-outside dismiss, the shared volume control, and click-a-thread-to-remove. The engine already owns those.
 
 ### What to leave alone
 
@@ -298,12 +309,12 @@ Clara’s portraits today: `clara`, `daniel`, `dunn`, `jesse`, `marcy`, `ortiz`,
 - The case-file shape, asset folders, and the copy steps above.
 - The player’s existing color variables (`--bg`, `--ink`, `--accent`, `--btn`, `--side`, `--card`, `--dim`, `--bar`, and the repeated palette hexes in its stylesheet) read these tokens, with the previous hex as the fallback.
 
-**Still one-off in `journey/index.html`**
+**Still one-off in `journey/app/player.js`**
 
 - The component rules themselves. `patterns.css` mirrors them for the guide. It is not a stylesheet the game loads, because loading it would define a second copy of `.fold`, `.pin`, and the rest.
 - Tape-player chrome (the phone and the cassette), the accusation report, the reveal, the filing drawer, the stamp, and the rank card.
-- Hint sentences inside `nextStep()`, hotspot maps, and pin coordinates.
-- Embedded font files and the embedded desk and cork photos.
-- The preview scrubber’s layout. Mentioned here so it stays a developer tool.
+- The narrative prose for the opening scenes, the reveal, the soft fail, and the rank card. It is Clara's and every case currently shares it. The case owns `steps(G)` and `seed(beat, G)`, but not those scenes yet.
+- Hotspot maps and pin coordinates.
+- The preview scrubber's layout and its list of stops. Those stops still use Clara's ids, so a new case previews with gaps; making the stop list case-authored is the next pass.
 
-A later pass can move the shared rules from the player into `patterns.css` once a second case is actually loading them. This pass keeps the running game on the CSS it already has, pointed at the tokens.
+The font files and the desk and cork photographs are no longer embedded. They are real files under `journey/assets/`, so they cache like any other image. A later pass can move the shared CSS rules from the player into `patterns.css` once a second case is actually loading them.

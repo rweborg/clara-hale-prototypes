@@ -1,5 +1,8 @@
-# Clara Hale: full-journey clickthrough prototype
-Open `index.html` in a browser. Keep the `assets/` folder next to it: all voices are ElevenLabs MP3s in `assets/audio/`. Works offline.
+# The Case Desk: full-journey clickthrough
+Open `index.html` in a browser. Keep the folder together: all voices are ElevenLabs MP3s in `assets/audio/`. Works offline, and also served.
+
+## How it is put together
+`index.html` is a case-neutral shell. It loads one case pack (`cases/<id>/case.js`) and then the engine (`app/player.js`). `?case=<id>` picks a pack; the default is `clara-hale`. Adding a case means adding a folder, not editing the engine. See [`_build/README.md`](_build/README.md) for the contract, and [`../DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md) for the visual system.
 
 ## Design system
 Tokens, pattern specimens, and the case-file contract live in [`design-system/`](design-system/). Open `design-system/index.html` for the style guide. The reuse guide is [`../DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md). The player links `design-system/tokens.css` for color and keeps the same hexes as fallbacks. Pattern classes in the guide mirror the live rules. They are not a second copy of the game. `?preview=1` (below) is a developer scrubber, not one of those patterns.
@@ -17,4 +20,13 @@ Preview mode does not read or write the real playthrough (`localStorage` key `jp
 - **Desk ambience follows the player's real clock and is cosmetic only.** 5–11 AM morning and 11 AM–5 PM daytime get coffee and a cherry danish. 5–9 PM evening and 9 PM–5 AM night get Chinese takeout, and the lamp comes on. The coffee, danish, and takeout respond to sips and bites, and that's all they do: they never gate progress. The ⚙ Prototype panel can preview each look without saving it.
 - **Voices are ElevenLabs only.** Clara's voicemail, the interview tapes (Daniel, Reed, Dunn, Jesse, Marcy), and all of Det. Ortiz's lines (cold open, handoff, pushbacks, breakthrough, reveal, welcome back) play bundled MP3s. The game never uses device or Mac text-to-speech. If a line has no sample, it shows as text only.
 
-Jump to any beat from the top rail (prototype). Research: `../research/journey-research.md`. Screenshots: `shots/` (`v2-*` = this revision). Build: `python3 _build/gen.py` rebuilds `index.html` and copies the audio. `_build/ortiz_lines.py` regenerates the Ortiz lines (it needs `ELEVENLABS_API_KEY`). `_build/smoke.js` runs the headless smoke test.
+Jump to any beat from the top rail (prototype). Research: `../research/journey-research.md`. Screenshots: `shots/` (`v2-*` = this revision).
+
+## Tools
+- `node _build/validate.js [case-id]` — checks a case pack against the contract and every file it points at. No browser.
+- `node _build/smoke.js` — headless browser: boot, every beat, both desks, the folder, the board, preview mode, a phone viewport. `--shots` writes screenshots to `_build/out/`.
+- `node _build/new-case.js <case-id>` — scaffolds a valid pack.
+- `node _build/probe.js "<expr>"` — evaluates expressions against a loaded page.
+
+`research/` and `shots/` are referenced above but are not in this repository. The old `_build/gen.py` and `_build/ortiz_lines.py` were never committed either; the build now splits into real files, so `index.html` is no longer assembled.
+

@@ -1,0 +1,5 @@
+# Smoke-test screenshots. Regenerate with `node _build/smoke.js --shots`.
+journey/_build/out/
+
+# OS noise
+.DS_Store

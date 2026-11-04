@@ -1,6 +1,8 @@
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY index.html /usr/share/nginx/html/
+COPY app /usr/share/nginx/html/app
+COPY cases /usr/share/nginx/html/cases
 COPY assets /usr/share/nginx/html/assets
 COPY design-system /usr/share/nginx/html/design-system
 # Railway healthchecks $PORT. Rewrite the placeholder, then run nginx in the foreground.
