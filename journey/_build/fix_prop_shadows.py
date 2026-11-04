@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 """
-_build/fix_prop_shadows.py — strip the baked cast shadow from the desk props.
+_build/fix_prop_shadows.py — recomposite the desk props.
 
-The props were exported with a pure-black cast shadow (rgb 0,0,0, up to 217
-alpha), far larger than the prop itself — the mug's covered five times its own
-area. The player crops each sprite to its opaque bounds, so that shadow was cut
-mid-gradient and read as a hard-edged dark rectangle on the desk. Softening it
-only made a lighter rectangle.
+The props were exported as rough cutouts carrying a pure-black cast shadow
+(rgb 0,0,0, up to 217 alpha) that was larger than the prop itself. The player
+crops each sprite to its opaque bounds, so the shadow was sliced mid-gradient
+and read as a hard dark rectangle on the desk.
 
-So this removes it outright:
+This script rebuilds each prop as a clean composite:
 
-  * Anything neutral (no chroma) and dark, at less than full opacity, is shadow.
-    Full opacity is never shadow: the kitchen mug's coffee is dark and neutral
-    but opaque, and an earlier colour-based pass destroyed it.
-  * One boundary layer around the removed area goes too, which takes the hard
-    edge where the shadow met the prop.
-  * The crop box and a matching hit box are measured and written into CFG.
+  1. Silhouette. The raw alpha has a ragged, speckled edge. It is re-derived
+     from a solid mask (alpha > 0.5), closed to fill notches, then feathered
+     one pixel.
+  2. Shadow. Two layers baked into the file: a tight contact shadow (2.5px
+     blur, 2px right / 3px down) and a wider ambient one (13px blur, 7/10),
+     both from the silhouette, so the prop sits on the desk instead of floating.
+  3. Boxes. The crop includes the shadow; a separate hit box marks the prop
+     itself so a shadow cannot steal a click from its neighbour.
 
-The props have no shadow of their own after this; the soft shadow is a CSS
-drop-shadow on #spr > img, which follows the cutout's silhouette and is not
-clipped by the crop.
+Baking rather than using a CSS filter means the shadow is not clipped by the
+crop, and it costs nothing at runtime.
 
     python3 _build/fix_prop_shadows.py [--dry-run]
 
-Restore the art first if you need to start over: git checkout -- assets/desk
+Not idempotent — it re-shadows whatever it is given. Restore first:
+
+    git checkout -- assets/desk
 """
 
 import json
@@ -37,47 +39,54 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLAYER = os.path.join(ROOT, 'app', 'player.js')
 
-CROP_LO = 6         # alpha floor when measuring the crop box
-CROP_FRAC = 0.06    # ignore rows/columns below this fraction of the busiest
+CLOSE_PX = 2                    # morphological closing on the silhouette mask
+FEATHER = 1.0                   # px of blur on the silhouette edge
+CONTACT = (2.5, 2, 3, 0.46)     # blur, dx, dy, strength
+AMBIENT = (13, 7, 10, 0.20)
 
 
-def strip(path, dry=False, grow_px=2):
-    """Remove the black cast shadow, including the hard edge against the prop."""
-    im = Image.open(path).convert('RGBA')
-    a = np.array(im).astype(np.int16)
-    r, g, b, alpha = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
-    mx = np.maximum(np.maximum(r, g), b)
-    mn = np.minimum(np.minimum(r, g), b)
+def silhouette(arr):
+    alpha = arr[..., 3].astype(np.float32) / 255.0
+    m = Image.fromarray(((alpha > 0.5) * 255).astype(np.uint8), 'L')
+    m = m.filter(ImageFilter.MaxFilter(CLOSE_PX * 2 + 1)).filter(ImageFilter.MinFilter(CLOSE_PX * 2 + 1))
+    m = m.filter(ImageFilter.GaussianBlur(FEATHER))
+    mask = np.array(m).astype(np.float32) / 255.0
+    out = arr.copy()
+    out[..., 3] = np.clip(alpha * mask * 255, 0, 255).astype(np.uint8)
+    return out
 
-    blackish = (mx - mn <= 7) & (mx <= 70) & (alpha > 0)
-    shadow = blackish & (alpha < 240)          # opaque dark pixels are the prop
-    grown = np.array(
-        Image.fromarray((shadow * 255).astype(np.uint8), 'L')
-        .filter(ImageFilter.MaxFilter(grow_px * 2 + 1))
-    ) > 0
-    remove = grown & blackish
 
-    out = a.astype(np.uint8).copy()
-    out[..., 3] = np.where(remove, 0, alpha)
-    if not dry:
-        Image.fromarray(out, 'RGBA').save(path, 'WEBP', quality=92, method=6)
-    return int(remove.sum())
+def with_shadow(arr):
+    im = Image.fromarray(arr, 'RGBA')
+    alpha = arr[..., 3].astype(np.float32) / 255.0
+    sil = Image.fromarray(((alpha > 0.15) * 255).astype(np.uint8), 'L')
+
+    def layer(spec):
+        blur, dx, dy, strength = spec
+        s = sil.filter(ImageFilter.GaussianBlur(blur))
+        shifted = Image.new('L', im.size, 0)
+        shifted.paste(s, (dx, dy))
+        return (np.array(shifted).astype(np.float32) / 255.0) * strength
+
+    shadow = 1 - (1 - layer(CONTACT)) * (1 - layer(AMBIENT))
+    out_a = alpha + shadow * (1 - alpha)
+    rgb = np.where(alpha[..., None] > 0, arr[..., :3], 0)
+    return np.dstack([rgb, np.clip(out_a * 255, 0, 255)]).astype(np.uint8)
 
 
 def boxes(path):
-    """Crop box (prop + shadow) and hit box (prop alone, relative to the crop)."""
     a = np.array(Image.open(path).convert('RGBA'))[..., 3]
-    m = a >= CROP_LO
+    m = a >= 6
     if not m.any():
         return None, None
     cols, rows = m.sum(0), m.sum(1)
-    xs = np.where(cols >= max(4, CROP_FRAC * cols.max()))[0]
-    ys = np.where(rows >= max(4, CROP_FRAC * rows.max()))[0]
-    cx0, cx1, cy0, cy1 = int(xs.min()), int(xs.max()), int(ys.min()), int(ys.max())
+    xs = np.where(cols >= max(4, 0.06 * cols.max()))[0]
+    ys = np.where(rows >= max(4, 0.06 * rows.max()))[0]
+    x0, x1, y0, y1 = int(xs.min()), int(xs.max()), int(ys.min()), int(ys.max())
+    crop = [max(0, x0 - 4), max(0, y0 - 4), x1 - x0 + 1 + 8, y1 - y0 + 1 + 8]
     ys2, xs2 = np.where(a >= 128)
-    ox0, ox1, oy0, oy1 = int(xs2.min()), int(xs2.max()), int(ys2.min()), int(ys2.max())
-    crop = [cx0, cy0, cx1 - cx0 + 1, cy1 - cy0 + 1]
-    hit = [ox0 - cx0, oy0 - cy0, ox1 - ox0 + 1, oy1 - oy0 + 1]
+    ox0, oy0 = int(xs2.min()), int(ys2.min())
+    hit = [ox0 - crop[0], oy0 - crop[1], int(xs2.max()) - ox0 + 1, int(ys2.max()) - oy0 + 1]
     return crop, hit
 
 
@@ -90,26 +99,26 @@ def main():
     conf = json.loads(m.group(1))
 
     done = set()
-    total = 0
     for theme in conf['desk'].values():
-        for key, spr in theme['spr'].items():
+        for spr in theme['spr'].values():
             path = spr['src']
             if path.startswith('data:') or spr['w'] < 900:
                 continue
             full = os.path.join(ROOT, path)
             if path.startswith('assets/desk/') and path not in done:
-                total += strip(full, dry)
+                arr = with_shadow(silhouette(np.array(Image.open(full).convert('RGBA'))))
+                if not dry:
+                    Image.fromarray(arr, 'RGBA').save(full, 'WEBP', quality=92, method=6)
                 done.add(path)
             crop, hit = boxes(full)
             if crop:
-                spr['crop'] = crop
-                spr['hit'] = hit
+                spr['crop'], spr['hit'] = crop, hit
 
     if not dry:
         out = json.dumps(conf, ensure_ascii=False, separators=(',', ':'))
         open(PLAYER, 'w', encoding='utf-8').write(src[:m.start(1)] + out + src[m.end(1):])
 
-    print(f'sprites stripped: {len(done)}  shadow pixels removed: {total:,}')
+    print(f'sprites recomposited: {len(done)}')
     print('CFG crop + hit boxes ' + ('measured (dry run)' if dry else 'written'))
 
 
