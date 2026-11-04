@@ -179,6 +179,37 @@ git revert --no-edit HEAD -- journey/nginx.conf
 git push
 ```
 
+## Known state (4 Nov 2026)
+
+| Host | Behaviour |
+| --- | --- |
+| `https://www.nextsteps.fun` | 200, serves the app, Let's Encrypt cert valid to Feb 2027 |
+| `https://nextsteps.fun` (apex) | 301 → `http://journey-production-fddc.up.railway.app/` |
+
+The apex is attached to the Railway service but sits at "Waiting for DNS
+update" because Railway wants `CNAME @ → qyz9zwf6.up.railway.app`, and GoDaddy
+cannot CNAME an apex. The apex is instead answered by GoDaddy's own forwarding,
+pointed at the Railway hostname rather than at `www`.
+
+**Pending fix.** GoDaddy → Domain Settings → Forwarding → edit the
+`nextsteps.fun` row → destination `https://www.nextsteps.fun`, type Permanent
+(301), masking off. Then delete the `nextsteps.fun` custom domain in Railway
+(it can never verify; it also occupies one of the two domain slots on the
+current plan).
+
+Blocked on 4 Nov by a GoDaddy throttle: more than five one-time passwords for
+this action in seven days, so editing that forward is locked for a week. Either
+wait it out or ask GoDaddy support to clear the throttle.
+
+The alternative — making the apex the canonical host — needs the nameservers
+moved to Cloudflare so the apex CNAME can be flattened (Path A above). That
+also needs an OTP, so it is blocked by the same window.
+
+Until then `www.nextsteps.fun` is the URL to share. `index.html` carries
+`<link rel="canonical" href="https://www.nextsteps.fun/">` so crawlers and link
+previews treat that as the address even when a page is served from the Railway
+hostname.
+
 ## After launch
 
 - Add the `nextsteps.fun` URL to the GitHub repo's About panel.

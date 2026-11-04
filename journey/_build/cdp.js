@@ -196,8 +196,18 @@ async function goto(c, url, timeout = 15000) {
     } catch (e) { /* context destroyed mid-navigation */ }
     await sleep(120);
   }
+  if (!live) {
+    // The URL may have redirected (an apex forward, for example). If a document
+    // is complete by now, it is the landing page: accept it and record where we
+    // actually ended up.
+    const s = await c.evaluate(`({href: location.href, rs: document.readyState})`).catch(() => null);
+    if (!s || s.rs !== 'complete') throw new Error(`navigation to ${url} did not settle`);
+    c.currentUrl = s.href;
+    c.redirectedFrom = url;
+    await sleep(350);
+    return;
+  }
   c.currentUrl = url;
-  if (!live) throw new Error(`navigation to ${url} did not settle`);
   await sleep(350);
 }
 
