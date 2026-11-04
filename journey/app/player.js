@@ -4,7 +4,7 @@
    prototype still opens straight off the filesystem.
    Case content lives in cases/<id>/case.js. */
 
-const CFG = {"desk":{"b":{"bare":"assets/desk/b-bare.jpg","spr":{"folder":{"x":45,"y":113,"w":340,"h":255,"src":"assets/evidence/folder-closed.webp"},"news":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-news.webp"},"briefing":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-briefing.webp"},"device":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-device.webp"},"bag":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-bag.webp"},"pad":{"x":3,"y":0,"w":1277,"h":800,"src":"assets/desk/b-pad.webp"},"envC":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-envC.webp"},"envB":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-envB.webp"},"envA":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-envA.webp"},"mug_full":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-mug_full.webp"},"mug_half":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-mug_half.webp"},"mug_empty":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-mug_empty.webp"},"lamp":{"x":0,"y":0,"w":1280,"h":799,"src":"assets/desk/b-lamp.webp"},"danish":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-danish.webp"},"takeout_full":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/b-takeout_full.webp"},"takeout_half":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/b-takeout_half.webp"},"takeout_empty":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/b-takeout_empty.webp"}}},"d":{"bare":"assets/desk/d-bare.jpg","spr":{"folder":{"x":70,"y":133,"w":340,"h":255,"rot":6,"src":"assets/evidence/folder-closed.webp"},"news":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-news.webp"},"briefing":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-briefing.webp"},"device":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-device.webp"},"bag":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-bag.webp"},"pad":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-pad.webp"},"envC":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-envC.webp"},"envB":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-envB.webp"},"envA":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-envA.webp"},"mug_full":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-mug_full.webp"},"mug_half":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-mug_half.webp"},"mug_empty":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-mug_empty.webp"},"lamp":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/d-lamp.webp"},"danish":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-danish.webp"},"takeout_full":{"x":0,"y":0,"w":1280,"h":800,"src":"assets/desk/d-takeout_full.webp"},"takeout_half":{"x":0,"y":0,"w":1280,"h":800,"src":"assets/desk/d-takeout_half.webp"},"takeout_empty":{"x":0,"y":0,"w":1280,"h":800,"src":"assets/desk/d-takeout_empty.webp"}}}},"A":{"cork":"assets/evidence/cork.jpg","folder_open":"assets/evidence/folder_open.webp","env":"assets/evidence/env.jpg","env_open":"assets/evidence/env_open.webp","env_strip":"assets/evidence/env_strip.webp","thumb_b":"assets/evidence/thumb_b.jpg","thumb_d":"assets/evidence/thumb_d.jpg"}};
+const CFG = {"desk":{"b":{"bare":"assets/desk/b-bare.jpg","spr":{"folder":{"x":45,"y":113,"w":340,"h":255,"src":"assets/evidence/folder-closed.webp"},"news":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-news.webp","crop":[639,440,239,310],"hit":[1,1,237,308]},"briefing":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-briefing.webp","crop":[406,96,225,288],"hit":[1,1,223,286]},"device":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-device.webp","crop":[714,160,104,164],"hit":[1,2,90,156]},"bag":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-bag.webp","crop":[87,455,209,294],"hit":[1,1,203,288]},"pad":{"x":3,"y":0,"w":1277,"h":800,"src":"assets/desk/b-pad.webp","crop":[335,442,274,324],"hit":[1,4,263,310]},"envC":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-envC.webp","crop":[989,465,250,157],"hit":[1,1,248,155]},"envB":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-envB.webp","crop":[989,521,254,158],"hit":[1,1,249,155]},"envA":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-envA.webp","crop":[989,577,257,160],"hit":[1,1,250,156]},"mug_full":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-mug_full.webp","crop":[965,336,286,188],"hit":[0,16,120,87]},"mug_half":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-mug_half.webp","crop":[965,336,286,188],"hit":[0,16,120,87]},"mug_empty":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-mug_empty.webp","crop":[965,336,286,188],"hit":[0,16,120,87]},"lamp":{"x":0,"y":0,"w":1280,"h":799,"src":"assets/desk/b-lamp.webp","crop":[1139,0,141,221],"hit":[1,0,111,220]},"danish":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/b-danish.webp","crop":[1116,276,144,117],"hit":[1,3,104,104]},"takeout_full":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/b-takeout_full.webp","crop":[846,110,383,252],"hit":[-1,17,250,176]},"takeout_half":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/b-takeout_half.webp","crop":[846,110,383,252],"hit":[-1,17,249,176]},"takeout_empty":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/b-takeout_empty.webp","crop":[846,110,383,252],"hit":[-1,17,250,176]}}},"d":{"bare":"assets/desk/d-bare.jpg","spr":{"folder":{"x":70,"y":133,"w":340,"h":255,"rot":6,"src":"assets/evidence/folder-closed.webp"},"news":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-news.webp","crop":[395,12,336,426],"hit":[0,0,336,426]},"briefing":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-briefing.webp","crop":[410,168,266,326],"hit":[-2,-1,270,327]},"device":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-device.webp","crop":[735,112,258,372],"hit":[5,-2,254,370]},"bag":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-bag.webp","crop":[204,456,247,331],"hit":[0,1,247,326]},"pad":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-pad.webp","crop":[491,463,245,337],"hit":[0,3,243,332]},"envC":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-envC.webp","crop":[758,451,278,197],"hit":[0,-1,278,199]},"envB":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-envB.webp","crop":[769,515,272,184],"hit":[1,1,269,183]},"envA":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-envA.webp","crop":[783,583,262,166],"hit":[1,2,257,163]},"mug_full":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-mug_full.webp","crop":[1004,374,137,180],"hit":[13,1,125,91]},"mug_half":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-mug_half.webp","crop":[1004,373,137,181],"hit":[14,2,124,91]},"mug_empty":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-mug_empty.webp","crop":[1004,373,137,181],"hit":[13,2,125,91]},"lamp":{"x":2,"y":0,"w":1278,"h":799,"src":"assets/desk/d-lamp.webp","crop":[1088,0,158,534],"hit":[46,0,115,226]},"danish":{"x":2,"y":0,"w":1278,"h":800,"src":"assets/desk/d-danish.webp","crop":[48,555,110,120],"hit":[1,2,107,107]},"takeout_full":{"x":0,"y":0,"w":1280,"h":800,"src":"assets/desk/d-takeout_full.webp","crop":[0,563,204,237],"hit":[0,-2,206,189]},"takeout_half":{"x":0,"y":0,"w":1280,"h":800,"src":"assets/desk/d-takeout_half.webp","crop":[0,563,204,237],"hit":[0,-2,206,189]},"takeout_empty":{"x":0,"y":0,"w":1280,"h":800,"src":"assets/desk/d-takeout_empty.webp","crop":[0,563,204,237],"hit":[0,-2,206,189]}}}},"A":{"cork":"assets/evidence/cork.jpg","folder_open":"assets/evidence/folder_open.webp","env":"assets/evidence/env.jpg","env_open":"assets/evidence/env_open.webp","env_strip":"assets/evidence/env_strip.webp","thumb_b":"assets/evidence/thumb_b.jpg","thumb_d":"assets/evidence/thumb_d.jpg"}};
 
 
 
@@ -30,6 +30,27 @@ const BRAND = window.PRODUCT || {name: 'The Case Desk', company: ''};
   if (tb) tb.textContent = oneLine;
   const sb = document.getElementById('subtitle');
   if (sb) sb.textContent = BRAND.name + ' · Case # ' + (PACK.number || '');
+}
+
+// The (i) chip says which build this is. Stamped by _build/stamp.js.
+{
+  const btn = document.getElementById('ver'), pop = document.getElementById('verpop');
+  if (btn && pop) {
+    const B = window.APP_BUILD || {};
+    const when = B.built ? new Date(B.built) : null;
+    const stamp = when && !isNaN(when) ? when.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'not stamped';
+    pop.innerHTML = `<b>${esc(BRAND.name)}</b><dl>`
+      + `<dt>Version</dt><dd>${esc(B.version || 'dev')}</dd>`
+      + `<dt>Built</dt><dd>${esc(stamp)}</dd>`
+      + `<dt>Case</dt><dd>${esc(PACK.number || '')}</dd>`
+      + `<dt>Company</dt><dd>${esc(BRAND.company || '')}</dd></dl>`;
+    const line = document.getElementById('verline');
+    if (line) line.textContent = `${BRAND.name} ${B.version || 'dev'} · built ${stamp}`;
+    const toggle = on => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); };
+    btn.onclick = e => { e.stopPropagation(); toggle(pop.hidden); };
+    document.addEventListener('click', e => { if (!pop.hidden && !pop.contains(e.target) && e.target !== btn) toggle(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) toggle(false); });
+  }
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -292,6 +313,7 @@ function clampOff(name, dx, dy) { const b = propBox(name); const x = Math.max(12
 function cropId(im) { const key = im && (im.dataset.spr || im.dataset.k); return key ? (im.dataset.theme || S.theme) + ':' + key : ''; }
 function measureCrop(im) { if (!im.isConnected || (im.dataset.theme && im.dataset.theme !== S.theme)) return; const key = im.dataset.spr || im.dataset.k, id = cropId(im); if (!id || CROP[id] || !im.naturalWidth) return;
   const d = CFG.desk[S.theme].spr[key]; if (!d || d.w < 900) { CROP[id] = {full: true}; return; }
+  if (d.crop) { CROP[id] = {x: d.crop[0], y: d.crop[1], w: d.crop[2], h: d.crop[3]}; return; }
   try { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext('2d', {willReadFrequently: true}); g.drawImage(im, 0, 0);
     const {data, width, height} = g.getImageData(0, 0, c.width, c.height); let minx = width, miny = height, maxx = 0, maxy = 0, any = false;
     for (let i = 3; i < data.length; i += 16) { if (data[i] > 128) { const p = (i - 3) / 4, x = p % width, y = (p / width) | 0; any = true; if (x < minx) minx = x; if (y < miny) miny = y; if (x > maxx) maxx = x; if (y > maxy) maxy = y; } }
@@ -309,7 +331,16 @@ function applyPlace(name) { const off = placeOff(name), H = HOT[S.theme][name], 
 function fitHot(name) { const b = $(`.hot[data-name="${name}"]`); if (!b) return;
   const imgs = $$('#spr img').filter(im => (im.dataset.hot || hotForSprite(im.dataset.k)) === name && im.style.visibility !== 'hidden');
   let L = Infinity, T = Infinity, R = -Infinity, B = -Infinity, deg = null;
-  for (const im of imgs) { const x = parseFloat(im.style.left), y = parseFloat(im.style.top), w = parseFloat(im.style.width), h = parseFloat(im.style.height); if (!isFinite(x) || !(w > 0) || !(h > 0)) continue; L = Math.min(L, x); T = Math.min(T, y); R = Math.max(R, x + w); B = Math.max(B, y + h); const m = /rotate\(([-\d.]+)deg\)/.exec(im.style.transform || ''); if (m && deg == null) deg = parseFloat(m[1]); }
+  for (const im of imgs) {
+    const x = parseFloat(im.style.left), y = parseFloat(im.style.top), w = parseFloat(im.style.width), h = parseFloat(im.style.height);
+    if (!isFinite(x) || !(w > 0) || !(h > 0)) continue;
+    const d = CFG.desk[S.theme].spr[im.dataset.spr || im.dataset.k] || {};
+    // the crop includes the prop's shadow; d.hit is the prop itself, so a
+    // shadow cannot steal a click from the thing next to it
+    const hx = d.hit ? x + d.hit[0] : x, hy = d.hit ? y + d.hit[1] : y;
+    const hw = d.hit ? d.hit[2] : w, hh = d.hit ? d.hit[3] : h;
+    L = Math.min(L, hx); T = Math.min(T, hy); R = Math.max(R, hx + hw); B = Math.max(B, hy + hh);
+    const m = /rotate\(([-\d.]+)deg\)/.exec(im.style.transform || ''); if (m && deg == null) deg = parseFloat(m[1]); }
   if (!isFinite(L) || R - L > 900 || B - T > 700) { seatTags(); return; }
   b.style.left = L + 'px'; b.style.top = T + 'px'; b.style.width = (R - L) + 'px'; b.style.height = (B - T) + 'px';
   b.style.transform = `rotate(${deg || 0}deg)`;
@@ -1019,6 +1050,7 @@ function previewNoteJump(b) {
 function initPreview() {
   const bar = $('#pv'); if (!bar) return;
   bar.hidden = false;
+  document.body.classList.add('pv-on');   // lifts the version chip clear of the scrubber
   const hint = $('#dz .small');
   if (hint) hint.textContent = 'Preview mode does not read or write your saved game. Scrub the bar along the bottom. Reload without ?preview=1 and a real playthrough resumes as usual.';
   const inner = $('#pvinner'); if (inner) inner.style.setProperty('--slots', String(STAGES.length - 1));

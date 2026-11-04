@@ -17,6 +17,7 @@
   <label>Jump to a beat</label><div class="row" id="jumprow"></div>
   <p class="small">Every beat can be jumped to; state is filled in as if you played up to it. Progress saves automatically and resumes on reload.</p>
   <label>Save</label><div class="row"><button id="newb">↺ Start the case over</button></div>
+  <p class="small" id="verline"></p>
 </div>
 <main id="stage">
   <section id="deskV" class="view on"><div class="fit" id="desk"><img id="bare" alt="" draggable="false"><div id="spr"></div><div id="tod"></div><div id="glow"></div><div id="hots"></div><div id="fly"></div><div id="drawer" hidden><div class="dfront"><span>PINE HOLLOW CASE FILES</span><i></i></div></div></div></section>
@@ -60,6 +61,8 @@
     </div>
   </div>
 </div>
+<button type="button" id="ver" class="verbtn" aria-label="Version information" aria-expanded="false" aria-controls="verpop">i</button>
+<div id="verpop" class="verpop" hidden role="status"></div>
 <script>
 /* Load the case pack, then the engine.
    document.write keeps the order deterministic and still works when this file
@@ -68,6 +71,7 @@
 (function () {
   var id = new URLSearchParams(location.search).get('case') || 'clara-hale';
   document.write('<script src="app/brand.js"><\/script>');
+  document.write('<script src="app/version.js"><\/script>');
   document.write('<script src="cases/' + id + '/case.js"><\/script>');
   document.write('<script src="app/player.js"><\/script>');
 })();
