@@ -1,5 +1,5 @@
 import { getPool, withTx } from './db.js';
-import { sendMagicLink } from './email.js';
+import { EMAIL_UNAVAILABLE, sendMagicLink } from './email.js';
 import {
   HttpError,
   clearCookie,
@@ -98,7 +98,7 @@ export async function requestMagicLink(req, res, config, limitBy) {
   limitBy(`email:${email}`);
 
   if (config.production && !config.resendApiKey) {
-    throw new HttpError(503, 'Sign-in email is not turned on yet. You can keep playing on this device.');
+    throw new HttpError(503, EMAIL_UNAVAILABLE);
   }
 
   let device = readCookie(req, DEVICE_COOKIE);

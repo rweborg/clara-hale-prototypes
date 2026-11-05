@@ -1,5 +1,8 @@
 import { HttpError } from './http.js';
 
+/** Shown when production has no Resend key. Never pair this with a sign-in link. */
+export const EMAIL_UNAVAILABLE = "Sign-in by email isn't available yet. You can keep playing — your progress is saved on this device.";
+
 /**
  * Send a magic-link email through Resend's HTTPS API.
  * Railway blocks outbound SMTP on Hobby and Free, so this is HTTP only.
@@ -11,7 +14,7 @@ import { HttpError } from './http.js';
 export async function sendMagicLink({ to, url, config, fetchImpl = globalThis.fetch }) {
   if (!config.resendApiKey) {
     if (config.production) {
-      throw new HttpError(503, 'Sign-in email is not turned on yet. You can keep playing on this device.');
+      throw new HttpError(503, EMAIL_UNAVAILABLE);
     }
     console.log(`[case-desk] dev magic link for ${to}: ${url}`);
     return { delivered: 'dev', devLink: url };

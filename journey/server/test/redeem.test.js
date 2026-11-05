@@ -91,6 +91,8 @@ describe('redeem', { concurrency: 1 }, () => {
     await signIn(started.base, player, 'player@example.com');
     const bad = await call(started.base, player, 'POST', '/api/redeem', { code: 'CD-AAAA-AAAA-AAAA' });
     assert.equal(bad.status, 400);
+    assert.equal(bad.json.error, 'That code does not work. Check the characters and try again.');
+    assert.doesNotMatch(bad.json.error, /Something went wrong/);
 
     const limited = await start({ redeemRateLimit: 2 });
     try {
@@ -100,6 +102,8 @@ describe('redeem', { concurrency: 1 }, () => {
       assert.equal((await call(limited.base, cookies, 'POST', '/api/redeem', { code: 'CD-BBBB-BBBB-BBBB' })).status, 400);
       const blocked = await call(limited.base, cookies, 'POST', '/api/redeem', { code: 'CD-CCCC-CCCC-CCCC' });
       assert.equal(blocked.status, 429);
+      assert.equal(blocked.json.error, 'Too many attempts. Please wait a few minutes and try again.');
+      assert.doesNotMatch(blocked.json.error, /Something went wrong/);
     } finally {
       await new Promise((resolve) => limited.server.close(resolve));
     }

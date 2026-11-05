@@ -100,6 +100,7 @@
 </main>
 <script>
 (function () {
+  const EMAIL_OFF = "Sign-in by email isn't available yet. You can keep playing — your progress is saved on this device.";
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   let me = null;
@@ -225,12 +226,27 @@
       $('buy').hidden = false;
     }
   }
+  function signInFailure(res) {
+    if (res.status === 503) return EMAIL_OFF;
+    const text = res.data && res.data.error;
+    if (text && text !== 'Something went wrong.') return text;
+    if (res.status === 429) return 'Too many attempts. Please wait a few minutes and try again.';
+    if (res.status === 400) return 'Enter the email address you want to use.';
+    return 'Could not send the link. You can keep playing — your progress is saved on this device.';
+  }
+  function redeemFailure(res) {
+    const text = res.data && res.data.error;
+    if (text && text !== 'Something went wrong.') return text;
+    if (res.status === 429) return 'Too many attempts. Please wait a few minutes and try again.';
+    return 'That code does not work. Check the characters and try again.';
+  }
   $('emailform').onsubmit = async (e) => {
     e.preventDefault();
     msg('emailmsg', 'Sending…');
     $('devlink').hidden = true;
+    $('devlink').textContent = '';
     const res = await api('POST', '/api/auth/request', { email: $('email').value });
-    if (!res.ok) { msg('emailmsg', res.data.error || 'Could not send the link.', 'err'); return; }
+    if (!res.ok) { msg('emailmsg', signInFailure(res), res.status === 503 ? 'note' : 'err'); return; }
     if (res.data.devLink) {
       msg('emailmsg', 'Email isn’t connected on this server yet. Use this link in this browser:', 'ok');
       $('devlink').hidden = false;
@@ -243,7 +259,7 @@
     e.preventDefault();
     msg('redeemmsg', 'Checking the code…');
     const res = await api('POST', '/api/redeem', { code: $('code').value });
-    if (!res.ok) { msg('redeemmsg', res.data.error || 'That code did not work.', 'err'); return; }
+    if (!res.ok) { msg('redeemmsg', redeemFailure(res), 'err'); return; }
     msg('redeemmsg', res.data.entitlement.title + ' is on your desk.', 'ok');
     $('code').value = '';
     await refresh();

@@ -178,14 +178,31 @@
     }
   }
 
+  const EMAIL_OFF = "Sign-in by email isn't available yet. You can keep playing — your progress is saved on this device.";
+  function signInFailure(res) {
+    if (res.status === 503) return EMAIL_OFF;
+    const text = res.data && res.data.error;
+    if (text && text !== 'Something went wrong.') return text;
+    if (res.status === 429) return 'Too many attempts. Please wait a few minutes and try again.';
+    if (res.status === 400) return 'Enter the email address you want to use.';
+    return 'Could not send the link. You can keep playing — your progress is saved on this device.';
+  }
+  function redeemFailure(res) {
+    const text = res.data && res.data.error;
+    if (text && text !== 'Something went wrong.') return text;
+    if (res.status === 429) return 'Too many attempts. Please wait a few minutes and try again.';
+    return 'That code does not work. Check the characters and try again.';
+  }
   async function onEmail(e) {
     e.preventDefault();
     status('Sending…');
+    const dev = root.querySelector('[data-dev]');
+    if (dev) { dev.hidden = true; dev.textContent = ''; }
     const email = root.querySelector('#acctemail').value;
     let res;
     try { res = await api('POST', '/api/auth/request', { email }); }
     catch (err) { status('Could not reach the desk. Your progress is still on this device.', true); return; }
-    if (!res.ok) { status(res.data.error || 'Could not send the link.', true); return; }
+    if (!res.ok) { status(signInFailure(res), res.status !== 503); return; }
     if (res.data.devLink) {
       status('Email isn’t connected here yet. Open this link in this browser:');
       const p = root.querySelector('[data-dev]');
@@ -200,7 +217,7 @@
     const el = root.querySelector('[data-redeemmsg]');
     el.textContent = 'Checking…';
     const res = await api('POST', '/api/redeem', { code: root.querySelector('#acctcode').value });
-    if (!res.ok) { el.className = 'err'; el.textContent = res.data.error || 'That code did not work.'; return; }
+    if (!res.ok) { el.className = 'err'; el.textContent = redeemFailure(res); return; }
     el.className = 'status';
     el.textContent = (res.data.entitlement.title || 'That case') + ' is on your desk.';
     await loadMe();
