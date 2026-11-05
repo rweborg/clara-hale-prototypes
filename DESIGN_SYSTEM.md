@@ -25,9 +25,25 @@ Ordinary players should be able to read this as a case file, not as a poster and
 
 ### Image treatment
 
-Characters are real photographs. The locked look is rough and natural: a little grain, a little softness, desaturated, with color still recognizable (hair, a coat, a flannel). Not illustration, and not a beauty-retouched studio shot.
+Characters are **generated photography, then treated**. The portraits come out of an image model, so on their own they share one look — same light, same grade, same flat rectangle — which reads as AI and is the fastest way to break the illusion. No generated image goes into the game raw.
 
-Every photo answers who gave it to the detective, and how. That provenance sets the place, the light, the framing, and the paper. The taxonomy is family snapshot, school picture, phone print, workplace or directory ID, newspaper, missing-person flyer, CCTV, scene still, and a mug shot only when that person was actually booked. Clara’s cast is not booked: Clara is a family snapshot from the Harvest Festival booth (her sister’s album), Ortiz and Deputy Dunn are county ID photos, Pastor Reed is a church-directory photo, Daniel and Marcy are phone candids, and Jesse is a yearbook picture. The recipe is written up in the [case photo provenance canvas](https://cursor.com/canvas/store-a0de2b96-6112-43d9-a6c2-fd1593f7d7f0/a26c9fc1-b943-4ca6-b96a-9cf33afd3203). Do not use a seamless gray backdrop, and do not invent a second face for the same person.
+Every portrait declares a provenance in the case file (`portraits` in `cases/<id>/case.js`), and `_build/plates.py` renders that provenance into the image: the grade, the paper, and the capture artefact a photo from that source would actually carry.
+
+| `type` | Look the plate gets |
+| --- | --- |
+| `snapshot` | Warm, slightly blown out, vignette, white print border, film date stamp |
+| `id` | Flat and neutral, thin border, name band along the bottom |
+| `directory` | Sepia, softer, double border, serif caption |
+| `school` | Warm neutral, thin white border, caption strip |
+| `phone` | Saturated, faint screen glare, no border |
+| `cctv` | Green monochrome, scanlines, timestamp bar |
+| `scene` | A plain photographic grade |
+
+Every plate also gets grain, a little softness and a light unsharp pass on the way out, because a generated face is too clean: that sheen is what the eye reads as fake. The finished plates are written to `assets/plates/` and the case art points at them; the raw portraits stay as source.
+
+The taxonomy is family snapshot (`snapshot`), school picture (`school`), phone print (`phone`), workplace or directory ID (`id`, `directory`), newspaper, missing-person flyer, CCTV (`cctv`), scene still (`scene`), and a mug shot (`mugshot`) only when that person was actually booked. The validator fails a case whose portrait has no provenance, an unknown type, no `name`, or no `source`.
+
+That provenance sets the place, the light, the framing, and the paper. Clara’s cast is not booked: Clara is a family snapshot from the Harvest Festival booth (her sister’s album), Ortiz and Deputy Dunn are county ID photos, Pastor Reed is a church-directory photo, Daniel and Marcy are phone candids, and Jesse is a yearbook picture. Do not use a seamless gray backdrop, and do not invent a second face for the same person.
 
 - Crop head and shoulders, forehead and eyes in frame. When a frame is taller than the face, use `object-position: center 16%` (`--ds-portrait-position`). Folder cards use `center 12%` on a short tile, which shows only the top of the file, so the place the photo came from (shelves, a hallway door, booth lanterns, the lake, a hymn board, the yearbook canvas) has to sit beside the head in that top band, not only under the chin.
 - Radius stays at 4px (`--ds-portrait-radius`) so a print looks cut, not like an app avatar.

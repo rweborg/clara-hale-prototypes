@@ -104,13 +104,13 @@ const MID = {viewed: {briefing: 1}, played: {voicemail: 1}, strings: [['clara', 
 const TR = {"voicemail":[{"sp":"CLARA","t":0.0,"e":6.88,"tag":"breathless, walking, slightly shaky","x":"Ruth, it's Clara. Sorry, I know it's late, it's Saturday. I'm up on the lake path. I needed air."},{"sp":"CLARA","t":7.38,"e":20.5,"tag":"urgent, lowered","x":"Listen. Forget the house stuff for a second. This isn't about Daniel. The ledger pages are gone. September, October. Just torn out. And the deposits don't match the register tapes. Not by a little."},{"sp":"CLARA","t":21.0,"e":33.16,"tag":"upset, voice tight","x":"I told her tonight. I told her I'm going to the sheriff on Monday. She cried. She said she'd pay it back. Six years, Ruth. I'd have given her the money if she'd just asked."},{"sp":"CLARA","t":33.66,"e":42.14,"tag":"steadying, firm","x":"But I can't. I can't let her keep doing this. Call me back first thing. I need to know what this does to the partnership agreement before I"},{"sp":"CLARA","t":42.64,"e":44.88,"tag":"pause, turning, uneasy","x":"...Hello? Is someone there?"},{"sp":"CLARA","t":45.38,"e":49.78,"tag":"nervous half-laugh, relieved","x":"It's just a lantern. Okay. Call me back, Ruth."}],"marcy":[{"sp":"ORTIZ","t":0.0,"e":2.88,"tag":"steady","x":"Ms. Tolliver. Have a seat."},{"sp":"MARCY","t":3.38,"e":15.86,"tag":"nervous, bright, over-talking","x":"Oh, thank you, yes. Sorry, I'm a mess, I haven't slept. I brought scones, they're with the lady at the front desk. Lemon poppyseed. Clara's recipe, actually, it's it's her recipe. Sorry."},{"sp":"ORTIZ","t":16.36,"e":19.72,"tag":"even","x":"That's kind of you. You and Clara are partners."},{"sp":"MARCY","t":20.22,"e":34.54,"tag":"rapid","x":"Six years. Forty-sixty, her sixty. I do the front, the ordering, the register, the people stuff. Clara's the genius. Clara does the books. I don't even, I'm hopeless with numbers, ask anybody."},{"sp":"ORTIZ","t":35.04,"e":36.88,"tag":"neutral","x":"Tell me about Saturday."},{"sp":"MARCY","t":37.38,"e":57.38,"tag":"chattering","x":"Big day. Biggest day of the year for us. Booth fourteen. I sold out of cider donuts by seven, it was amazing, actually. Jesse was there until, oh, I sent him home early, he looked tired, poor kid. Clara came by around eight-thirty? She was fine. Totally fine. We talked about Christmas orders."},{"sp":"ORTIZ","t":57.88,"e":59.16,"tag":"dry","x":"Christmas orders."},{"sp":"MARCY","t":59.66,"e":64.86,"tag":"laughs nervously","x":"Yule logs. She wanted to do yule logs this year."}],"daniel":[{"sp":"ORTIZ","t":0.0,"e":2.32,"tag":"steady","x":"Daniel Hale. Thanks for coming in."},{"sp":"DANIEL","t":2.82,"e":7.14,"tag":"curt, defensive","x":"Did I have a choice? Your people were on my porch at seven in the morning."},{"sp":"ORTIZ","t":7.64,"e":14.84,"tag":"even","x":"You had a choice. You chose to come. I appreciate it. Your wife has been missing since Saturday night."},{"sp":"DANIEL","t":15.34,"e":20.06,"tag":"bitter","x":"Soon-to-be ex-wife. Go ahead and say it. Everybody else in this town does."},{"sp":"ORTIZ","t":20.56,"e":22.4,"tag":"neutral","x":"Tell me about the divorce."},{"sp":"DANIEL","t":22.9,"e":38.02,"tag":"sighs heavily","x":"It's a divorce. Two people who used to like each other, fighting over the one thing they built. The bakery. My name's on that sign, Detective. I put up half the down payment. I laid the brick around those ovens with my own hands."},{"sp":"ORTIZ","t":38.52,"e":40.44,"tag":"probing","x":"And Clara wanted to keep it."},{"sp":"DANIEL","t":40.94,"e":47.1,"tag":"sharp","x":"Clara wanted to keep everything. Her lawyer, Ruth Kessler, sends me letters with words in them I have to look up."}],"jesse":[{"sp":"ORTIZ","t":0.0,"e":2.64,"tag":"gentle but steady","x":"Jesse. You want some water?"},{"sp":"JESSE","t":3.14,"e":7.62,"tag":"nervous, mumbling","x":"No. I'm good. Am I under arrest?"},{"sp":"ORTIZ","t":8.12,"e":15.88,"tag":"even","x":"No. You're here because you work for Clara, and you left town the night she disappeared. Your cousin's place in Missoula. Two days."},{"sp":"JESSE","t":16.38,"e":18.7,"tag":"defensive, fast","x":"I came back. I came back on my own."},{"sp":"ORTIZ","t":19.2,"e":20.88,"tag":"calm","x":"You did. Why'd you leave?"},{"sp":"JESSE","t":21.38,"e":24.26,"tag":"long pause","x":"...You already know why."},{"sp":"ORTIZ","t":24.76,"e":26.28,"tag":"patient","x":"Tell me anyway."},{"sp":"JESSE","t":26.78,"e":48.62,"tag":"quietly","x":"I've got a record. Juvie. It's sealed, but it's Pine Hollow. Sealed means everybody knows and nobody says. I took a car when I was fifteen. A car. And then Clara's car shows up at the lake with the keys in it? Who do you think Deputy Dunn knocks on first?"}],"reed":[{"sp":"ORTIZ","t":0.0,"e":2.4,"tag":"steady","x":"Pastor Reed. Thank you for your time."},{"sp":"REED","t":2.9,"e":9.46,"tag":"warm, calm","x":"Of course, Detective. Whatever helps bring Clara home. The whole congregation is praying."},{"sp":"ORTIZ","t":9.96,"e":11.72,"tag":"neutral","x":"You were at the festival Saturday."},{"sp":"REED","t":12.22,"e":21.82,"tag":"pleasant","x":"The church runs the pie table every year. Booth two, by the entrance. I'm there from four until close. More or less."},{"sp":"ORTIZ","t":22.32,"e":23.84,"tag":"dry","x":"More or less."},{"sp":"REED","t":24.34,"e":31.22,"tag":"gentle laugh","x":"I wander. A pastor at a festival is half pie-seller, half confessor."},{"sp":"ORTIZ","t":31.72,"e":34.84,"tag":"probing","x":"You told the sheriff's office you saw Clara arguing that evening."},{"sp":"REED","t":35.34,"e":41.74,"tag":"measured","x":"I did. Around nine, near the bakery booth. Clara and Marcy Tolliver."}],"dunn":[{"sp":"ORTIZ","t":0.0,"e":1.36,"tag":"steady","x":"Deputy Dunn."},{"sp":"DUNN","t":1.86,"e":8.26,"tag":"bored, drawling","x":"Detective. Helena sent you all the way up here for a lady who probably drove off to clear her head."},{"sp":"ORTIZ","t":8.76,"e":11.8,"tag":"even","x":"Her car's at the trailhead. She didn't drive anywhere."},{"sp":"DUNN","t":12.3,"e":17.5,"tag":"shrugs","x":"So she walked. People walk. The lake loop's six miles."},{"sp":"ORTIZ","t":18.0,"e":20.08,"tag":"flat","x":"It's been three days."},{"sp":"DUNN","t":20.58,"e":21.46,"tag":"dismissive","x":"Yeah, yeah."},{"sp":"ORTIZ","t":21.96,"e":24.04,"tag":"neutral","x":"You were first on scene Sunday morning."},{"sp":"DUNN","t":24.54,"e":34.06,"tag":"reciting, bored","x":"Seven-ish. Jogger called it in. Keys in the ignition, doors unlocked, no phone. Ran the plate, it came back to Clara."}],"marcy_more":[{"sp":"ORTIZ","tag":"probing","x":"Pastor Reed heard you two arguing near nine. He heard you say, \"You'll ruin me.\""},{"sp":"MARCY","tag":"too quick","x":"Oh, that! No, that was about the yule logs. Clara wanted to order the good chocolate, the Belgian, and I said, \"Clara, you'll ruin me,\" like a joke, you know..."},{"sp":"ORTIZ","tag":"pause","x":"What time did you leave the festival?"},{"sp":"MARCY","tag":"confident","x":"Nine-thirty. I packed up and drove straight home. Watched a cooking show and fell asleep on the couch."},{"sp":"ORTIZ","tag":"calm","x":"Your Corolla was still in the festival lot at six Sunday morning. It's in the cleanup crew's photos."},{"sp":"MARCY","tag":"flustered","x":"Oh. Right, I... I'd had a cider. I didn't want to drive, so I walked. I walked home."},{"sp":"ORTIZ","tag":"","x":"…"},{"sp":"ORTIZ","tag":"casual","x":"How tall are you, Ms. Tolliver?","key":"height"},{"sp":"MARCY","tag":"thrown","x":"What? Five-two. Five-two and a half. Why does that...","key":"height","save":"Marcy is 5′2″"}]};
 
 const ART = {
-  "p_clara": "assets/portraits/clara.jpg",
-  "p_daniel": "assets/portraits/daniel.jpg",
-  "p_marcy": "assets/portraits/marcy.jpg",
-  "p_ortiz": "assets/portraits/ortiz.jpg",
-  "p_reed": "assets/portraits/reed.jpg",
-  "p_jesse": "assets/portraits/jesse.jpg",
-  "p_dunn": "assets/portraits/dunn.jpg",
+  "p_clara": "assets/plates/clara.jpg",
+  "p_daniel": "assets/plates/daniel.jpg",
+  "p_marcy": "assets/plates/marcy.jpg",
+  "p_ortiz": "assets/plates/ortiz.jpg",
+  "p_reed": "assets/plates/reed.jpg",
+  "p_jesse": "assets/plates/jesse.jpg",
+  "p_dunn": "assets/plates/dunn.jpg",
   "dock_daniel": "assets/evidence/dock-daniel.jpg",
   "camera_still": "assets/evidence/camera-marcy.jpg",
   "lantern": "assets/evidence/lantern.jpg",
@@ -454,6 +454,51 @@ const FACE_THUMBS = [
   "camera_still"
 ];
 
+const PORTRAITS = {
+  "p_clara": {
+    "type": "snapshot",
+    "name": "Clara Hale",
+    "source": "her sister's album",
+    "note": "Harvest Festival booth, September"
+  },
+  "p_daniel": {
+    "type": "phone",
+    "name": "Daniel Hale",
+    "source": "texted to Ortiz",
+    "note": "phone candid, Saturday night"
+  },
+  "p_marcy": {
+    "type": "phone",
+    "name": "Marcy Tolliver",
+    "source": "texted to Ortiz",
+    "note": "phone candid, at the bakery"
+  },
+  "p_reed": {
+    "type": "directory",
+    "name": "Ellis Reed",
+    "source": "church directory",
+    "note": "Pine Hollow Lutheran, 2019"
+  },
+  "p_jesse": {
+    "type": "school",
+    "name": "Jesse Cole",
+    "source": "high school yearbook",
+    "note": "junior year"
+  },
+  "p_dunn": {
+    "type": "id",
+    "name": "Ray Dunn",
+    "source": "county sheriff",
+    "note": "county ID, 2024"
+  },
+  "p_ortiz": {
+    "type": "id",
+    "name": "Sam Ortiz",
+    "source": "Montana state police",
+    "note": "state police ID, 2023"
+  }
+};
+
 const DETECTIVE = 'Det. Ortiz';
 const TAILS = {marcy: 'marcy_more'};
 const PLAYFIRST = 'marcy';
@@ -526,6 +571,7 @@ return {
   reportDemos: REPORT_DEMOS,
   onPull: ONPULL,
   detective: DETECTIVE,
+  portraits: PORTRAITS,
   faceThumbs: FACE_THUMBS,
   previewTitles: PREVIEW_TITLES,
   tails: TAILS,

@@ -243,6 +243,20 @@ function validate(id, pack) {
   }
   if (!((pack.copy || {}).handoff || {}).portrait) warn('copy.handoff.portrait is unset: the handoff will show no portrait');
 
+  // Every portrait must say who gave it to the detective and how. That
+  // provenance is what sets its crop, grade and paper — see _build/plates.py.
+  const PROV = pack.portraits || {};
+  const TYPES = ['snapshot', 'school', 'phone', 'id', 'directory', 'newspaper', 'flyer', 'cctv', 'scene', 'mugshot'];
+  for (const key of Object.keys(ART)) {
+    if (!/^p_/.test(key)) continue;
+    const rec = PROV[key];
+    if (!rec) { fail(`portraits.${key} is missing: every portrait needs a provenance`); continue; }
+    if (!TYPES.includes(rec.type)) fail(`portraits.${key}.type "${rec.type}" is not in the taxonomy (${TYPES.join(', ')})`);
+    if (!rec.name) fail(`portraits.${key}.name is empty`);
+    if (!rec.source) fail(`portraits.${key}.source is empty — who gave it to the detective?`);
+  }
+  for (const key of Object.keys(PROV)) if (!ART[key]) fail(`portraits.${key} has no art`);
+
   checkAssets('art', ART);
   checkAssets('audio', AU);
 
