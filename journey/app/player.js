@@ -499,9 +499,17 @@ const closeOv = () => $('#ov')._close && !$('#ov').hidden && $('#ov')._close();
 document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if ($('#peek') && !$('#peek').hidden) { closePeek(); return; } closeOv(); });
 function viewImg(key, title, text, after, face) { SFX.paper(); const shot = face ? `<img class="vface" src="${face}" alt="">` : ''; ov(`<div class="viewer"><img src="${A[key]}" alt=""><div class="panel">${shot}<h2>${title}</h2><p class="sub">${text}</p><button class="btn" id="vx">Done</button></div></div>`); $('#vx').onclick = closeOv; after && after(); }
 const FACE_TH = new Set(PACK.faceThumbs || []);
+
+// Where the face sits in each portrait. A wide photograph cannot be cropped from
+// a fixed centre: the subject is usually below and to one side, so the case says
+// where to look and every surface honours it.
+const FOCUS = {};
+for (const [k, v] of Object.entries(PACK.portraits || {})) if (v && v.focus) FOCUS[k] = v.focus;
+const focusOf = a => FOCUS[a] || null;
+const fStyle = a => { const f = focusOf(a); return f ? ` style="--ds-portrait-position:${f}"` : ''; };
 // Larger print for the in-folder look, when the case has one. The thumb stays the small file.
 const PEEK_BIG = {news: 'news_big', bag: 'ledger_big', report: 'report_big'};
-function thumb(id) { const it = IT[id], t = it.th; const inset = it.face && A[it.face] && it.face !== t ? `<img class="inset" src="${A[it.face]}" alt="">` : ''; const face = FACE_TH.has(t) ? ' face' : ''; const doc = !face && A[t] ? ' doc' : ''; return A[t] ? `<div class="th${face}${doc}" style="background-image:url(${A[t]})">${inset}</div>` : `<div class="th">${inset || t}</div>`; }
+function thumb(id) { const it = IT[id], t = it.th; const inset = it.face && A[it.face] && it.face !== t ? `<img class="inset" src="${A[it.face]}" alt="">` : ''; const face = FACE_TH.has(t) ? ' face' : ''; const doc = !face && A[t] ? ' doc' : ''; const fpos = focusOf(t); return A[t] ? `<div class="th${face}${doc}" style="background-image:url(${A[t]})${fpos && face ? `;background-position:${fpos}` : ''}">${inset}</div>` : `<div class="th">${inset || t}</div>`; }
 function closePeek() { const el = $('#peek'); if (!el) return; el.hidden = true; el.style.display = 'none'; el.removeAttribute('data-open'); el.innerHTML = ''; el.onclick = el.onpointerdown = null; }
 function showPeek(el) { document.body.appendChild(el); el.hidden = false; el.style.display = 'flex'; el.style.zIndex = '220'; el.dataset.open = '1'; el._opened = Date.now(); }
 function peekItem(id, onTake) { const it = IT[id]; if (!it) return; SFX.paper(); const key = PEEK_BIG[id] && A[PEEK_BIG[id]] ? PEEK_BIG[id] : it.th; const src = A[key]; const portrait = /^p_/.test(String(key || ''));
@@ -567,9 +575,9 @@ function openPlayer(rid) { const L = recs(); if (!rid) return; const isB = S.the
   const TAIL = (PACK.tails || {})[rid];
   const META = r => TITLES[r] || [r, ''];
   const meta = META;
-  const av = r => A[FACE[r]] ? `<img class="av" src="${A[FACE[r]]}" alt="">` : (isB ? '🎙️' : '📼');
+  const av = r => A[FACE[r]] ? `<img class="av" src="${A[FACE[r]]}" alt=""${fStyle(FACE[r])}>` : (isB ? '🎙️' : '📼');
   const o = ov(`<div class="player ${isB ? 'ph' : 'tp'}"><div><div class="recs">${L.map(r => `<button data-r="${r}" class="${r === rid ? 'on' : ''}">${av(r)} ${meta(r)[0]}</button>`).join('')}</div>
-    <div class="whohead">${A[FACE[rid]] ? `<img class="avbig" src="${A[FACE[rid]]}" alt="">` : ''}<div><h3>${meta(rid)[0]}</h3><div class="s">${meta(rid)[1]}</div></div></div><div class="wave" id="wave">${Array.from({length: 48}, (_, i) => `<i style="height:${15 + Math.abs(Math.sin(i * 1.7 + rid.length)) * 70 + (i * 37 % 13)}%"></i>`).join('')}</div>
+    <div class="whohead">${A[FACE[rid]] ? `<img class="avbig" src="${A[FACE[rid]]}" alt=""${fStyle(FACE[rid])}>` : ''}<div><h3>${meta(rid)[0]}</h3><div class="s">${meta(rid)[1]}</div></div></div><div class="wave" id="wave">${Array.from({length: 48}, (_, i) => `<i style="height:${15 + Math.abs(Math.sin(i * 1.7 + rid.length)) * 70 + (i * 37 % 13)}%"></i>`).join('')}</div>
     <div class="keys"><button id="pp">▶ Play</button><button id="st">⏹ Stop</button><button id="rw">↺ 10s</button>${TAIL ? '<button id="end">⏭ End</button>' : ''}</div><div class="volrow"><span class="vollab">Volume</span><button type="button" data-volmute aria-label="Mute">🔊</button><input type="range" data-vol min="0" max="100" step="1" value="100" aria-label="Volume"></div><div class="cred" id="cred">🔊 ElevenLabs voices (real audio). ${TAIL ? 'After the voiced excerpt the tape continues as text.' : 'Voiced excerpt of the interview.'}</div></div>
     <div class="tx" id="tx">${TR[rid].map((l, i) => `<div class="ln" data-i="${i}"><span class="who">${l.sp}</span><span>${l.tag ? `<em>[${esc(l.tag)}]</em> ` : ''}${esc(l.x)}</span></div>`).join('')}
     ${TAIL ? `<div class="ln txt"><span class="who"></span><em>— voiced excerpt ends; transcript continues —</em></div>` + (TR[TAIL] || []).map((l, i) => `<div class="ln txt${l.key ? ' key' : ''}"><span class="who">${l.sp}</span><span>${l.tag ? `<em>[${esc(l.tag)}]</em> ` : ''}${esc(l.x)}</span>${l.save ? `<button class="sv${S.saved[l.key] ? ' done' : ''}" data-save="${esc(l.save)}" data-key="${esc(l.key || '')}">${S.saved[l.key] ? '✓ In notes' : '☆ Save to notes'}</button>` : ''}</div>`).join('') : ''}</div></div>`);
@@ -617,7 +625,7 @@ function pinTag(id) { const t = PIN_TAGS[id]; if (!t) return ''; if (t.saved && 
 function renderBoard() { $('#cork').src = A.cork; const P = $('#pins'); P.innerHTML = ''; const ids = Object.keys(S.board); $('#bempty').style.display = ids.length ? 'none' : 'block';
   for (const id of ids) { const [cx, cy, w, lab, lc] = BP[id]; const p = S.board[id]; const d = document.createElement('div'); d.className = 'pin' + (S.fresh[id] ? ' in' : '') + (S.sel === id ? ' sel' : ''); d.dataset.id = id;
     Object.assign(d.style, {left: p.x - w / 2 + 'px', top: p.y + 'px', width: w + 'px', transform: `rotate(${(id.length * 7 % 7) - 3}deg)`});
-    const th = IT[id].th; const pinface = IT[id].face && IT[id].face !== th && A[IT[id].face] ? `<img class="pinface" src="${A[IT[id].face]}" alt="">` : ''; const snap = CARDS[id] && A[th] ? `<img class="snap" src="${A[th]}" alt="">` : ''; d.innerHTML = (CARDS[id] ? `<div class="cardx">${snap}<b>${CARDS[id][0]}</b>${CARDS[id][1]}</div>` : `<img src="${A[th]}" alt="">`) + pinface + `<span class="nm ${lc || ''}">${esc(lab)}</span>` + pinTag(id);
+    const th = IT[id].th; const pinface = IT[id].face && IT[id].face !== th && A[IT[id].face] ? `<img class="pinface" src="${A[IT[id].face]}" alt=""${fStyle(IT[id].face)}>` : ''; const snap = CARDS[id] && A[th] ? `<img class="snap" src="${A[th]}" alt="">` : ''; d.innerHTML = (CARDS[id] ? `<div class="cardx">${snap}<b>${CARDS[id][0]}</b>${CARDS[id][1]}</div>` : `<img src="${A[th]}" alt="">`) + pinface + `<span class="nm ${lc || ''}">${esc(lab)}</span>` + pinTag(id);
     P.appendChild(d); dragPin(d); }
   S.fresh = {}; drawStrings(); $('#connectb').classList.toggle('on', S.connect); $('#connectb').textContent = S.connect ? '✕ Stop connecting' : '🧶 Connect two things';
   const cut = $('#cutb'); if (cut) cut.hidden = !S.strSel; const nStr = S.strings.filter(([a, b]) => S.board[a] && S.board[b]).length;

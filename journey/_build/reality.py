@@ -35,6 +35,7 @@ PRESETS = {
     'overcast':   dict(cast=(1.02, 1.03, 1.10), blur=0.8, motion=(2, 2),  clip=238, noise=0.035, q=70, tilt=0.8),
     'flash':      dict(cast=(1.04, 1.0, 0.96),  blur=0.4, motion=(1, 0),  clip=204, noise=0.060, q=58, tilt=2.2),
     'cctv':       dict(cast=(0.82, 1.02, 0.86),  blur=1.6, motion=(0, 0),  clip=246, noise=0.090, q=48, tilt=0.0),
+    'clean':      dict(cast=(1.0, 1.0, 1.0),     blur=0.3, motion=(0, 0),  clip=248, noise=0.018, q=88, tilt=0.0),
 }
 
 
@@ -60,8 +61,26 @@ def motion_blur(im, length, angle):
     return Image.fromarray(np.clip(acc, 0, 255).astype(np.uint8))
 
 
-def degrade(im, preset='tungsten', tilt=None, vignette=0.22, seed=3):
-    p = PRESETS[preset]
+# How much worse the camera was, on top of whichever bad camera it was.
+QUALITY = {
+    'poor':  dict(blur=1.8, noise=1.7, q=-14, down=520),
+    'soft':  dict(blur=1.5, noise=0.9, q=-6, down=680),
+    'ok':    dict(blur=1.0, noise=1.0, q=0, down=0),
+    'sharp': dict(blur=0.4, noise=0.5, q=10, down=0),
+}
+
+
+def degrade(im, preset='tungsten', tilt=None, vignette=0.22, seed=3, quality='ok'):
+    p = dict(PRESETS[preset])
+    q = QUALITY.get(quality, QUALITY['ok'])
+    p['blur'] = p['blur'] * q['blur']
+    p['noise'] = p['noise'] * q['noise']
+    p['q'] = max(35, min(92, p['q'] + q['q']))
+
+    # a bad camera also throws resolution away before it is saved
+    if q['down'] and im.width > q['down']:
+        im = im.resize((q['down'], max(1, int(im.height * q['down'] / im.width))), Image.LANCZOS)
+        im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS)
     rng = np.random.default_rng(seed)
     im = im.convert('RGB')
 

@@ -16,10 +16,13 @@ look the plates then have to fight.
 A photograph of a woman, 34, dark wavy shoulder-length hair, no makeup, cream knit sweater, tired.
 A wide candid photograph taken by a family member indoors, from a few steps back.
 The person is only about a third of the frame, off to one side, sitting or standing among other people
-and ordinary clutter. She has just looked up; nobody is posing.
+and ordinary clutter. Nobody is posing for the picture.
 The room is the subject as much as she is: boxes, shelving, a doorway, a table, two other people mid-conversation.
 Available light, slightly crooked, the framing a little careless and too wide.
 Shot on a compact camera, plain colour, visible grain, no retouching.
+The place: the back room of her bakery, cardboard boxes stacked on a shelf and a prep counter behind her.
+She is not looking at the camera — she is looking at what she is doing, or past it.
+The photograph is decent but not careful: the focus is slightly off and the exposure uneven.
 Context: Harvest Festival booth, September.
 Why it exists: it came from her sister's album, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -41,10 +44,13 @@ Save as `assets/portraits/clara.jpg`, ideally 3:4 portrait, at least 900px wide.
 ```text
 A photograph of a man, 42, short dark hair, full beard, blue-and-red plaid flannel over a t-shirt.
 A photograph taken on a phone across a room and sent as a message attachment.
-The person is mid-action, turned away or half-turned, small in the frame, with the room around her:
+The person is mid-action, small in the frame, with the room around her:
 a counter, shelving, a doorway, someone's back in the foreground.
 Available indoor light, no flash, high ISO noise, a little motion blur, the horizon slightly off.
 It looks like it was taken quickly to show someone where she was, not to flatter her.
+The place: the shop he works in, shelves of supplies and a doorway, someone else in the foreground.
+He is not looking at the camera — she is looking at what she is doing, or past it.
+The photograph is poor: soft, noisy, badly exposed, as if taken quickly in bad light.
 Context: phone candid, Saturday night.
 Why it exists: it came from texted to Ortiz, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -66,10 +72,13 @@ Save as `assets/portraits/daniel.jpg`, ideally 3:4 portrait, at least 900px wide
 ```text
 A photograph of a woman, 40, dark hair pulled back, navy cardigan over a grey tee, watchful.
 A photograph taken on a phone across a room and sent as a message attachment.
-The person is mid-action, turned away or half-turned, small in the frame, with the room around her:
+The person is mid-action, small in the frame, with the room around her:
 a counter, shelving, a doorway, someone's back in the foreground.
 Available indoor light, no flash, high ISO noise, a little motion blur, the horizon slightly off.
 It looks like it was taken quickly to show someone where she was, not to flatter her.
+The place: behind the bakery counter, a lit display case of bread and a customer in the foreground.
+She is looking straight into the camera, aware of it.
+The photograph is decent but not careful: the focus is slightly off and the exposure uneven.
 Context: phone candid, at the bakery.
 Why it exists: it came from texted to Ortiz, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -94,6 +103,9 @@ A photograph taken by a volunteer after a Sunday service, in a church hall.
 The person is standing in front of a noticeboard and stacked chairs, not a backdrop,
 and only fills the middle of the frame. Soft frontal flash, fluorescent ceiling light, slightly soft focus,
 dated clothing, a slightly awkward half-smile. It is not a studio portrait.
+The place: the church hall after the service, a cork noticeboard and stacked plastic chairs.
+He is looking straight into the camera, aware of it.
+The photograph is soft, a little underlit, and not quite in focus anywhere.
 Context: Pine Hollow Lutheran, 2019.
 Why it exists: it came from church directory, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -116,6 +128,9 @@ Save as `assets/portraits/reed.jpg`, ideally 3:4 portrait, at least 900px wide.
 A photograph of a young man, 22, dark wavy hair, thin moustache, plain dark t-shirt.
 A high school yearbook photograph. Two-light kit with a slight hot spot, painted grey-blue canvas backdrop,
 shoulders square, a forced smile, tidy hair. Printed on matte yearbook stock and gently faded.
+The place: a school photographer's painted canvas backdrop.
+He is looking straight into the camera, aware of it.
+The photograph is sharp and correctly exposed, as a studio or official camera would be.
 Context: junior year.
 Why it exists: it came from high school yearbook, and that is what the picture looks like.
 Avoid: no studio lighting, no beauty lighting, no rim light, no softbox, no bokeh,
@@ -136,6 +151,9 @@ A photograph of a man, 55, receding grey-brown hair, heavy moustache, tan unifor
 A county sheriff's office ID photograph taken at a desk.
 Flat frontal on-camera flash against a plain painted wall, no shadow control, slightly overexposed.
 Shoulders square, neutral expression, dead centre, no depth of field, cheap office camera.
+The place: a plain painted wall in the county office.
+He is looking straight into the camera, aware of it.
+The photograph is poor: soft, noisy, badly exposed, as if taken quickly in bad light.
 Context: county ID, 2024.
 Why it exists: it came from county sheriff, and that is what the picture looks like.
 Avoid: no studio lighting, no beauty lighting, no rim light, no softbox, no bokeh,
@@ -156,6 +174,9 @@ A photograph of a man, 52, thick dark hair going grey, deep-set eyes, dark open-
 A county sheriff's office ID photograph taken at a desk.
 Flat frontal on-camera flash against a plain painted wall, no shadow control, slightly overexposed.
 Shoulders square, neutral expression, dead centre, no depth of field, cheap office camera.
+The place: a painted office wall at the state police post.
+He is looking slightly off to one side, only half aware of the camera.
+The photograph is decent but not careful: the focus is slightly off and the exposure uneven.
 Context: state police ID, 2023.
 Why it exists: it came from Montana state police, and that is what the picture looks like.
 Avoid: no studio lighting, no beauty lighting, no rim light, no softbox, no bokeh,

@@ -196,9 +196,11 @@ def plate(src, rec):
     heavy = kind in ('snapshot', 'phone')
     out = finish(out, grain=0.050 if heavy else 0.035, soften=0.4)
     if reality_degrade:
-        preset = REALITY.get(kind)
+        # The case says which bad camera took it and how badly it was shot;
+        # fall back to the provenance default.
+        preset = rec.get('tint') or REALITY.get(kind)
         if preset:
-            out = reality_degrade(out, preset, tilt=0)
+            out = reality_degrade(out, preset, tilt=0, quality=rec.get('quality', 'ok'))
     return out, (78 if heavy else 86)
 
 

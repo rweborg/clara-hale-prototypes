@@ -45,12 +45,12 @@ function loadPack(id) {
 const SOURCE = {
   snapshot: `A wide candid photograph taken by a family member indoors, from a few steps back.
 The person is only about a third of the frame, off to one side, sitting or standing among other people
-and ordinary clutter. She has just looked up; nobody is posing.
+and ordinary clutter. Nobody is posing for the picture.
 The room is the subject as much as she is: boxes, shelving, a doorway, a table, two other people mid-conversation.
 Available light, slightly crooked, the framing a little careless and too wide.
 Shot on a compact camera, plain colour, visible grain, no retouching.`,
   phone: `A photograph taken on a phone across a room and sent as a message attachment.
-The person is mid-action, turned away or half-turned, small in the frame, with the room around her:
+The person is mid-action, small in the frame, with the room around her:
 a counter, shelving, a doorway, someone's back in the foreground.
 Available indoor light, no flash, high ISO noise, a little motion blur, the horizon slightly off.
 It looks like it was taken quickly to show someone where she was, not to flatter her.`,
@@ -80,11 +80,30 @@ const RECIPE = `Shot on 35mm or a compact camera at a moderate aperture, so the 
 in available light, in natural colour, with visible grain and no retouching.
 It must look like an ordinary photograph someone kept, not a portrait made for a portfolio.`;
 
+/** How the subject relates to the camera. A folder needs both kinds. */
+const GAZE = {
+  camera: 'She is looking straight into the camera, aware of it.',
+  away:   'She is not looking at the camera — she is looking at what she is doing, or past it.',
+  off:    'She is looking slightly off to one side, only half aware of the camera.',
+};
+
+/** How good the photograph is. Not every source is a good one. */
+const QUALITY = {
+  sharp: 'The photograph is sharp and correctly exposed, as a studio or official camera would be.',
+  ok:    'The photograph is decent but not careful: the focus is slightly off and the exposure uneven.',
+  soft:  'The photograph is soft, a little underlit, and not quite in focus anywhere.',
+  poor:  'The photograph is poor: soft, noisy, badly exposed, as if taken quickly in bad light.',
+};
+
 function promptFor(rec) {
   const look = (rec.look || rec.name).replace(/^\s*(a|an|the)\s+/i, '');
+  const he = /^woman/i.test(look) ? 'She' : 'He';
   return [
     `A photograph of a ${look}.`,
     SOURCE[rec.type] || SOURCE.scene,
+    rec.place ? `The place: ${rec.place}.` : '',
+    rec.gaze && GAZE[rec.gaze] ? GAZE[rec.gaze].replace(/^She/, he) : '',
+    rec.quality && QUALITY[rec.quality] ? QUALITY[rec.quality].replace(/^The photograph/, 'The photograph') : '',
     rec.note ? `Context: ${rec.note}.` : '',
     `Why it exists: it came from ${rec.source}, and that is what the picture looks like.`,
     // An ID or a yearbook photo has its own hardware; the documentary frame

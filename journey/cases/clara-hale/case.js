@@ -461,7 +461,11 @@ const PORTRAITS = {
     "source": "her sister's album",
     "note": "Harvest Festival booth, September",
     "look": "woman, 34, dark wavy shoulder-length hair, no makeup, cream knit sweater, tired",
-    "file": "assets/portraits/clara.jpg"
+    "file": "assets/portraits/clara.jpg",
+    "gaze": "away",
+    "quality": "ok",
+    "tint": "tungsten",
+    "place": "the back room of her bakery, cardboard boxes stacked on a shelf and a prep counter behind her"
   },
   "p_daniel": {
     "type": "phone",
@@ -469,7 +473,11 @@ const PORTRAITS = {
     "source": "texted to Ortiz",
     "note": "phone candid, Saturday night",
     "look": "man, 42, short dark hair, full beard, blue-and-red plaid flannel over a t-shirt",
-    "file": "assets/portraits/daniel.jpg"
+    "file": "assets/portraits/daniel.jpg",
+    "gaze": "away",
+    "quality": "poor",
+    "tint": "tungsten",
+    "place": "the shop he works in, shelves of supplies and a doorway, someone else in the foreground"
   },
   "p_marcy": {
     "type": "phone",
@@ -477,7 +485,11 @@ const PORTRAITS = {
     "source": "texted to Ortiz",
     "note": "phone candid, at the bakery",
     "look": "woman, 40, dark hair pulled back, navy cardigan over a grey tee, watchful",
-    "file": "assets/portraits/marcy.jpg"
+    "file": "assets/portraits/marcy.jpg",
+    "gaze": "camera",
+    "quality": "ok",
+    "tint": "fluorescent",
+    "place": "behind the bakery counter, a lit display case of bread and a customer in the foreground"
   },
   "p_reed": {
     "type": "directory",
@@ -485,7 +497,11 @@ const PORTRAITS = {
     "source": "church directory",
     "note": "Pine Hollow Lutheran, 2019",
     "look": "man, late 60s, thinning grey hair, clean-shaven, grey cardigan over a pale shirt",
-    "file": "assets/portraits/reed.jpg"
+    "file": "assets/portraits/reed.jpg",
+    "gaze": "camera",
+    "quality": "soft",
+    "tint": "fluorescent",
+    "place": "the church hall after the service, a cork noticeboard and stacked plastic chairs"
   },
   "p_jesse": {
     "type": "school",
@@ -493,7 +509,11 @@ const PORTRAITS = {
     "source": "high school yearbook",
     "note": "junior year",
     "look": "young man, 22, dark wavy hair, thin moustache, plain dark t-shirt",
-    "file": "assets/portraits/jesse.jpg"
+    "file": "assets/portraits/jesse.jpg",
+    "gaze": "camera",
+    "quality": "sharp",
+    "tint": "clean",
+    "place": "a school photographer's painted canvas backdrop"
   },
   "p_dunn": {
     "type": "id",
@@ -501,7 +521,11 @@ const PORTRAITS = {
     "source": "county sheriff",
     "note": "county ID, 2024",
     "look": "man, 55, receding grey-brown hair, heavy moustache, tan uniform shirt",
-    "file": "assets/portraits/dunn.jpg"
+    "file": "assets/portraits/dunn.jpg",
+    "gaze": "camera",
+    "quality": "poor",
+    "tint": "fluorescent",
+    "place": "a plain painted wall in the county office"
   },
   "p_ortiz": {
     "type": "id",
@@ -509,7 +533,11 @@ const PORTRAITS = {
     "source": "Montana state police",
     "note": "state police ID, 2023",
     "look": "man, 52, thick dark hair going grey, deep-set eyes, dark open-collar shirt",
-    "file": "assets/portraits/ortiz.jpg"
+    "file": "assets/portraits/ortiz.jpg",
+    "gaze": "off",
+    "quality": "ok",
+    "tint": "clean",
+    "place": "a painted office wall at the state police post"
   }
 };
 
