@@ -132,6 +132,22 @@ async function generate(prompt, name) {
   return buf;
 }
 
+/** --whoami: which account does this token belong to? Useful when credit is
+ *  showing on one login and the token belongs to another. */
+async function whoami() {
+  if (!TOKEN) {
+    console.error('REPLICATE_API_TOKEN is not set.');
+    process.exit(2);
+  }
+  try {
+    const a = await api('/account');
+    console.log(`token belongs to: ${a.username || a.name || '?'} (${a.type || 'personal'})`);
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
+}
+
 async function main() {
   if (!TOKEN && !dry) {
     console.error('REPLICATE_API_TOKEN is not set.\n');
@@ -139,6 +155,8 @@ async function main() {
     console.error('  Then run this again. --dry prints the prompts without sending.\n');
     process.exit(2);
   }
+
+  if (argv.includes('--whoami')) { await whoami(); return; }
 
   const pack = loadPack(caseId);
   const portraits = pack.portraits || {};
