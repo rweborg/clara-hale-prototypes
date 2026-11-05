@@ -48,7 +48,7 @@ const only = onlyFlag >= 0 ? argv[onlyFlag + 1].split(',') : null;
 const TOKEN = process.env.REPLICATE_API_TOKEN;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function api(pathname, init) {
+async function api(pathname, init, attempt = 0) {
   const res = await fetch(API + pathname, {
     ...init,
     headers: {
@@ -60,6 +60,17 @@ async function api(pathname, init) {
   const text = await res.text();
   let body;
   try { body = JSON.parse(text); } catch (e) { body = text; }
+
+  // Under $5 credit Replicate allows 6 predictions a minute, so a batch trips
+  // the limit. It tells us how long to wait; do that instead of failing.
+  if ((res.status === 429 || res.status >= 500) && attempt < 5) {
+    const told = body && typeof body === 'object' && body.retry_after;
+    const waitMs = told ? told * 1000 : 2000 * (attempt + 1);
+    console.log(`         throttled by the API; retrying in ${Math.round(waitMs / 1000)}s`);
+    await sleep(waitMs + 300);
+    return api(pathname, init, attempt + 1);
+  }
+
   if (!res.ok) {
     const detail = typeof body === 'string' ? body : JSON.stringify(body, null, 2);
     throw new Error(`${res.status} ${res.statusText}\n${detail}`);
@@ -195,6 +206,7 @@ async function main() {
       continue;
     }
     try {
+      if (made || skipped) await sleep(1200);   // stay under 6 a minute
       const buf = await generate(prompt, name);
       const target = outDir
         ? path.join(outDir, `${name}--${model.split('/').pop()}.jpg`)
