@@ -43,24 +43,26 @@ function loadPack(id) {
  * default studio headshot far more reliably than "no bokeh".
  */
 const SOURCE = {
-  snapshot: `A candid photograph taken by a family member, indoors or under a porch light.
-Available light only, no flash. The subject has just looked up from what she was doing,
-caught between two things, not posing for anyone.
-The place is legible and in focus behind her: boxes, shelving, a doorway, other people at the edge of frame.
-Slightly crooked, slightly too wide, the colour plain and true. It looks like a photograph kept in an
-album, not one taken to be shown off.`,
-  phone: `A photograph taken on a phone by a coworker and sent as a message attachment.
-Available indoor light, no flash, mid-afternoon. She is at work and has half-turned,
-looking up from the counter or the shelving behind her. The room stays legible and in focus.
-Awkward casual framing, phone lens, mild noise, ordinary colour, nothing styled for the camera.`,
+  snapshot: `A wide candid photograph taken by a family member indoors, from a few steps back.
+The person is only about a third of the frame, off to one side, sitting or standing among other people
+and ordinary clutter. She has just looked up; nobody is posing.
+The room is the subject as much as she is: boxes, shelving, a doorway, a table, two other people mid-conversation.
+Available light, slightly crooked, the framing a little careless and too wide.
+Shot on a compact camera, plain colour, visible grain, no retouching.`,
+  phone: `A photograph taken on a phone across a room and sent as a message attachment.
+The person is mid-action, turned away or half-turned, small in the frame, with the room around her:
+a counter, shelving, a doorway, someone's back in the foreground.
+Available indoor light, no flash, high ISO noise, a little motion blur, the horizon slightly off.
+It looks like it was taken quickly to show someone where she was, not to flatter her.`,
   id: `A county sheriff's office ID photograph taken at a desk.
 Flat frontal on-camera flash against a plain painted wall, no shadow control, slightly overexposed.
 Shoulders square, neutral expression, dead centre, no depth of field, cheap office camera.`,
-  directory: `A church directory portrait taken after a Sunday service by a volunteer with a kit lens.
-Soft frontal flash, a plain curtain backdrop, slightly soft focus, dated clothing,
-warm sepia from the print, formal but unpolished.`,
+  directory: `A photograph taken by a volunteer after a Sunday service, in a church hall.
+The person is standing in front of a noticeboard and stacked chairs, not a backdrop,
+and only fills the middle of the frame. Soft frontal flash, fluorescent ceiling light, slightly soft focus,
+dated clothing, a slightly awkward half-smile. It is not a studio portrait.`,
   school: `A high school yearbook photograph. Two-light kit with a slight hot spot, painted grey-blue canvas backdrop,
-shoulders square, a slightly forced smile, tidy hair. Printed on matte yearbook stock and gently faded.`,
+shoulders square, a forced smile, tidy hair. Printed on matte yearbook stock and gently faded.`,
   cctv: `A frame from a fixed security camera at night. Wide angle from above head height, infrared-lit,
 green-grey monochrome, heavy grain and compression blocking, harsh contrast, no shallow depth of field.`,
   scene: `A documentary photograph of a real thing at a real location, available light, no staging,

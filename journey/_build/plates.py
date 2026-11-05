@@ -28,6 +28,11 @@ import re
 import sys
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+try:
+    from reality import degrade as reality_degrade
+except Exception:  # the pass is optional; plates still render without it
+    reality_degrade = None
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -104,6 +109,18 @@ def add_scanlines(im, gap=4, strength=0.10):
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
 
 
+# Which bad camera each source was photographed with.
+REALITY = {
+    'snapshot': 'tungsten',
+    'phone': 'tungsten',
+    'id': 'fluorescent',
+    'school': 'fluorescent',
+    'directory': 'tungsten',
+    'cctv': 'cctv',
+    'scene': 'overcast',
+}
+
+
 def plate(src, rec):
     """Render one provenance into a finished plate."""
     im = Image.open(src).convert('RGB')
@@ -177,7 +194,12 @@ def plate(src, rec):
         out = grade(im, sat=0.95, contrast=1.04)
 
     heavy = kind in ('snapshot', 'phone')
-    return finish(out, grain=0.070 if heavy else 0.045, soften=0.6 if heavy else 0.5), (74 if heavy else 86)
+    out = finish(out, grain=0.050 if heavy else 0.035, soften=0.4)
+    if reality_degrade:
+        preset = REALITY.get(kind)
+        if preset:
+            out = reality_degrade(out, preset, tilt=0)
+    return out, (78 if heavy else 86)
 
 
 def main():

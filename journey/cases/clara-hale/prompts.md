@@ -14,12 +14,12 @@ look the plates then have to fight.
 
 ```text
 A photograph of a woman, 34, dark wavy shoulder-length hair, no makeup, cream knit sweater, tired.
-A candid photograph taken by a family member, indoors or under a porch light.
-Available light only, no flash. The subject has just looked up from what she was doing,
-caught between two things, not posing for anyone.
-The place is legible and in focus behind her: boxes, shelving, a doorway, other people at the edge of frame.
-Slightly crooked, slightly too wide, the colour plain and true. It looks like a photograph kept in an
-album, not one taken to be shown off.
+A wide candid photograph taken by a family member indoors, from a few steps back.
+The person is only about a third of the frame, off to one side, sitting or standing among other people
+and ordinary clutter. She has just looked up; nobody is posing.
+The room is the subject as much as she is: boxes, shelving, a doorway, a table, two other people mid-conversation.
+Available light, slightly crooked, the framing a little careless and too wide.
+Shot on a compact camera, plain colour, visible grain, no retouching.
 Context: Harvest Festival booth, September.
 Why it exists: it came from her sister's album, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -40,10 +40,11 @@ Save as `assets/portraits/clara.jpg`, ideally 3:4 portrait, at least 900px wide.
 
 ```text
 A photograph of a man, 42, short dark hair, full beard, blue-and-red plaid flannel over a t-shirt.
-A photograph taken on a phone by a coworker and sent as a message attachment.
-Available indoor light, no flash, mid-afternoon. She is at work and has half-turned,
-looking up from the counter or the shelving behind her. The room stays legible and in focus.
-Awkward casual framing, phone lens, mild noise, ordinary colour, nothing styled for the camera.
+A photograph taken on a phone across a room and sent as a message attachment.
+The person is mid-action, turned away or half-turned, small in the frame, with the room around her:
+a counter, shelving, a doorway, someone's back in the foreground.
+Available indoor light, no flash, high ISO noise, a little motion blur, the horizon slightly off.
+It looks like it was taken quickly to show someone where she was, not to flatter her.
 Context: phone candid, Saturday night.
 Why it exists: it came from texted to Ortiz, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -64,10 +65,11 @@ Save as `assets/portraits/daniel.jpg`, ideally 3:4 portrait, at least 900px wide
 
 ```text
 A photograph of a woman, 40, dark hair pulled back, navy cardigan over a grey tee, watchful.
-A photograph taken on a phone by a coworker and sent as a message attachment.
-Available indoor light, no flash, mid-afternoon. She is at work and has half-turned,
-looking up from the counter or the shelving behind her. The room stays legible and in focus.
-Awkward casual framing, phone lens, mild noise, ordinary colour, nothing styled for the camera.
+A photograph taken on a phone across a room and sent as a message attachment.
+The person is mid-action, turned away or half-turned, small in the frame, with the room around her:
+a counter, shelving, a doorway, someone's back in the foreground.
+Available indoor light, no flash, high ISO noise, a little motion blur, the horizon slightly off.
+It looks like it was taken quickly to show someone where she was, not to flatter her.
 Context: phone candid, at the bakery.
 Why it exists: it came from texted to Ortiz, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -88,9 +90,10 @@ Save as `assets/portraits/marcy.jpg`, ideally 3:4 portrait, at least 900px wide.
 
 ```text
 A photograph of a man, late 60s, thinning grey hair, clean-shaven, grey cardigan over a pale shirt.
-A church directory portrait taken after a Sunday service by a volunteer with a kit lens.
-Soft frontal flash, a plain curtain backdrop, slightly soft focus, dated clothing,
-warm sepia from the print, formal but unpolished.
+A photograph taken by a volunteer after a Sunday service, in a church hall.
+The person is standing in front of a noticeboard and stacked chairs, not a backdrop,
+and only fills the middle of the frame. Soft frontal flash, fluorescent ceiling light, slightly soft focus,
+dated clothing, a slightly awkward half-smile. It is not a studio portrait.
 Context: Pine Hollow Lutheran, 2019.
 Why it exists: it came from church directory, and that is what the picture looks like.
 Shot on 35mm or a compact camera at a moderate aperture, so the whole scene is in focus,
@@ -112,7 +115,7 @@ Save as `assets/portraits/reed.jpg`, ideally 3:4 portrait, at least 900px wide.
 ```text
 A photograph of a young man, 22, dark wavy hair, thin moustache, plain dark t-shirt.
 A high school yearbook photograph. Two-light kit with a slight hot spot, painted grey-blue canvas backdrop,
-shoulders square, a slightly forced smile, tidy hair. Printed on matte yearbook stock and gently faded.
+shoulders square, a forced smile, tidy hair. Printed on matte yearbook stock and gently faded.
 Context: junior year.
 Why it exists: it came from high school yearbook, and that is what the picture looks like.
 Avoid: no studio lighting, no beauty lighting, no rim light, no softbox, no bokeh,
