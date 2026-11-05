@@ -1,6 +1,10 @@
 # Smoke-test screenshots. Regenerate with `node _build/smoke.js --shots`.
 journey/_build/out/
 
+# Platform server
+journey/server/node_modules/
+journey/server/.env
+
 # OS noise
 .DS_Store
 __pycache__/

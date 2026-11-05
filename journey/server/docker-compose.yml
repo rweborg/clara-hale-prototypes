@@ -1,0 +1,16 @@
+# Local Postgres for The Case Desk API. Not used in production
+# (Railway Postgres supplies DATABASE_URL there).
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: casedesk
+      POSTGRES_PASSWORD: casedesk
+      POSTGRES_DB: casedesk
+    ports:
+      - "5432:5432"
+    volumes:
+      - casedesk-pg:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  casedesk-pg:

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Operators · The Case Desk</title>
+<link rel="stylesheet" href="/design-system/fonts.css">
+<link rel="stylesheet" href="/design-system/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ds-paper, #ECE7DF); color: var(--ds-ink, #1D1B18); font-family: Atkinson, Georgia, serif; }
+  main { width: min(880px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; }
+  .brand { letter-spacing: .16em; text-transform: uppercase; font-size: 12px; color: var(--ds-pine, #1F5E4E); font-weight: 700; }
+  h1 { font-size: 40px; margin: 6px 0 8px; }
+  .card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 10px 30px rgba(40, 24, 8, .08); margin: 16px 0; }
+  .counts { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .counts div { background: #F7F4EF; border-radius: 12px; padding: 12px; }
+  .counts b { display: block; font-size: 28px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #EEE7DA; vertical-align: top; }
+  input { font: inherit; border: 1.5px solid #D9D2C6; border-radius: 10px; padding: 10px 12px; }
+  button, .btn { font: inherit; cursor: pointer; border: none; border-radius: 12px; background: var(--ds-pine, #1F5E4E); color: #fff; font-weight: 700; padding: 12px 16px; }
+  .note { color: #6B645B; }
+  .err { color: #B3261E; font-weight: 700; }
+  pre { background: #FBFAF4; padding: 12px; border-radius: 10px; overflow: auto; font-family: CourierP, ui-monospace, monospace; }
+  label { display: block; font-weight: 700; margin: 10px 0 4px; }
+  a { color: #1F5E4E; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">The Case Desk</div>
+  <h1>Operators</h1>
+  <p class="note" id="blurb">A thin count of players, codes, and ratings. Charts wait. Codes minted here are practice codes for a mock Etsy SKU — not real orders.</p>
+  <p id="gate" class="note"></p>
+  <div id="app" hidden>
+    <section class="card">
+      <div class="counts" id="counts"></div>
+      <p class="note" id="money"></p>
+    </section>
+    <section class="card">
+      <h2>Cases</h2>
+      <table id="cases"><thead><tr><th>Case</th><th>Owners</th><th>Real purchases</th><th>Practice</th><th>Rating</th></tr></thead><tbody></tbody></table>
+    </section>
+    <section class="card">
+      <h2>Mint practice codes</h2>
+      <p class="note">Shown once. Only a hint is stored. Hand them out the way an Etsy download will later.</p>
+      <form id="mint">
+        <label for="slug">Case</label>
+        <input id="slug" value="clara-hale" required>
+        <label for="sku">Mock SKU</label>
+        <input id="sku" value="MOCK-CLARA-HALE" required>
+        <label for="count">How many</label>
+        <input id="count" type="number" min="1" max="50" value="5" required>
+        <p><button type="submit">Mint codes</button></p>
+      </form>
+      <p id="mintmsg" class="note" role="status"></p>
+      <pre id="fresh" hidden></pre>
+    </section>
+    <section class="card">
+      <h2>Recent codes</h2>
+      <p class="note">Hints only. The full code is not kept.</p>
+      <table id="codes"><thead><tr><th>Hint</th><th>Case</th><th>SKU</th><th>Used</th></tr></thead><tbody></tbody></table>
+    </section>
+  </div>
+</main>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  async function api(method, path, body) {
+    const res = await fetch(path, {
+      method,
+      credentials: 'same-origin',
+      headers: { accept: 'application/json', ...(body ? { 'content-type': 'application/json' } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) { data = {}; }
+    return { ok: res.ok, status: res.status, data };
+  }
+  function money(cents) {
+    return '$' + (Number(cents || 0) / 100).toFixed(2);
+  }
+  async function load() {
+    const who = await api('GET', '/api/me');
+    if (!who.ok || !who.data.user) {
+      $('gate').innerHTML = 'Sign in first, with an email on the operator list. <a href="/library">Go to your desk</a>.';
+      return;
+    }
+    if (!who.data.admin) {
+      $('gate').textContent = 'This page is only for operator emails (ADMIN_EMAILS). You are signed in as ' + who.data.user.email + '.';
+      return;
+    }
+    const [summary, codes] = await Promise.all([api('GET', '/api/admin/summary'), api('GET', '/api/admin/codes')]);
+    if (!summary.ok) { $('gate').textContent = summary.data.error || 'Could not load counts.'; return; }
+    $('app').hidden = false;
+    $('gate').textContent = '';
+    const s = summary.data;
+    $('counts').innerHTML = [
+      ['Players', s.users],
+      ['Cases owned', s.entitlements],
+      ['Codes left', s.codesOpen],
+      ['Playthroughs', s.sessions],
+      ['Ratings', s.ratings],
+    ].map(([k, v]) => `<div><b>${v}</b>${k}</div>`).join('');
+    $('money').textContent = `Recorded sales ${money(s.paidCents)}. Practice total ${money(s.mockCents)} (not real revenue).`;
+    $('cases').querySelector('tbody').innerHTML = s.cases.map((c) => `<tr><td>${c.title}<br><span class="note">${c.slug} · ${c.status} · ${c.access}</span></td><td>${c.owners}</td><td>${c.purchases}</td><td>${c.mockPurchases}</td><td>${c.ratingAvg === null ? '—' : c.ratingAvg} (${c.ratingCount})</td></tr>`).join('');
+    const rows = codes.ok ? codes.data.codes : [];
+    $('codes').querySelector('tbody').innerHTML = rows.map((c) => `<tr><td>${c.hint}</td><td>${c.slug}</td><td>${c.sku || ''}</td><td>${c.redeemed ? 'yes' : 'no'}</td></tr>`).join('') || '<tr><td colspan="4">None yet.</td></tr>';
+  }
+  $('mint').onsubmit = async (e) => {
+    e.preventDefault();
+    $('mintmsg').textContent = 'Minting…';
+    $('fresh').hidden = true;
+    const res = await api('POST', '/api/admin/codes', {
+      slug: $('slug').value.trim(),
+      sku: $('sku').value.trim(),
+      count: Number($('count').value),
+    });
+    if (!res.ok) { $('mintmsg').className = 'err'; $('mintmsg').textContent = res.data.error || 'Could not mint.'; return; }
+    $('mintmsg').className = 'note';
+    $('mintmsg').textContent = res.data.label + '. Copy them now. ' + res.data.note;
+    $('fresh').hidden = false;
+    $('fresh').textContent = res.data.codes.join('\n');
+    await load();
+  };
+  load();
+})();
+</script>
+</body>
+</html>

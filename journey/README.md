@@ -16,7 +16,7 @@ Preview mode does not read or write the real playthrough (`localStorage` key `jp
 
 ## Rules this build follows
 - **No in-game days.** The case moves forward only through play: Ortiz hands over the case → take items out of the folder onto the desk or the corkboard → solve Objective 1 → tear open Envelope A → realization on the board (seat + Marcy's height) → Envelope B → write the accusation report (3 attempts, a wrong answer gets Ortiz's pushback) → reveal / Envelope C → pack up, stamp, and file the case in the drawer.
-- **Save and resume.** Progress saves automatically to this device (`localStorage` key `jp-save-v2`). That covers the current beat, items taken out, board pin positions and strings, notes, objectives, envelopes, played tapes, report attempts, and file-away steps. Reopen the page and you land back at your desk where you left off. To start over: ⚙ Prototype → ↺ Start the case over.
+- **Save and resume.** Progress saves automatically to this device (`localStorage` key `jp-save-v2`). That covers the current beat, items taken out, board pin positions and strings, notes, objectives, envelopes, played tapes, report attempts, and file-away steps. Reopen the page and you land back at your desk where you left off. To start over: ⚙ Prototype → ↺ Start the case over. Signed-in play on the platform server also keeps that save on your account. Without an account, nothing about this changes.
 - **Desk ambience follows the player's real clock and is cosmetic only.** 5–11 AM morning and 11 AM–5 PM daytime get coffee and a cherry danish. 5–9 PM evening and 9 PM–5 AM night get Chinese takeout, and the lamp comes on. The coffee, danish, and takeout respond to sips and bites, and that's all they do: they never gate progress. The ⚙ Prototype panel can preview each look without saving it.
 - **Voices are ElevenLabs only.** Clara's voicemail, the interview tapes (Daniel, Reed, Dunn, Jesse, Marcy), and all of Det. Ortiz's lines (cold open, handoff, pushbacks, breakthrough, reveal, welcome back) play bundled MP3s. The game never uses device or Mac text-to-speech. If a line has no sample, it shows as text only.
 
@@ -29,4 +29,15 @@ Jump to any beat from the top rail (prototype). Research: `../research/journey-r
 - `node _build/probe.js "<expr>"` — evaluates expressions against a loaded page.
 
 `research/` and `shots/` are referenced above but are not in this repository. The old `_build/gen.py` and `_build/ortiz_lines.py` were never committed either; the build now splits into real files, so `index.html` is no longer assembled.
+
+## Platform server
+
+[`server/`](server/) serves this folder plus accounts, redeem codes, and saved playthroughs. Anonymous `localStorage` play is the same. Local setup, env vars, and Railway Postgres steps are in the repo [README](../README.md#platform-phase-1).
+
+```bash
+docker compose -f server/docker-compose.yml up -d
+cd server && cp .env.example .env && npm install && npm test && npm start
+```
+
+Open <http://127.0.0.1:8080/>. With no `RESEND_API_KEY`, the sign-in link is shown on screen. `npm run mint -- --slug clara-hale --count 5` prints practice codes. They are not real Etsy orders. Deploy notes: [`../DEPLOY.md`](../DEPLOY.md).
 

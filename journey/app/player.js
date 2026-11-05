@@ -112,9 +112,10 @@ S = fresh();
 const SAVE = PACK.id === 'clara-hale' ? 'jp-save-v2' : 'jp-save-v2:' + PACK.id, TRANSIENT = ['sel', 'connect', 'strSel', 'fresh', '_sc'];
 // ?preview=1 is the developer journey scrubber (initPreview). It must not touch a real playthrough.
 const PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
-function save() { if (PREVIEW || !S || S.beat === 'intro') return; try { const o = {}; for (const k in S) if (!TRANSIENT.includes(k)) o[k] = S[k]; o.savedAt = Date.now(); localStorage.setItem(SAVE, JSON.stringify(o)); } catch (e) {} }
+function deskSnapshot() { const o = {}; for (const k in S) if (!TRANSIENT.includes(k)) o[k] = S[k]; o.savedAt = Date.now(); return o; }
+function save() { if (PREVIEW || !S || S.beat === 'intro') return; let o; try { o = deskSnapshot(); localStorage.setItem(SAVE, JSON.stringify(o)); } catch (e) { return; } const hook = window.CaseDesk && window.CaseDesk.onLocalSave; if (typeof hook === 'function') { try { hook(o); } catch (e) {} } }
 function loadSave() { try { const o = JSON.parse(localStorage.getItem(SAVE) || 'null'); if (!o || !o.beat || o.beat === 'intro' || !BEATS.some(b => b[0] === o.beat)) return null; return Object.assign(fresh(), o, {sel: null, connect: false, fresh: {}}); } catch (e) { return null; } }
-function clearSave() { if (PREVIEW) return; try { localStorage.removeItem(SAVE); } catch (e) {} }
+function clearSave() { if (PREVIEW) return; try { localStorage.removeItem(SAVE); } catch (e) {} const hook = window.CaseDesk && window.CaseDesk.onClear; if (typeof hook === 'function') { try { hook(); } catch (e) {} } }
 // ---------------- sound ----------------
 let AC, MASTER; const ac = () => AC || (AC = new (window.AudioContext || window.webkitAudioContext)());
 let VOL = 1, MUTED = false;
@@ -773,7 +774,8 @@ $$('#dz [data-theme]').forEach(b => b.onclick = () => { S.theme = b.dataset.them
 $('#todrow').innerHTML = `<button data-p="">🕰 My clock</button>` + Object.keys(AMB).map(p => `<button data-p="${p}">${AMB[p][0]} ${AMB[p][1]}</button>`).join(''); $$('#todrow button').forEach(b => b.onclick = () => setAmb(b.dataset.p));
 $('#newb').onclick = () => {
   if (PREVIEW) { if (!confirm('Restart the preview from the intro? Your real saved game on this device is left alone.')) return; $('#dz').hidden = true; previewGoto(0, {user: true}); return; }
-  if (!confirm('Start the case over? Your saved progress on this device will be erased.')) return; $('#dz').hidden = true; clearSave(); jump('intro'); };
+  const onAccount = window.CaseDesk && window.CaseDesk.signedIn;
+  if (!confirm(onAccount ? 'Start the case over? Your saved progress on this device and on your Case Desk will be erased.' : 'Start the case over? Your saved progress on this device will be erased.')) return; $('#dz').hidden = true; clearSave(); jump('intro'); };
 $('#voiceb').onclick = () => { S.voice = !S.voice; hush(); renderSide(); };
 $('#jumprow').innerHTML = BEATS.map(([k, l]) => `<button data-j="${k}">${l}</button>`).join(''); $$('#jumprow button').forEach(b => b.onclick = () => { $('#dz').hidden = true; jump(b.dataset.j); });
 // ---------------- scenes: intro, handoff, day card ----------------
@@ -1118,10 +1120,15 @@ function initPreview() {
   const mapped = hashStage[location.hash.slice(1)];
   previewGoto(mapped ? idIndex(mapped) : 0);
 }
-window.__jp = {jump, S: () => S, openFolder, openPlayer, openEnv, openObj, openReport, aha, pinTap, fileStep, setAmb, setView, deskClick, save, loadSave, clearSave, amb, clockAmb, AU: () => AU, preview: () => PREVIEW, previewGoto: (i) => previewGoto(typeof i === 'number' ? i : idIndex(i), {user: true}), previewPlay: () => { if (!previewPlaying) previewToggle(); }, previewPause: () => previewPause(), previewStop: () => previewStop(), previewState: () => ({index: previewIndex, id: STAGES[previewIndex] && STAGES[previewIndex].id, playing: previewPlaying, n: STAGES.length})};
+window.__jp = {jump, S: () => S, openFolder, openPlayer, openEnv, openObj, openReport, aha, pinTap, fileStep, setAmb, setView, deskClick, save, loadSave, clearSave, resume, packId: PACK.id, amb, clockAmb, AU: () => AU, preview: () => PREVIEW, previewGoto: (i) => previewGoto(typeof i === 'number' ? i : idIndex(i), {user: true}), previewPlay: () => { if (!previewPlaying) previewToggle(); }, previewPause: () => previewPause(), previewStop: () => previewStop(), previewState: () => ({index: previewIndex, id: STAGES[previewIndex] && STAGES[previewIndex].id, playing: previewPlaying, n: STAGES.length})};
 // ---------------- resume ----------------
-function resume(o) { S = o; prevSet = new Set(deskSet()); setView(S.view === 'board' ? 'board' : 'desk'); render();
+function resume(o, opts) {
+  const scene = $('#scene');
+  if (scene && !scene.hidden) unscene();
+  S = Object.assign(fresh(), o || {}, {sel: null, connect: false, strSel: null, fresh: {}});
+  prevSet = new Set(deskSet()); setView(S.view === 'board' ? 'board' : 'desk'); render();
   if (S.beat === 'handoff') return handoff();
+  if (opts && opts.quiet) return;
   toast('🗂 Welcome back, Detective. Your desk is just how you left it.', 3600); ortiz('welcome'); }
 // real clock: refresh the desk ambience when the tab comes back or the hour bucket changes
 let lastAmb = clockAmb();

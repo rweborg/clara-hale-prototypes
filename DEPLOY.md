@@ -1,8 +1,11 @@
 # Deploying The Case Desk to nextsteps.fun
 
-Railway runs `journey/` as a single nginx container. The domain is registered at
-GoDaddy; GoDaddy's DNS cannot point an apex/root domain at Railway, so there is
-one decision to make (Step 4) before touching records.
+Railway runs `journey/` as one Node container. It serves the same static game
+and a JSON API (accounts, redeem codes, saved playthroughs) backed by Postgres.
+The domain is registered at GoDaddy; GoDaddy's DNS cannot point an apex/root
+domain at Railway, so there is one decision to make (Step 4) before touching
+records. Do not change mail DNS in the same visit until the paused window
+described in the repo README.
 
 ---
 
@@ -44,8 +47,38 @@ Checklist:
 - [ ] DevTools console is clean; no 404s on `/app/`, `/cases/`, or `/assets/`.
 - [ ] Progress saves and survives a reload.
 
-The container listens on `$PORT`, which Railway injects; `nginx.conf` is rewritten
-at start-up to listen on it. Health check is `GET /`, served by `index.html`.
+The container listens on `$PORT`, which Railway injects. The image command is
+`node server/src/index.js` (do not set a custom start command). Migrations run
+before it listens. Health check is `GET /health`. Art, engine, and case-pack
+cache headers match the old nginx policy (`nginx.conf` is kept as that reference).
+
+### Postgres and variables
+
+In the same Railway project: **New → Database → Postgres**. On the game service,
+add a variable reference so `DATABASE_URL` is the plugin’s connection string.
+
+Set these on the game service:
+
+| Variable | Value |
+| --- | --- |
+| `NODE_ENV` | `production` |
+| `PUBLIC_BASE_URL` | `https://www.nextsteps.fun` |
+| `SESSION_SECRET` | a long random string (see `journey/server/.env.example`) |
+| `EMAIL_FROM` | `The Case Desk <no-reply@nextsteps.fun>` |
+| `ADMIN_EMAILS` | operator emails, comma-separated |
+| `RESEND_API_KEY` | leave empty until Resend DNS is verified |
+| `MOCK_COMMERCE` | leave unset (off in production) |
+| `ETSY_LISTING_URL` | leave empty — there is no Etsy listing yet |
+
+`RESEND_API_KEY` empty means sign-in email is off. The game still plays without
+an account, and the server does not print magic links in production. When the
+domain is verified at Resend, set the key. Sending is Resend’s HTTPS API, not
+SMTP (Railway blocks SMTP on Hobby).
+
+Redeploy and confirm `GET /health` returns `"db": true`. Anonymous reload of
+the desk should behave as before. Turn on backups under the Postgres plugin.
+A restore drill on a copy is still to do once. Full local steps are in the
+repo README under Platform.
 
 ---
 
@@ -146,7 +179,10 @@ dig +short nextsteps.fun
 curl -sI https://nextsteps.fun | head -5
 
 # gzip is actually on for the engine
-curl -sI -H 'Accept-Encoding: gzip' https://nextsteps.fun/app/player.js | grep -i content-encoding
+curl -sI -H 'Accept-Encoding: gzip' https://www.nextsteps.fun/app/player.js | grep -i content-encoding
+
+# the platform is up (after Postgres is attached)
+curl -s https://www.nextsteps.fun/health
 
 # the case pack is served from the right path
 curl -s -o /dev/null -w '%{http_code}\n' https://nextsteps.fun/cases/clara-hale/case.js
@@ -167,7 +203,9 @@ Flush a stale local cache with `sudo dscacheutil -flushcache` on macOS.
 | Certificate not issued | Proxy enabled before Railway could validate, or CAA records blocking Let's Encrypt. |
 | Apex works, `www` does not | You added only one custom domain. Both are separate domains to Railway. |
 | Build fails, "Dockerfile not found" | **Root Directory** is not set to `journey`. |
-| Deploy healthy but the desk is broken | Check `/app/player.js` and `/cases/clara-hale/case.js` return 200. The regex location now returns 404 for a missing asset instead of the HTML shell. |
+| Deploy healthy but the desk is broken | Check `/app/player.js` and `/cases/clara-hale/case.js` return 200. A missing asset is a 404, not the HTML shell. |
+| `/health` is 503 | `DATABASE_URL` is missing or Postgres is still starting. The game process exits if migrations cannot run. |
+| Sign-in says email is not on | `RESEND_API_KEY` is empty, on purpose, until DNS. Anonymous play still works. |
 
 ## Rollback
 
@@ -175,7 +213,7 @@ A failed deploy does not replace the running one: Railway only promotes a
 deployment that passes the health check. To undo the server config alone:
 
 ```bash
-git revert --no-edit HEAD -- journey/nginx.conf
+git revert --no-edit HEAD
 git push
 ```
 

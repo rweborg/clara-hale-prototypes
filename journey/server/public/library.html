@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Your desk · The Case Desk</title>
+<link rel="stylesheet" href="/design-system/fonts.css">
+<link rel="stylesheet" href="/design-system/tokens.css">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ds-paper, #ECE7DF); color: var(--ds-ink, #1D1B18); font-family: Atkinson, Georgia, serif; }
+  header, main { width: min(880px, calc(100% - 32px)); margin: 0 auto; }
+  header { padding: 28px 0 8px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-end; }
+  .brand { letter-spacing: .16em; text-transform: uppercase; font-size: 12px; color: var(--ds-pine, #1F5E4E); font-weight: 700; }
+  h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.05; margin: 6px 0; }
+  p.lead { font-size: 18px; line-height: 1.45; color: var(--ds-ink-soft, #4A443C); max-width: 40rem; }
+  a { color: var(--ds-pine, #1F5E4E); }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 10px 30px rgba(40, 24, 8, .08); margin: 16px 0; }
+  label { display: block; font-weight: 700; margin-bottom: 6px; }
+  input[type=email], input[type=text], textarea {
+    width: 100%; max-width: 420px; border: 1.5px solid #D9D2C6; border-radius: 10px; padding: 12px 14px; background: #fff;
+  }
+  textarea { min-height: 80px; max-width: 100%; }
+  .btn { border: none; border-radius: 12px; background: var(--ds-pine, #1F5E4E); color: #fff; font-weight: 700; padding: 12px 16px; min-height: 48px; }
+  .btn.gold { background: var(--ds-gold, #F2C14E); color: var(--ds-ink, #1D1B18); }
+  .btn.quiet { background: transparent; color: var(--ds-ink, #1D1B18); border: 1.5px solid #CFC6B8; }
+  .note { color: var(--ds-muted, #7A7268); font-size: 14px; line-height: 1.45; }
+  .err { color: var(--ds-alarm-deep, #B3261E); font-weight: 700; }
+  .ok { color: var(--ds-pine, #1F5E4E); font-weight: 700; }
+  .cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .case { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(40, 24, 8, .08); display: flex; flex-direction: column; }
+  .case img { width: 100%; height: 150px; object-fit: cover; background: #E7E0D4; display: block; }
+  .case div { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .badge { display: inline-block; background: #F3EBDD; border-radius: 999px; padding: 3px 8px; font-size: 13px; font-weight: 700; }
+  .code { font-family: CourierP, ui-monospace, monospace; font-size: 20px; letter-spacing: .04em; background: #FBFAF4; border-radius: 10px; padding: 12px; }
+  .stars button { min-width: 44px; min-height: 44px; border: none; background: transparent; font-size: 22px; }
+  #devlink { word-break: break-all; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">The Case Desk</div>
+    <h1>Your desk</h1>
+  </div>
+  <div class="row" id="who"></div>
+</header>
+<main>
+  <p class="lead" id="lead">Play a case, keep your place, and add one you bought.</p>
+  <section class="card" id="signin">
+    <h2>Sign in</h2>
+    <p class="note">We’ll email you a link. Open it in this browser. No password to remember. You can also keep playing without an account — progress stays on this device until you sign in.</p>
+    <form id="emailform">
+      <label for="email">Email</label>
+      <div class="row">
+        <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
+        <button class="btn" type="submit">Email me a link</button>
+      </div>
+    </form>
+    <p id="emailmsg" class="note" role="status"></p>
+    <p id="devlink" hidden></p>
+  </section>
+  <section id="desk" hidden>
+    <h2>Cases</h2>
+    <div class="cases" id="cases"></div>
+    <section class="card">
+      <h2>Add a case</h2>
+      <p class="note">When you buy a case, the download includes a code. Enter it here. It works once.</p>
+      <form id="redeemform">
+        <label for="code">Code</label>
+        <div class="row">
+          <input id="code" name="code" type="text" autocapitalize="characters" autocomplete="off" maxlength="32" placeholder="CD-XXXX-XXXX-XXXX">
+          <button class="btn" type="submit">Add to my desk</button>
+        </div>
+      </form>
+      <p id="redeemmsg" class="note" role="status"></p>
+    </section>
+    <section class="card" id="buy">
+      <h2>Buy on Etsy</h2>
+      <p class="note" id="buynote"></p>
+      <div class="row" id="buyactions"></div>
+      <p id="practicecode" class="code" hidden></p>
+      <p id="buymsg" class="note" role="status"></p>
+    </section>
+    <section class="card" id="ratecard">
+      <h2>How was the case?</h2>
+      <p class="note">Optional. One rating per case. You can change it.</p>
+      <div class="stars" id="stars" role="group" aria-label="Rating"></div>
+      <label for="ratebody">A short note, if you want</label>
+      <textarea id="ratebody" maxlength="500"></textarea>
+      <p><button class="btn" id="ratesave" type="button">Save rating</button></p>
+      <p id="ratemsg" class="note" role="status"></p>
+    </section>
+  </section>
+</main>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let me = null;
+  let cases = [];
+  let stars = 0;
+  let commerce = null;
+
+  function msg(id, text, kind) {
+    const el = $(id);
+    el.className = kind === 'err' ? 'err' : kind === 'ok' ? 'ok' : 'note';
+    el.textContent = text || '';
+  }
+  async function api(method, path, body) {
+    const res = await fetch(path, {
+      method,
+      credentials: 'same-origin',
+      headers: { accept: 'application/json', ...(body ? { 'content-type': 'application/json' } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) { data = {}; }
+    return { ok: res.ok, status: res.status, data };
+  }
+  function cover(url) {
+    if (!url) return '';
+    if (/^https?:/.test(url)) return url;
+    return '/' + url.replace(/^\//, '');
+  }
+  function owned(slug) {
+    return (me.entitlements || []).some((e) => e.slug === slug);
+  }
+  function paintWho() {
+    $('who').innerHTML = me
+      ? `<span>${esc(me.user.displayName || me.user.email)}</span> <button class="btn quiet" id="out" type="button">Sign out</button>`
+      : '';
+    const out = $('out');
+    if (out) out.onclick = async () => { await api('POST', '/api/auth/logout'); location.reload(); };
+  }
+  function paintCases() {
+    $('cases').innerHTML = cases.map((c) => {
+      const badge = c.access === 'free' ? 'Included' : owned(c.slug) ? 'Yours' : 'Needs a code';
+      const play = (c.access === 'free' || owned(c.slug))
+        ? `<a class="btn" href="/?case=${encodeURIComponent(c.slug)}">Play</a>`
+        : '<span class="note">Enter your code to play this one with your account.</span>';
+      const img = c.coverUrl ? `<img src="${esc(cover(c.coverUrl))}" alt="">` : '<img alt="">';
+      const rating = c.ratingCount ? `${c.ratingAvg} · ${c.ratingCount} rating${c.ratingCount === 1 ? '' : 's'}` : 'No ratings yet';
+      return `<article class="case">${img}<div><span class="badge">${esc(badge)}</span><h3>${esc(c.title)}</h3><p class="note">${esc(c.blurb || '')}</p><p class="note">${esc(rating)}</p>${play}</div></article>`;
+    }).join('') || '<p class="note">No cases are on the desk yet.</p>';
+  }
+  function paintBuy() {
+    if (!commerce) return;
+    const note = commerce.listingUrl
+      ? 'Buy the case on Etsy. The download includes a code to enter above.'
+      : 'The Etsy shop is not open yet. This button is a practice stand-in, clearly not a real order. No payment is taken.';
+    $('buynote').textContent = note + ' ' + (commerce.note || '');
+    const actions = [];
+    if (commerce.listingUrl) {
+      actions.push(`<a class="btn gold" href="${esc(commerce.listingUrl)}" target="_blank" rel="noopener">Buy on Etsy</a>`);
+    }
+    if (commerce.practice) {
+      actions.push('<button class="btn quiet" id="practice" type="button">Get a practice code</button>');
+    }
+    $('buyactions').innerHTML = actions.join('');
+    const practice = $('practice');
+    if (practice) practice.onclick = async () => {
+      msg('buymsg', 'Making a practice code…');
+      const slug = (cases[0] && cases[0].slug) || 'clara-hale';
+      const res = await api('POST', '/api/commerce/mock-purchase', { slug });
+      if (!res.ok) { msg('buymsg', res.data.error || 'Could not make a practice code.', 'err'); return; }
+      $('practicecode').hidden = false;
+      $('practicecode').textContent = res.data.code;
+      $('code').value = res.data.code;
+      msg('buymsg', res.data.label + '. ' + (res.data.note || ''), 'ok');
+    };
+  }
+  function paintStars() {
+    const box = $('stars');
+    box.innerHTML = '';
+    for (let n = 1; n <= 5; n += 1) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = n <= stars ? '★' : '☆';
+      b.setAttribute('aria-label', n + ' star' + (n === 1 ? '' : 's'));
+      b.onclick = () => { stars = n; paintStars(); };
+      box.appendChild(b);
+    }
+  }
+  async function loadRating() {
+    const slug = (cases[0] && cases[0].slug) || 'clara-hale';
+    const res = await api('GET', '/api/cases/' + encodeURIComponent(slug) + '/rating');
+    if (res.ok && res.data.mine) {
+      stars = res.data.mine.stars;
+      $('ratebody').value = res.data.mine.body || '';
+      paintStars();
+    }
+  }
+  async function refresh() {
+    const [who, list, shop] = await Promise.all([
+      api('GET', '/api/me'),
+      api('GET', '/api/cases'),
+      api('GET', '/api/commerce/etsy?slug=clara-hale'),
+    ]);
+    cases = list.ok ? list.data.cases : [];
+    commerce = shop.ok ? shop.data : { note: '' };
+    if (!who.ok || !who.data.user) {
+      me = null;
+      $('signin').hidden = false;
+      $('desk').hidden = true;
+      $('lead').textContent = 'Sign in to keep your place on any device, or play without an account.';
+      paintWho();
+      return;
+    }
+    me = who.data;
+    $('signin').hidden = true;
+    $('desk').hidden = false;
+    $('lead').textContent = 'These are the cases on your desk. Clara Hale is included. A code from a purchase adds another.';
+    paintWho();
+    paintCases();
+    paintBuy();
+    paintStars();
+    await loadRating();
+    if (!commerce.listingUrl && commerce.mode === 'mock') {
+      $('buy').hidden = false;
+    }
+  }
+  $('emailform').onsubmit = async (e) => {
+    e.preventDefault();
+    msg('emailmsg', 'Sending…');
+    $('devlink').hidden = true;
+    const res = await api('POST', '/api/auth/request', { email: $('email').value });
+    if (!res.ok) { msg('emailmsg', res.data.error || 'Could not send the link.', 'err'); return; }
+    if (res.data.devLink) {
+      msg('emailmsg', 'Email isn’t connected on this server yet. Use this link in this browser:', 'ok');
+      $('devlink').hidden = false;
+      $('devlink').innerHTML = `<a href="${esc(res.data.devLink)}">${esc(res.data.devLink)}</a>`;
+      return;
+    }
+    msg('emailmsg', 'Check your email. Open the link in this browser.', 'ok');
+  };
+  $('redeemform').onsubmit = async (e) => {
+    e.preventDefault();
+    msg('redeemmsg', 'Checking the code…');
+    const res = await api('POST', '/api/redeem', { code: $('code').value });
+    if (!res.ok) { msg('redeemmsg', res.data.error || 'That code did not work.', 'err'); return; }
+    msg('redeemmsg', res.data.entitlement.title + ' is on your desk.', 'ok');
+    $('code').value = '';
+    await refresh();
+  };
+  $('ratesave').onclick = async () => {
+    if (!stars) { msg('ratemsg', 'Choose a star first.', 'err'); return; }
+    const slug = (cases[0] && cases[0].slug) || 'clara-hale';
+    const res = await api('PUT', '/api/cases/' + encodeURIComponent(slug) + '/rating', { stars, body: $('ratebody').value });
+    if (!res.ok) { msg('ratemsg', res.data.error || 'Could not save that.', 'err'); return; }
+    msg('ratemsg', 'Saved. Thank you.', 'ok');
+    await refresh();
+  };
+  const params = new URLSearchParams(location.search);
+  if (params.get('code')) $('code').value = params.get('code');
+  refresh().catch(() => msg('emailmsg', 'The desk could not be reached. You can still play the case.', 'err'));
+})();
+</script>
+</body>
+</html>
