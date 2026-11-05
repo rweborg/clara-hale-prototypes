@@ -13,7 +13,8 @@ node _build/new-case.js my-case --title "The Lighthouse Keeper"
 # 2. edit cases/my-case/case.js until it validates
 node _build/validate.js my-case
 
-# 3. render the portraits' provenance into finished plates
+# 3. get the prompts for the image model, then treat whatever comes back
+node _build/prompts.js my-case
 python3 _build/plates.py
 
 # 4. play it
@@ -143,6 +144,7 @@ Preview mode (`?preview=1`) never reads or writes the real save.
 | `node _build/playthrough.js` | Plays the case from the intro to the filed record, plus the failure paths. |
 | `node _build/probe.js "<expr>"` | Ad-hoc poking in a loaded page. |
 | `node _build/new-case.js <id>` | Scaffold a valid pack. |
+| `node _build/prompts.js [id]` | Write `cases/<id>/prompts.md`: a model-ready prompt per portrait. |
 | `python3 _build/plates.py` | Render portrait provenance into `assets/plates/`. |
 | `node _build/stamp.js <version>` | Write `app/version.js` for the (i) chip. |
 | `python3 _build/fix_prop_shadows.py` | Recomposite the desk props' shadows. |
