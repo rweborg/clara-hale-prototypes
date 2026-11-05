@@ -209,6 +209,36 @@ describe('auth', { concurrency: 1 }, () => {
     }
   });
 
+  it('claims an account save only after a checkpoint, and keeps the signed-out line', () => {
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const saved = 'Your progress is saved to your account, so it follows you to other devices. This device keeps a copy too.';
+    const waiting = "You're signed in. Progress stays on this device until it is saved to your account.";
+    const library = fs.readFileSync(path.join(here, '../public/library.html'), 'utf8');
+    const panel = fs.readFileSync(path.join(here, '../../app/account.js'), 'utf8');
+    assert.ok(library.includes(saved));
+    assert.ok(panel.includes(saved));
+    assert.ok(library.includes(waiting));
+    assert.ok(panel.includes(waiting));
+    assert.match(library, /progress stays on this device until you sign in/);
+    assert.match(panel, /Your progress already stays on this device/);
+
+    const paint = panel.slice(panel.indexOf('function paint()'), panel.indexOf('function paintStars'));
+    const signedOut = paint.slice(paint.indexOf('if (!me)'), paint.indexOf('const cases'));
+    assert.equal(paint.includes('saved to your account'), false);
+    assert.match(signedOut, /stays on this device/);
+    assert.equal(signedOut.includes('account'), false);
+
+    const flush = panel.slice(panel.indexOf('async function flushNow'), panel.indexOf('function schedule'));
+    const gate = flush.indexOf('if (!saved.ok)');
+    const claim = flush.indexOf('synced = true');
+    assert.ok(gate > -1 && claim > gate);
+    assert.ok(flush.includes('synced = false'));
+
+    const note = library.slice(library.indexOf('async function progressNote'), library.indexOf('async function refresh'));
+    assert.ok(note.indexOf('summary.beat') !== -1 && note.indexOf('summary.beat') < note.indexOf('SAVED_LINE'));
+    assert.ok(note.includes('if (!checked) return WAITING_LINE'));
+  });
+
   it('sets the Secure flag on production cookies', () => {
     const header = cookieHeader('cd_session', 'abc', { production: true, maxAge: 60 });
     assert.match(header, /HttpOnly/);
