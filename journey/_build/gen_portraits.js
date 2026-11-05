@@ -32,7 +32,16 @@ const caseId = argv.find(a => !a.startsWith('--')) || 'clara-hale';
 const dry = argv.includes('--dry');
 const force = argv.includes('--force');
 const modelFlag = argv.indexOf('--model');
-const model = modelFlag >= 0 ? argv[modelFlag + 1] : 'deepseek-ai/janus-pro-7b';
+const modelsFlag = argv.indexOf('--models');
+const outDirFlag = argv.indexOf('--out-dir');
+const outDir = outDirFlag >= 0 ? argv[outDirFlag + 1] : null;
+
+/** Short names expand to the Black Forest Labs models; anything with a slash is used as-is. */
+const full = m => (m.includes('/') ? m : `black-forest-labs/${m}`);
+const models = modelsFlag >= 0
+  ? argv[modelsFlag + 1].split(',').map(m => full(m.trim()))
+  : [modelFlag >= 0 ? argv[modelFlag + 1] : 'deepseek-ai/janus-pro-7b'];
+let model = models[0];
 const onlyFlag = argv.indexOf('--only');
 const only = onlyFlag >= 0 ? argv[onlyFlag + 1].split(',') : null;
 
@@ -58,7 +67,7 @@ async function api(pathname, init) {
   return body;
 }
 
-let VERSION = null;
+const VERSIONS = new Map();
 
 /**
  * Community models have no runnable default endpoint: /models/<id>/predictions
@@ -66,16 +75,17 @@ let VERSION = null;
  * call /predictions with it.
  */
 async function resolveVersion() {
-  if (VERSION) return VERSION;
+  if (VERSIONS.has(model)) return VERSIONS.get(model);
   try {
     const m = await api(`/models/${model}`);
-    VERSION = (m.latest_version && m.latest_version.id) || null;
-    if (!VERSION) throw new Error('the model has no published version');
+    const id = (m.latest_version && m.latest_version.id) || null;
+    if (!id) throw new Error('the model has no published version');
+    VERSIONS.set(model, id);
   } catch (e) {
     const detail = e.message.split('\n').slice(1).join(' ').slice(0, 300);
     throw new Error(`cannot resolve ${model}: ${e.message.split('\n')[0]} ${detail}`);
   }
-  return VERSION;
+  return VERSIONS.get(model);
 }
 
 async function generate(prompt, name) {
@@ -149,11 +159,14 @@ async function main() {
   }
 
   let made = 0, skipped = 0;
+  for (const m of models) {
+  model = m;
+  if (models.length > 1) console.log(`  --- ${m}`);
   for (const key of keys) {
     const rec = portraits[key];
     const name = key.replace(/^p_/, '');
     const out = path.join(ROOT, 'assets', 'portraits', `${name}.jpg`);
-    if (!dry && fs.existsSync(out) && !force) {
+    if (!dry && !outDir && fs.existsSync(out) && !force && models.length === 1) {
       console.log(`  skip   ${name.padEnd(10)} already exists (--force to redo)`);
       skipped++;
       continue;
@@ -165,9 +178,12 @@ async function main() {
     }
     try {
       const buf = await generate(prompt, name);
-      fs.mkdirSync(path.dirname(out), { recursive: true });
-      fs.writeFileSync(out, buf);
-      console.log(`  ok     ${name.padEnd(10)} ${Math.round(buf.length / 1024)} KB -> assets/portraits/${name}.jpg`);
+      const target = outDir
+        ? path.join(outDir, `${name}--${model.split('/').pop()}.jpg`)
+        : out;
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, buf);
+      console.log(`  ok     ${name.padEnd(10)} ${Math.round(buf.length / 1024)} KB -> ${path.relative(ROOT, target)}`);
       made++;
     } catch (e) {
       console.error(`  FAIL   ${name.padEnd(10)} ${e.message.split('\n')[0]}`);
@@ -178,6 +194,7 @@ async function main() {
           + '         open replicate.com/' + model + '/api and check the field names.'
         : '');
     }
+  }
   }
 
   console.log('');
