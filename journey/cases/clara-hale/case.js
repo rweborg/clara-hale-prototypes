@@ -464,6 +464,7 @@ const PORTRAITS = {
     "file": "assets/portraits/clara.jpg",
     "gaze": "away",
     "quality": "ok",
+    "focus": "center 24%",
     "tint": "tungsten",
     "place": "the back room of her bakery, cardboard boxes stacked on a shelf and a prep counter behind her"
   },
@@ -476,6 +477,7 @@ const PORTRAITS = {
     "file": "assets/portraits/daniel.jpg",
     "gaze": "away",
     "quality": "poor",
+    "focus": "center 28%",
     "tint": "tungsten",
     "place": "the shop he works in, shelves of supplies and a doorway, someone else in the foreground"
   },
@@ -488,6 +490,7 @@ const PORTRAITS = {
     "file": "assets/portraits/marcy.jpg",
     "gaze": "camera",
     "quality": "ok",
+    "focus": "center 24%",
     "tint": "fluorescent",
     "place": "behind the bakery counter, a lit display case of bread and a customer in the foreground"
   },
@@ -500,6 +503,7 @@ const PORTRAITS = {
     "file": "assets/portraits/reed.jpg",
     "gaze": "camera",
     "quality": "soft",
+    "focus": "center 30%",
     "tint": "fluorescent",
     "place": "the church hall after the service, a cork noticeboard and stacked plastic chairs"
   },
@@ -512,6 +516,7 @@ const PORTRAITS = {
     "file": "assets/portraits/jesse.jpg",
     "gaze": "camera",
     "quality": "sharp",
+    "focus": "center 32%",
     "tint": "clean",
     "place": "a school photographer's painted canvas backdrop"
   },
@@ -524,6 +529,7 @@ const PORTRAITS = {
     "file": "assets/portraits/dunn.jpg",
     "gaze": "camera",
     "quality": "poor",
+    "focus": "center 34%",
     "tint": "fluorescent",
     "place": "a plain painted wall in the county office"
   },
@@ -536,6 +542,7 @@ const PORTRAITS = {
     "file": "assets/portraits/ortiz.jpg",
     "gaze": "off",
     "quality": "ok",
+    "focus": "center 24%",
     "tint": "clean",
     "place": "a painted office wall at the state police post"
   }
