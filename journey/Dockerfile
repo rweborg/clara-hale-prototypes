@@ -1,9 +1,17 @@
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY index.html /usr/share/nginx/html/
-COPY app /usr/share/nginx/html/app
-COPY cases /usr/share/nginx/html/cases
-COPY assets /usr/share/nginx/html/assets
-COPY design-system /usr/share/nginx/html/design-system
-# Railway healthchecks $PORT. Rewrite the placeholder, then run nginx in the foreground.
-CMD ["sh", "-c", "sed -i \"s/listen 8080;/listen ${PORT:-8080};/\" /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
+FROM node:22-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY server/package.json server/package-lock.json server/
+RUN npm ci --omit=dev --prefix server
+COPY server/src server/src
+COPY server/migrations server/migrations
+COPY server/public server/public
+COPY server/scripts server/scripts
+COPY index.html ./index.html
+COPY app ./app
+COPY cases ./cases
+COPY assets ./assets
+COPY design-system ./design-system
+ENV STATIC_ROOT=/app
+EXPOSE 8080
+CMD ["node", "server/src/index.js"]
