@@ -224,6 +224,11 @@ def main():
         art_map = json.loads(art.group(1))
 
         for key, rec in portraits.items():
+            # Approved art is shipped as-is. The pipeline must never quietly
+            # re-grade a cast that has been signed off.
+            if rec.get('locked'):
+                print(f'  lock   {key:<10} approved, left alone')
+                continue
             # Always treat the raw portrait, never the plate: art already points
             # at the plate after the first run, and re-treating it compounds the
             # border, grade and grain.

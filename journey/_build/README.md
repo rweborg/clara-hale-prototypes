@@ -48,6 +48,15 @@ style guide needs the server so its portraits resolve.
 
 ## Portraits and plates
 
+**Approved casts are locked.** A portrait with `locked: true` in the case file is
+shipped as-is: `plates.py` skips it and prints `lock … approved, left alone`. The
+Clara Hale cast is locked, and its portraits and plates are the same approved
+files with no second grade. Locking exists so the pipeline cannot quietly
+re-grade a cast that has been signed off.
+
+Everything below applies to a case whose art is still being generated:
+
+
 No generated image is shown raw. Each portrait declares a provenance, and
 `_build/plates.py` renders that provenance into a plate — the grade, the paper,
 and the capture artefact that source would carry:

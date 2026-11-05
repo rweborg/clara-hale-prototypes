@@ -466,7 +466,8 @@ const PORTRAITS = {
     "quality": "ok",
     "focus": "center 24%",
     "tint": "tungsten",
-    "place": "the back room of her bakery, cardboard boxes stacked on a shelf and a prep counter behind her"
+    "place": "the back room of her bakery, cardboard boxes stacked on a shelf and a prep counter behind her",
+    "locked": true
   },
   "p_daniel": {
     "type": "phone",
@@ -479,7 +480,8 @@ const PORTRAITS = {
     "quality": "poor",
     "focus": "center 28%",
     "tint": "tungsten",
-    "place": "the shop he works in, shelves of supplies and a doorway, someone else in the foreground"
+    "place": "the shop he works in, shelves of supplies and a doorway, someone else in the foreground",
+    "locked": true
   },
   "p_marcy": {
     "type": "phone",
@@ -492,7 +494,8 @@ const PORTRAITS = {
     "quality": "ok",
     "focus": "center 24%",
     "tint": "fluorescent",
-    "place": "behind the bakery counter, a lit display case of bread and a customer in the foreground"
+    "place": "behind the bakery counter, a lit display case of bread and a customer in the foreground",
+    "locked": true
   },
   "p_reed": {
     "type": "directory",
@@ -505,7 +508,8 @@ const PORTRAITS = {
     "quality": "soft",
     "focus": "center 30%",
     "tint": "fluorescent",
-    "place": "the church hall after the service, a cork noticeboard and stacked plastic chairs"
+    "place": "the church hall after the service, a cork noticeboard and stacked plastic chairs",
+    "locked": true
   },
   "p_jesse": {
     "type": "school",
@@ -518,7 +522,8 @@ const PORTRAITS = {
     "quality": "sharp",
     "focus": "center 32%",
     "tint": "clean",
-    "place": "a school photographer's painted canvas backdrop"
+    "place": "a school photographer's painted canvas backdrop",
+    "locked": true
   },
   "p_dunn": {
     "type": "id",
@@ -531,7 +536,8 @@ const PORTRAITS = {
     "quality": "poor",
     "focus": "center 34%",
     "tint": "fluorescent",
-    "place": "a plain painted wall in the county office"
+    "place": "a plain painted wall in the county office",
+    "locked": true
   },
   "p_ortiz": {
     "type": "id",
@@ -544,7 +550,8 @@ const PORTRAITS = {
     "quality": "ok",
     "focus": "center 24%",
     "tint": "clean",
-    "place": "a painted office wall at the state police post"
+    "place": "a painted office wall at the state police post",
+    "locked": true
   }
 };
 

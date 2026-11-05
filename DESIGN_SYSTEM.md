@@ -27,6 +27,8 @@ Ordinary players should be able to read this as a case file, not as a poster and
 
 Characters are **generated photography, then treated**. The portraits come out of an image model, so on their own they share one look — same light, same grade, same flat rectangle — which reads as AI and is the fastest way to break the illusion. No generated image goes into the game raw.
 
+A cast that has been approved is marked `locked: true` and shipped exactly as delivered — the treatment step leaves it alone. Locking is what stops a pipeline run from silently re-grading signed-off art.
+
 Every portrait declares a provenance in the case file (`portraits` in `cases/<id>/case.js`), and `_build/plates.py` renders that provenance into the image: the grade, the paper, and the capture artefact a photo from that source would actually carry.
 
 | `type` | Look the plate gets |
