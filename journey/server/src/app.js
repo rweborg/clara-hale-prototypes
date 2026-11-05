@@ -217,9 +217,16 @@ export function createApp(config = loadConfig()) {
     const status = err.status
       || (err.type === 'entity.parse.failed' ? 400 : 0)
       || (err.type === 'entity.too.large' ? 413 : 500);
-    if (status >= 500 && status !== 503) console.error('[case-desk]', err.message);
+    if (status >= 500 && !(err instanceof HttpError)) console.error('[case-desk]', err.message);
     if (err.retryAfter) res.set('Retry-After', String(err.retryAfter));
-    const message = status >= 500 ? 'Something went wrong.' : err.message;
+    // HttpError messages are written for players. Unexpected failures stay generic
+    // so a database error never becomes the text on the page.
+    let message;
+    if (err.type === 'entity.parse.failed') message = 'That request could not be read.';
+    else if (err.type === 'entity.too.large') message = 'That is too large to save.';
+    else if (err instanceof HttpError) message = err.message;
+    else if (status >= 500) message = 'Something went wrong.';
+    else message = err.message || 'Something went wrong.';
     if (req.path.startsWith('/api') || wantsJsonSafe(req)) res.status(status).json({ error: message });
     else res.status(status).type('text').send(message);
   });

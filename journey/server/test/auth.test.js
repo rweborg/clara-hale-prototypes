@@ -1,5 +1,8 @@
 import './env.js';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { after, before, beforeEach, describe, it } from 'node:test';
 import { cookieHeader } from '../src/http.js';
 import { getPool } from '../src/db.js';
@@ -15,6 +18,8 @@ describe('auth', { concurrency: 1 }, () => {
   it('rejects a bad email', async () => {
     const res = await call(started.base, jar(), 'POST', '/api/auth/request', { email: 'not-an-email' });
     assert.equal(res.status, 400);
+    assert.equal(res.json.error, 'Enter the email address you want to use.');
+    assert.doesNotMatch(res.json.error, /Something went wrong/);
   });
 
   it('signs in with a single-use link bound to this browser', async () => {
@@ -79,6 +84,8 @@ describe('auth', { concurrency: 1 }, () => {
       assert.equal((await call(limited.base, cookies, 'POST', '/api/auth/request', { email: 'ada@example.com' })).status, 200);
       const blocked = await call(limited.base, cookies, 'POST', '/api/auth/request', { email: 'ada@example.com' });
       assert.equal(blocked.status, 429);
+      assert.equal(blocked.json.error, 'Too many attempts. Please wait a few minutes and try again.');
+      assert.doesNotMatch(blocked.json.error, /Something went wrong/);
       assert.ok(blocked.headers.get('retry-after'));
     } finally {
       await new Promise((resolve) => limited.server.close(resolve));
@@ -91,8 +98,14 @@ describe('auth', { concurrency: 1 }, () => {
       const before = await getPool().query('SELECT count(*)::int AS n FROM magic_link_tokens');
       const res = await call(prod.base, jar(), 'POST', '/api/auth/request', { email: 'ada@example.com' });
       assert.equal(res.status, 503);
+      assert.equal(
+        res.json.error,
+        "Sign-in by email isn't available yet. You can keep playing — your progress is saved on this device.",
+      );
+      assert.doesNotMatch(res.json.error, /Something went wrong/);
       assert.equal(res.json.devLink, undefined);
       assert.doesNotMatch(JSON.stringify(res.json), /token=/);
+      assert.doesNotMatch(JSON.stringify(res.json), /https?:\/\//);
       assert.match(res.headers.get('strict-transport-security'), /max-age=/);
       const after = await getPool().query('SELECT count(*)::int AS n FROM magic_link_tokens');
       assert.equal(after.rows[0].n, before.rows[0].n);
@@ -137,6 +150,36 @@ describe('auth', { concurrency: 1 }, () => {
     }
   });
 
+  it('says when Resend rejects the message, without a link', async () => {
+    const config = loadConfig({ resendApiKey: 're_test_key' });
+    config.fetchImpl = async () => ({ ok: false, status: 422 });
+    const { createApp } = await import('../src/app.js');
+    const server = await new Promise((resolve) => {
+      const listening = createApp(config).listen(0, '127.0.0.1', () => resolve(listening));
+    });
+    try {
+      const res = await call(`http://127.0.0.1:${server.address().port}`, jar(), 'POST', '/api/auth/request', { email: 'ada@example.com' });
+      assert.equal(res.status, 502);
+      assert.equal(res.json.error, 'Could not send the sign-in email. Try again in a minute.');
+      assert.equal(res.json.devLink, undefined);
+      assert.doesNotMatch(JSON.stringify(res.json), /token=/);
+      assert.doesNotMatch(res.json.error, /Something went wrong/);
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  });
+
+  it('does not leak a parser error on a broken sign-in body', async () => {
+    const res = await fetch(started.base + '/api/auth/request', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      body: '{',
+    });
+    const json = await res.json();
+    assert.equal(res.status, 400);
+    assert.equal(json.error, 'That request could not be read.');
+  });
+
   it('keeps the operator page behind the allowlist', async () => {
     const player = jar();
     await signIn(started.base, player, 'player@example.com');
@@ -147,6 +190,23 @@ describe('auth', { concurrency: 1 }, () => {
     const allowed = await call(started.base, owner, 'GET', '/api/admin/summary');
     assert.equal(allowed.status, 200);
     assert.equal(typeof allowed.json.users, 'number');
+  });
+
+  it('library and desk panel use the same unavailable-email sentence', () => {
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const sentence = "Sign-in by email isn't available yet. You can keep playing — your progress is saved on this device.";
+    const library = fs.readFileSync(path.join(here, '../public/library.html'), 'utf8');
+    const panel = fs.readFileSync(path.join(here, '../../app/account.js'), 'utf8');
+    assert.ok(library.includes(sentence));
+    assert.ok(panel.includes(sentence));
+    // A failed sign-in returns before any dev link is written into the page.
+    const libraryEmail = library.slice(library.indexOf("$('emailform').onsubmit"), library.indexOf("$('redeemform').onsubmit"));
+    const panelEmail = panel.slice(panel.indexOf('async function onEmail'), panel.indexOf('async function onRedeem'));
+    for (const source of [libraryEmail, panelEmail]) {
+      const failAt = source.indexOf('if (!res.ok)');
+      const linkAt = source.indexOf('devLink');
+      assert.ok(failAt > -1 && linkAt > failAt);
+    }
   });
 
   it('sets the Secure flag on production cookies', () => {
