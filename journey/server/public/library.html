@@ -52,6 +52,7 @@
 </header>
 <main>
   <p class="lead" id="lead">Play a case, keep your place, and add one you bought.</p>
+  <p class="note" id="progress" hidden></p>
   <section class="card" id="signin">
     <h2>Sign in</h2>
     <p class="note">We’ll email you a link. Open it in this browser. No password to remember. You can also keep playing without an account — progress stays on this device until you sign in.</p>
@@ -197,6 +198,23 @@
       paintStars();
     }
   }
+  const SAVED_LINE = 'Your progress is saved to your account, so it follows you to other devices. This device keeps a copy too.';
+  const WAITING_LINE = "You're signed in. Progress stays on this device until it is saved to your account.";
+  async function progressNote() {
+    const slugs = cases.map((c) => c.slug);
+    if (!slugs.length) slugs.push('clara-hale');
+    let saved = false;
+    let checked = false;
+    for (const slug of slugs) {
+      const cur = await api('GET', '/api/cases/' + encodeURIComponent(slug) + '/sessions/current');
+      if (!cur.ok) continue;
+      checked = true;
+      const summary = cur.data && cur.data.checkpoint && cur.data.checkpoint.summary;
+      if (summary && summary.beat) saved = true;
+    }
+    if (!checked) return WAITING_LINE;
+    return saved ? SAVED_LINE : WAITING_LINE;
+  }
   async function refresh() {
     const [who, list, shop] = await Promise.all([
       api('GET', '/api/me'),
@@ -209,6 +227,7 @@
       me = null;
       $('signin').hidden = false;
       $('desk').hidden = true;
+      $('progress').hidden = true;
       $('lead').textContent = 'Sign in to keep your place on any device, or play without an account.';
       paintWho();
       return;
@@ -217,6 +236,8 @@
     $('signin').hidden = true;
     $('desk').hidden = false;
     $('lead').textContent = 'These are the cases on your desk. Clara Hale is included. A code from a purchase adds another.';
+    $('progress').hidden = false;
+    $('progress').textContent = await progressNote();
     paintWho();
     paintCases();
     paintBuy();

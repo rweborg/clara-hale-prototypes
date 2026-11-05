@@ -22,6 +22,11 @@
   let timer = null;
   let flushing = false;
   let panelOpen = false;
+  // null until a checkpoint is confirmed, true after one lands, false if the last try failed.
+  let synced = null;
+  const SAVED_LINE = 'Your progress is saved to your account, so it follows you to other devices. This device keeps a copy too.';
+  const WAITING_LINE = "You're signed in. Progress stays on this device until it is saved to your account.";
+  const FAILED_LINE = "Couldn't save to your account just now. This device still has your progress.";
 
   function contentOf(snap) {
     if (!snap) return '';
@@ -125,6 +130,13 @@
     el.className = bad ? 'err' : 'status';
     el.textContent = text || '';
   }
+  function paintProgress() {
+    const el = root.querySelector('[data-progress]');
+    if (!el) return;
+    if (synced === true) { el.className = 'status'; el.textContent = SAVED_LINE; }
+    else if (synced === false) { el.className = 'err'; el.textContent = FAILED_LINE; }
+    else { el.className = 'status'; el.textContent = WAITING_LINE; }
+  }
 
   function paint() {
     if (!me) {
@@ -140,7 +152,8 @@
     const cases = (me.entitlements || []).map((e) => '<li>' + esc(e.title) + '</li>').join('');
     root.innerHTML = '<h2>Your desk</h2>'
       + '<p>Signed in as <b>' + esc(me.user.displayName || me.user.email) + '</b>.</p>'
-      + '<p data-status class="status" role="status">This device keeps a copy. Signed-in progress also saves to your desk.</p>'
+      + '<p data-progress class="status"></p>'
+      + '<p data-status class="status" role="status"></p>'
       + (cases ? '<p>From your codes:</p><ul>' + cases + '</ul>' : '<p>Clara Hale is included. A code from a purchase adds another case.</p>')
       + '<form data-redeem><label for="acctcode">Add a case with a code</label><input id="acctcode" maxlength="32" autocapitalize="characters" autocomplete="off" placeholder="CD-XXXX-XXXX-XXXX">'
       + '<div class="row"><button class="act" type="submit">Add to my desk</button></div></form>'
@@ -158,6 +171,7 @@
     paintStars(0);
     const params = new URLSearchParams(location.search);
     if (params.get('code')) root.querySelector('#acctcode').value = params.get('code');
+    paintProgress();
   }
   function paintStars(n) {
     const box = root.querySelector('[data-stars]');
@@ -244,6 +258,7 @@
     await api('POST', '/api/auth/logout');
     me = null;
     sessionId = null;
+    synced = null;
     window.CaseDesk.signedIn = false;
     paint();
   }
@@ -269,23 +284,29 @@
     pending = null;
     try {
       const id = await ensureSession();
-      if (!id) { pending = snap; return; }
+      if (!id) {
+        pending = snap;
+        if (!syncBlocked) { synced = false; paintProgress(); }
+        return;
+      }
       const events = diff(lastSent, snap).map((event) => Object.assign({ clientEventId: eventId() }, event));
       if (events.length) {
         const posted = await api('POST', '/api/sessions/' + id + '/events', { events }, keepalive);
-        if (!posted.ok && posted.status !== 409) { pending = snap; return; }
+        if (!posted.ok && posted.status !== 409) { pending = snap; synced = false; paintProgress(); return; }
       }
       const saved = await api('PUT', '/api/sessions/' + id + '/checkpoints/resume', { summary: snap }, keepalive);
-      if (!saved.ok) { pending = snap; return; }
+      if (!saved.ok) { pending = snap; synced = false; paintProgress(); return; }
       if (snap.filed && !completed) {
         const done = await api('POST', '/api/sessions/' + id + '/complete', {}, keepalive);
         if (done.ok) completed = true;
       }
       lastSent = snap;
-      status('Saved to your desk.');
+      synced = true;
+      paintProgress();
     } catch (e) {
       pending = snap;
-      status('Couldn’t reach your desk. This device still has your progress.');
+      synced = false;
+      paintProgress();
     } finally {
       flushing = false;
       if (pending) schedule();
@@ -311,6 +332,8 @@
       completed = false;
       lastSent = null;
       pending = null;
+      synced = null;
+      paintProgress();
       if (!id || !window.CaseDesk.signedIn) return;
       api('POST', '/api/sessions/' + id + '/abandon').catch(() => {});
     },
@@ -348,14 +371,17 @@
       window.__jp.resume(summary, { quiet: !!localOk });
       window.CaseDesk.applying = false;
       lastSent = window.__jp.loadSave() || summary;
-      status('Picked up your saved desk.');
+      synced = true;
+      paintProgress();
       return;
     }
     if (localOk && (!serverOk || contentOf(local) !== contentOf(summary))) {
       pending = local;
       lastSent = serverOk ? summary : null;
       flushNow(false);
+      return;
     }
+    if (serverOk) { synced = true; paintProgress(); }
   }
 
   window.addEventListener('pagehide', () => { if (pending && me) flushNow(true); });
