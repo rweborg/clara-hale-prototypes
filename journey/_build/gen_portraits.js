@@ -81,10 +81,19 @@ async function resolveVersion() {
 async function generate(prompt, name) {
   const version = await resolveVersion();
   const headers = { Prefer: 'wait=60' };
+
+  // The FLUX models take format and shape knobs; others may reject them.
+  // Without output_format, flux-schnell returns WebP bytes under a .jpg name.
+  const input = { prompt };
+  if (/flux/i.test(model)) {
+    input.output_format = 'jpg';
+    input.aspect_ratio = '3:4';
+  }
+
   const prediction = await api('/predictions', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ version, input: { prompt } }),
+    body: JSON.stringify({ version, input }),
   });
 
   let p = prediction;
@@ -104,7 +113,13 @@ async function generate(prompt, name) {
 
   const img = await fetch(url);
   if (!img.ok) throw new Error(`${name}: could not download the result`);
-  return Buffer.from(await img.arrayBuffer());
+  const buf = Buffer.from(await img.arrayBuffer());
+  // A wrong-format file under a .jpg name renders by luck; catch it instead.
+  if (!(buf[0] === 0xff && buf[1] === 0xd8)) {
+    throw new Error(`${name}: the model returned ${buf.subarray(0, 4).toString('hex')} bytes, not JPEG — `
+      + 'add output_format jpg for this model');
+  }
+  return buf;
 }
 
 async function main() {
