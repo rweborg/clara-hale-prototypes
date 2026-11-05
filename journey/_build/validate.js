@@ -268,7 +268,9 @@ function validate(id, pack) {
 }
 
 function main() {
-  const only = process.argv[2];
+  const candidate = process.argv.slice(2).find(a => !a.startsWith('-'));
+  const only = candidate && fs.existsSync(path.join(CASES, candidate, 'case.js')) ? candidate : null;
+  if (candidate && !only) console.error(`ignoring "${candidate}" — no such case in cases/`);
   if (!fs.existsSync(CASES)) {
     console.error('no cases/ directory');
     process.exit(2);

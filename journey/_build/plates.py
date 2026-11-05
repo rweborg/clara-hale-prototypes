@@ -178,7 +178,10 @@ def main():
         art_map = json.loads(art.group(1))
 
         for key, rec in portraits.items():
-            raw = art_map.get(key)
+            # Always treat the raw portrait, never the plate: art already points
+            # at the plate after the first run, and re-treating it compounds the
+            # border, grade and grain.
+            raw = rec.get('file') or art_map.get(key)
             if not raw:
                 continue
             full = os.path.join(ROOT, raw)

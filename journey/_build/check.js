@@ -17,10 +17,15 @@
  */
 
 const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-const caseArg = process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : null;
+// Only treat the argument as a case id if that case actually exists, so a
+// stray shell token (a pasted "#" comment, say) cannot derail the run.
+const candidate = process.argv.slice(2).find(a => !a.startsWith('-'));
+const caseArg = candidate && fs.existsSync(path.join(ROOT, 'cases', candidate, 'case.js')) ? candidate : null;
+if (candidate && !caseArg) console.log(`\n  (ignoring "${candidate}" — not a case in cases/)`);
 
 function run(label, script, args = []) {
   process.stdout.write(`\n\x1b[1m${label}\x1b[0m\n`);

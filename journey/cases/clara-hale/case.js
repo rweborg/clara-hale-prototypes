@@ -460,49 +460,56 @@ const PORTRAITS = {
     "name": "Clara Hale",
     "source": "her sister's album",
     "note": "Harvest Festival booth, September",
-    "look": "woman, 34, dark wavy shoulder-length hair, no makeup, cream knit sweater, tired"
+    "look": "woman, 34, dark wavy shoulder-length hair, no makeup, cream knit sweater, tired",
+    "file": "assets/portraits/clara.jpg"
   },
   "p_daniel": {
     "type": "phone",
     "name": "Daniel Hale",
     "source": "texted to Ortiz",
     "note": "phone candid, Saturday night",
-    "look": "man, 42, short dark hair, full beard, blue-and-red plaid flannel over a t-shirt"
+    "look": "man, 42, short dark hair, full beard, blue-and-red plaid flannel over a t-shirt",
+    "file": "assets/portraits/daniel.jpg"
   },
   "p_marcy": {
     "type": "phone",
     "name": "Marcy Tolliver",
     "source": "texted to Ortiz",
     "note": "phone candid, at the bakery",
-    "look": "woman, 40, dark hair pulled back, navy cardigan over a grey tee, watchful"
+    "look": "woman, 40, dark hair pulled back, navy cardigan over a grey tee, watchful",
+    "file": "assets/portraits/marcy.jpg"
   },
   "p_reed": {
     "type": "directory",
     "name": "Ellis Reed",
     "source": "church directory",
     "note": "Pine Hollow Lutheran, 2019",
-    "look": "man, late 60s, thinning grey hair, clean-shaven, grey cardigan over a pale shirt"
+    "look": "man, late 60s, thinning grey hair, clean-shaven, grey cardigan over a pale shirt",
+    "file": "assets/portraits/reed.jpg"
   },
   "p_jesse": {
     "type": "school",
     "name": "Jesse Cole",
     "source": "high school yearbook",
     "note": "junior year",
-    "look": "young man, 22, dark wavy hair, thin moustache, plain dark t-shirt"
+    "look": "young man, 22, dark wavy hair, thin moustache, plain dark t-shirt",
+    "file": "assets/portraits/jesse.jpg"
   },
   "p_dunn": {
     "type": "id",
     "name": "Ray Dunn",
     "source": "county sheriff",
     "note": "county ID, 2024",
-    "look": "man, 55, receding grey-brown hair, heavy moustache, tan uniform shirt"
+    "look": "man, 55, receding grey-brown hair, heavy moustache, tan uniform shirt",
+    "file": "assets/portraits/dunn.jpg"
   },
   "p_ortiz": {
     "type": "id",
     "name": "Sam Ortiz",
     "source": "Montana state police",
     "note": "state police ID, 2023",
-    "look": "man, 52, thick dark hair going grey, deep-set eyes, dark open-collar shirt"
+    "look": "man, 52, thick dark hair going grey, deep-set eyes, dark open-collar shirt",
+    "file": "assets/portraits/ortiz.jpg"
   }
 };
 
