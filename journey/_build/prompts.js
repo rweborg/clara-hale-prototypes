@@ -107,4 +107,6 @@ function main() {
   }
 }
 
-main();
+module.exports = { loadPack, promptFor, SOURCE, NEGATIVE };
+
+if (require.main === module) main();

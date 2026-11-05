@@ -145,6 +145,7 @@ Preview mode (`?preview=1`) never reads or writes the real save.
 | `node _build/probe.js "<expr>"` | Ad-hoc poking in a loaded page. |
 | `node _build/new-case.js <id>` | Scaffold a valid pack. |
 | `node _build/prompts.js [id]` | Write `cases/<id>/prompts.md`: a model-ready prompt per portrait. |
+| `node _build/gen_portraits.js [id]` | Generate the portraits from those prompts with a hosted model (needs `REPLICATE_API_TOKEN`). |
 | `python3 _build/plates.py` | Render portrait provenance into `assets/plates/`. |
 | `node _build/stamp.js <version>` | Write `app/version.js` for the (i) chip. |
 | `python3 _build/fix_prop_shadows.py` | Recomposite the desk props' shadows. |
