@@ -58,12 +58,33 @@ async function api(pathname, init) {
   return body;
 }
 
+let VERSION = null;
+
+/**
+ * Community models have no runnable default endpoint: /models/<id>/predictions
+ * 404s unless a default version exists. Ask for the latest version instead and
+ * call /predictions with it.
+ */
+async function resolveVersion() {
+  if (VERSION) return VERSION;
+  try {
+    const m = await api(`/models/${model}`);
+    VERSION = (m.latest_version && m.latest_version.id) || null;
+    if (!VERSION) throw new Error('the model has no published version');
+  } catch (e) {
+    const detail = e.message.split('\n').slice(1).join(' ').slice(0, 300);
+    throw new Error(`cannot resolve ${model}: ${e.message.split('\n')[0]} ${detail}`);
+  }
+  return VERSION;
+}
+
 async function generate(prompt, name) {
+  const version = await resolveVersion();
   const headers = { Prefer: 'wait=60' };
-  const prediction = await api(`/models/${model}/predictions`, {
+  const prediction = await api('/predictions', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ input: { prompt } }),
+    body: JSON.stringify({ version, input: { prompt } }),
   });
 
   let p = prediction;
@@ -100,6 +121,18 @@ async function main() {
 
   console.log(`\n${caseId} · ${model} · ${keys.length} portrait${keys.length === 1 ? '' : 's'}\n`);
 
+  // Resolve before spending anything: if the model id is wrong or has no
+  // published version, say so once instead of failing per portrait.
+  if (!dry) {
+    try {
+      const v = await resolveVersion();
+      console.log(`  model  ${model} @ ${v.slice(0, 12)}…\n`);
+    } catch (e) {
+      console.error(e.message + '\n');
+      process.exit(1);
+    }
+  }
+
   let made = 0, skipped = 0;
   for (const key of keys) {
     const rec = portraits[key];
@@ -123,6 +156,8 @@ async function main() {
       made++;
     } catch (e) {
       console.error(`  FAIL   ${name.padEnd(10)} ${e.message.split('\n')[0]}`);
+      const body = e.message.split('\n').slice(1).join(' ').trim();
+      if (body) console.error(`         ${body.slice(0, 300)}`);
       console.error(e.message.includes('422')
         ? '         The model rejected the input. Its schema probably wants more than `prompt`;\n'
           + '         open replicate.com/' + model + '/api and check the field names.'
