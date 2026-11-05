@@ -78,6 +78,26 @@ def finish(im, grain=0.05, soften=0.6):
     return im
 
 
+def roughen(im, zoom=1.07, dx=0.05, dy=0.02, down=680, ca=1.1):
+    """Take the studio gloss off a generated portrait: crop it off-centre, throw
+    resolution away and get it back, and split the colour channels slightly the
+    way a cheap lens does. A model cannot be asked for bad optics."""
+    w, h = im.size
+    cw, ch = int(w / zoom), int(h / zoom)
+    x0 = max(0, min(w - cw, int((w - cw) / 2 + dx * cw)))
+    y0 = max(0, min(h - ch, int((h - ch) / 2 + dy * ch)))
+    im = im.crop((x0, y0, x0 + cw, y0 + ch))
+    if down and im.width > down:
+        small = im.resize((down, max(1, int(im.height * down / im.width))), Image.LANCZOS)
+        im = small.resize((cw, ch), Image.LANCZOS)
+    if ca:
+        r, g, b = im.split()
+        r = r.transform(r.size, Image.AFFINE, (1, 0, -ca, 0, 1, 0))
+        b = b.transform(b.size, Image.AFFINE, (1, 0, ca, 0, 1, 0))
+        im = Image.merge('RGB', (r, g, b))
+    return im
+
+
 def add_scanlines(im, gap=4, strength=0.10):
     a = np.asarray(im).astype(np.float32)
     a[::gap] *= (1 - strength)
@@ -92,7 +112,7 @@ def plate(src, rec):
     name = rec.get('name', '')
 
     if kind == 'snapshot':
-        im = grade(im, sat=1.12, warm=(1.07, 1.0, 0.9), gamma=0.94, vignette=0.35)
+        im = roughen(grade(im, sat=1.12, warm=(1.07, 1.0, 0.9), gamma=0.94, vignette=0.35))
         border = int(w * 0.035)
         out = Image.new('RGB', (w + border * 2, h + border * 2), (247, 244, 236))
         out.paste(im, (border, border))
@@ -134,7 +154,8 @@ def plate(src, rec):
                font=font(int(w * 0.038), True), fill=(58, 58, 62), anchor='mm')
 
     elif kind == 'phone':
-        im = grade(im, sat=1.18, warm=(1.02, 1.0, 1.0), contrast=1.03, vignette=0.12)
+        im = roughen(grade(im, sat=1.18, warm=(1.02, 1.0, 1.0), contrast=1.03, vignette=0.12),
+                    zoom=1.04, dx=-0.04, dy=0.03, down=720, ca=1.4)
         # faint screen glare across the top-left, like a phone held up
         hh, ww = im.size
         glare = Image.new('L', (ww, hh), 0)
@@ -155,7 +176,8 @@ def plate(src, rec):
     else:  # scene, newspaper, flyer, mugshot — a plain photographic grade
         out = grade(im, sat=0.95, contrast=1.04)
 
-    return finish(out, grain=0.045, soften=0.5)
+    heavy = kind in ('snapshot', 'phone')
+    return finish(out, grain=0.070 if heavy else 0.045, soften=0.6 if heavy else 0.5), (74 if heavy else 86)
 
 
 def main():
@@ -191,9 +213,9 @@ def main():
             out_name = key[2:] if key.startswith('p_') else key
             out_rel = f'assets/plates/{out_name}.jpg'
             out_full = os.path.join(ROOT, out_rel)
-            img = plate(full, rec)
+            img, quality = plate(full, rec)
             if not dry:
-                img.save(out_full, 'JPEG', quality=88, optimize=True)
+                img.save(out_full, 'JPEG', quality=quality, optimize=True)
             art_map[key] = out_rel
             made.append((key, rec['type'], out_rel))
 

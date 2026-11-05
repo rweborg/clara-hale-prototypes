@@ -14,15 +14,21 @@ look the plates then have to fight.
 
 ```text
 A photograph of a woman, 34, dark wavy shoulder-length hair, no makeup, cream knit sweater, tired.
-Candid family snapshot, taken by a relative at an outdoor town festival in the evening.
-Slightly overexposed on-camera flash, warm colour cast, 1990s point-and-shoot, 35mm film grain,
-a little soft, imperfect framing with somebody's shoulder at the edge. Not posed, she is not looking at the camera.
+Amateur snapshot taken by a relative at a small-town fair in the evening, camera flash on.
+Direct hard on-camera flash: bright flat lighting on the subject, dark falloff behind, shiny highlights on the skin,
+a hard shadow thrown on whatever is behind them. Everything from the subject to the background is in focus.
+Caught mid-movement, not posing: shoulders uneven, mouth slightly open, eyes half-closed or looking off to the side.
+Framing is crooked and too wide, with fairground clutter and strangers in the frame.
+Shot on a cheap mid-2000s compact camera: slightly underexposed, visible noise, JPEG artefacts, faint red-eye.
 Context: Harvest Festival booth, September.
 Why it exists: it came from her sister's album, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/clara.jpg`, ideally 3:4 portrait, at least 900px wide.
@@ -33,15 +39,19 @@ Save as `assets/portraits/clara.jpg`, ideally 3:4 portrait, at least 900px wide.
 
 ```text
 A photograph of a man, 42, short dark hair, full beard, blue-and-red plaid flannel over a t-shirt.
-Photo taken on a phone by an acquaintance, handed over as a message attachment.
-Wide phone lens, mixed indoor light, mild motion blur, a little noise, awkward casual framing,
-the subject caught mid-expression. Nothing cinematic.
+Photo taken on a phone by an acquaintance and sent as a message attachment.
+Mixed overhead indoor light, no flash, high-ISO noise, slight motion blur, muted colour.
+Awkward casual crop with the room still legible behind them — shelving, clutter, a doorway.
+The subject is half-turned, caught mid-conversation, not looking their best.
 Context: phone candid, Saturday night.
 Why it exists: it came from texted to Ortiz, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/daniel.jpg`, ideally 3:4 portrait, at least 900px wide.
@@ -52,15 +62,19 @@ Save as `assets/portraits/daniel.jpg`, ideally 3:4 portrait, at least 900px wide
 
 ```text
 A photograph of a woman, 40, dark hair pulled back, navy cardigan over a grey tee, watchful.
-Photo taken on a phone by an acquaintance, handed over as a message attachment.
-Wide phone lens, mixed indoor light, mild motion blur, a little noise, awkward casual framing,
-the subject caught mid-expression. Nothing cinematic.
+Photo taken on a phone by an acquaintance and sent as a message attachment.
+Mixed overhead indoor light, no flash, high-ISO noise, slight motion blur, muted colour.
+Awkward casual crop with the room still legible behind them — shelving, clutter, a doorway.
+The subject is half-turned, caught mid-conversation, not looking their best.
 Context: phone candid, at the bakery.
 Why it exists: it came from texted to Ortiz, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/marcy.jpg`, ideally 3:4 portrait, at least 900px wide.
@@ -72,14 +86,17 @@ Save as `assets/portraits/marcy.jpg`, ideally 3:4 portrait, at least 900px wide.
 ```text
 A photograph of a man, late 60s, thinning grey hair, clean-shaven, grey cardigan over a pale shirt.
 Church directory portrait, photographed after a Sunday service by a volunteer with a kit lens.
-Soft frontal flash, a plain curtain backdrop, warm sepia from the print, gentle vignetting,
-slightly dated clothing, formal but not polished.
+Soft frontal flash, a plain curtain backdrop, warm sepia from the print, slightly soft focus,
+dated clothing, a formal but unpolished pose.
 Context: Pine Hollow Lutheran, 2019.
 Why it exists: it came from church directory, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/reed.jpg`, ideally 3:4 portrait, at least 900px wide.
@@ -90,14 +107,17 @@ Save as `assets/portraits/reed.jpg`, ideally 3:4 portrait, at least 900px wide.
 
 ```text
 A photograph of a young man, 22, dark wavy hair, thin moustache, plain dark t-shirt.
-High school yearbook photo. Plain painted canvas backdrop, flat frontal light from a two-head kit,
-formal shoulders-square pose, thin white border, printed on matte yearbook stock in the 2010s.
+High school yearbook photo. Flat two-light setup with a slight hot spot, painted grey-blue canvas backdrop,
+shoulders square, a forced neutral smile, tidy hair. Printed on matte yearbook stock and slightly faded.
 Context: junior year.
 Why it exists: it came from high school yearbook, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/jesse.jpg`, ideally 3:4 portrait, at least 900px wide.
@@ -108,14 +128,19 @@ Save as `assets/portraits/jesse.jpg`, ideally 3:4 portrait, at least 900px wide.
 
 ```text
 A photograph of a man, 55, receding grey-brown hair, heavy moustache, tan uniform shirt.
-County sheriff's office ID photograph. Flat frontal on-camera flash, plain painted cinderblock wall,
-hard shadow behind the head, dead-centre framing, neutral expression, no depth of field, slightly washed out.
+County sheriff's office ID photograph, taken at a desk.
+Dead-flat frontal on-camera flash, plain painted cinderblock wall, hard shadow behind the head.
+Slightly overexposed, no depth of field at all, hair flat, no smile, dead-centre framing.
+Looks like a cheap 2010s webcam in a government office, not a portrait.
 Context: county ID, 2024.
 Why it exists: it came from county sheriff, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/dunn.jpg`, ideally 3:4 portrait, at least 900px wide.
@@ -126,14 +151,19 @@ Save as `assets/portraits/dunn.jpg`, ideally 3:4 portrait, at least 900px wide.
 
 ```text
 A photograph of a man, 52, thick dark hair going grey, deep-set eyes, dark open-collar shirt.
-County sheriff's office ID photograph. Flat frontal on-camera flash, plain painted cinderblock wall,
-hard shadow behind the head, dead-centre framing, neutral expression, no depth of field, slightly washed out.
+County sheriff's office ID photograph, taken at a desk.
+Dead-flat frontal on-camera flash, plain painted cinderblock wall, hard shadow behind the head.
+Slightly overexposed, no depth of field at all, hair flat, no smile, dead-centre framing.
+Looks like a cheap 2010s webcam in a government office, not a portrait.
 Context: state police ID, 2023.
 Why it exists: it came from Montana state police, and that is what the picture looks like.
-Avoid: no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing.
+It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.
+Avoid: no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion.
 ```
 
 Save as `assets/portraits/ortiz.jpg`, ideally 3:4 portrait, at least 900px wide.

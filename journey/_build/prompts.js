@@ -30,31 +30,49 @@ function loadPack(id) {
   return sandbox.window.CASE_PACK;
 }
 
-/** What each provenance should look like, in a model's language. */
+/**
+ * What each provenance should look like, in a model's language.
+ *
+ * The enemy is the model's default: a beautiful, lit, shallow-bokeh portrait.
+ * These push hard the other way — on-camera flash, deep focus, awkward pose,
+ * clutter in frame, cheap hardware — because a case file is full of photos
+ * taken by ordinary people, not photographs.
+ */
 const SOURCE = {
-  snapshot: `Candid family snapshot, taken by a relative at an outdoor town festival in the evening.
-Slightly overexposed on-camera flash, warm colour cast, 1990s point-and-shoot, 35mm film grain,
-a little soft, imperfect framing with somebody's shoulder at the edge. Not posed, she is not looking at the camera.`,
-  phone: `Photo taken on a phone by an acquaintance, handed over as a message attachment.
-Wide phone lens, mixed indoor light, mild motion blur, a little noise, awkward casual framing,
-the subject caught mid-expression. Nothing cinematic.`,
-  id: `County sheriff's office ID photograph. Flat frontal on-camera flash, plain painted cinderblock wall,
-hard shadow behind the head, dead-centre framing, neutral expression, no depth of field, slightly washed out.`,
+  snapshot: `Amateur snapshot taken by a relative at a small-town fair in the evening, camera flash on.
+Direct hard on-camera flash: bright flat lighting on the subject, dark falloff behind, shiny highlights on the skin,
+a hard shadow thrown on whatever is behind them. Everything from the subject to the background is in focus.
+Caught mid-movement, not posing: shoulders uneven, mouth slightly open, eyes half-closed or looking off to the side.
+Framing is crooked and too wide, with fairground clutter and strangers in the frame.
+Shot on a cheap mid-2000s compact camera: slightly underexposed, visible noise, JPEG artefacts, faint red-eye.`,
+  phone: `Photo taken on a phone by an acquaintance and sent as a message attachment.
+Mixed overhead indoor light, no flash, high-ISO noise, slight motion blur, muted colour.
+Awkward casual crop with the room still legible behind them — shelving, clutter, a doorway.
+The subject is half-turned, caught mid-conversation, not looking their best.`,
+  id: `County sheriff's office ID photograph, taken at a desk.
+Dead-flat frontal on-camera flash, plain painted cinderblock wall, hard shadow behind the head.
+Slightly overexposed, no depth of field at all, hair flat, no smile, dead-centre framing.
+Looks like a cheap 2010s webcam in a government office, not a portrait.`,
   directory: `Church directory portrait, photographed after a Sunday service by a volunteer with a kit lens.
-Soft frontal flash, a plain curtain backdrop, warm sepia from the print, gentle vignetting,
-slightly dated clothing, formal but not polished.`,
-  school: `High school yearbook photo. Plain painted canvas backdrop, flat frontal light from a two-head kit,
-formal shoulders-square pose, thin white border, printed on matte yearbook stock in the 2010s.`,
+Soft frontal flash, a plain curtain backdrop, warm sepia from the print, slightly soft focus,
+dated clothing, a formal but unpolished pose.`,
+  school: `High school yearbook photo. Flat two-light setup with a slight hot spot, painted grey-blue canvas backdrop,
+shoulders square, a forced neutral smile, tidy hair. Printed on matte yearbook stock and slightly faded.`,
   cctv: `Frame from a fixed security camera at night. Wide angle from above head height, infrared-lit,
 green-grey monochrome, heavy grain and compression blocking, harsh contrast, no shallow depth of field.`,
   scene: `Documentary photograph of a real thing at a real location, available light, no staging,
 mild colour, honest and a little dull.`
 };
 
-const NEGATIVE = `no text, no watermark, no logo, no seamless studio backdrop, no beauty retouching,
-no airbrushed or poreless skin, no dramatic rim light, no cinematic teal-and-orange grade,
-no shallow bokeh portrait, no looking directly at the camera unless the source is an ID,
-no illustration, no 3d render, no symmetrical framing`;
+const NEGATIVE = `no beauty retouching, no flawless or poreless skin, no perfect hair, no makeup ad,
+no studio lighting, no soft key light, no rim light, no bokeh, no shallow depth of field,
+no blurred background, no cinematic colour grade, no teal and orange, no centred symmetrical composition,
+no model pose, no fashion styling, no glamour, no airbrushing, no text, no watermark, no logo,
+no illustration, no 3d render, no cgi, no wide-angle distortion`;
+
+/** Every prompt ends with this, whatever the source. */
+const REALITY = `It must look like a photograph taken by an ordinary person rather than a professional portrait:
+imperfect, slightly awkward, with the place still visible behind the subject.`;
 
 function promptFor(rec) {
   const look = (rec.look || rec.name).replace(/^\s*(a|an|the)\s+/i, '');
@@ -63,6 +81,7 @@ function promptFor(rec) {
     SOURCE[rec.type] || SOURCE.scene,
     rec.note ? `Context: ${rec.note}.` : '',
     `Why it exists: it came from ${rec.source}, and that is what the picture looks like.`,
+    REALITY,
     `Avoid: ${NEGATIVE}.`
   ].filter(Boolean).join('\n');
 }
@@ -107,6 +126,6 @@ function main() {
   }
 }
 
-module.exports = { loadPack, promptFor, SOURCE, NEGATIVE };
+module.exports = { loadPack, promptFor, SOURCE, NEGATIVE, REALITY };
 
 if (require.main === module) main();
