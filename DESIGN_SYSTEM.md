@@ -98,7 +98,11 @@ One line-icon set for the whole app: [Lucide](https://lucide.dev) (ISC license),
 
 ### Desk labels
 
-Labels are a small paper card (sheet white, hairline border, 4px corner, line icon, name, optional detail such as "4 tapes"). They appear on hover, keyboard focus, or press, never all at once, so the desk reads as a desk. The prop under the pointer lifts with a soft shadow. The next step is marked on the prop itself with a warm glow; its label shows on its own only at More help (`deskLabels: 'next'`). Board name tags use the same paper-tape style; a missing person's tag keeps a red edge.
+Labels are a small paper card (sheet white, hairline border, 3px corner, 13px text, line icon, name, optional detail such as "4 tapes"). Each sits centered against the bottom edge of its item, slightly overlapping so it reads as attached; it flips above only when the item is at the bottom of the desk. They appear on hover, keyboard focus, or press, never all at once, so the desk reads as a desk. The prop under the pointer lifts with a soft shadow. The next step is marked on the prop itself with a warm glow; its label shows on its own only at More help (`deskLabels: 'next'`). Board name tags use the same paper-tape style; a missing person's tag keeps a red edge.
+
+### Folder open and close
+
+Clicking the desk folder lifts it to the middle of the screen while the desk photo cross-fades into a manila cover with the case label, then the cover swings open on the spine (about 0.85 s) and the open folder takes over. Putting it back plays it in reverse and the folder settles into its spot on the desk. Phones get a plain grow and shrink; reduced motion gets none. A new overlay opened mid-animation always wins (`ov()` tracks which opening owns `#ov`). See `folderFly()` in `player.js`.
 
 ### Button roles
 

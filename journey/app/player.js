@@ -399,46 +399,18 @@ function fitHot(name) { const b = $(`.hot[data-name="${name}"]`); if (!b) return
   seatTags(); }
 function seatTags() { const desk = $('#desk'); if (!desk || seatTags.busy) return; seatTags.busy = true; try { seatTagsNow(); } finally { seatTags.busy = false; } }
 function seatTagsNow() { const desk = $('#desk');
-  const sc = S._sc || 1, dr = desk.getBoundingClientRect(), tagSc = parseFloat(getComputedStyle(desk).getPropertyValue('--tag-sc')) || 1;
-  const toD = r => ({l: (r.left - dr.left) / sc, t: (r.top - dr.top) / sc, r: (r.right - dr.left) / sc, b: (r.bottom - dr.top) / sc});
-  const sprites = $$('#spr img').filter(im => im.style.visibility !== 'hidden' && im.offsetWidth > 0 && im.offsetWidth < 900).map(im => Object.assign(toD(im.getBoundingClientRect()), {hot: im.dataset.hot}));
-  const items = $$('.hot').map(b => { const tag = b.querySelector('.tag'); if (!tag || !(b.offsetWidth > 0)) return null; const box = toD(b.getBoundingClientRect()); return {b, tag, box, name: b.dataset.name, rot: tag.dataset.rot || '0'}; }).filter(Boolean).sort((a, c) => a.box.t - c.box.t);
-  const placed = [];
-  const area = box => Math.max(1, (box.r - box.l) * (box.b - box.t));
-  const overlap = (a, b) => { const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t); return ox > 1 && oy > 1 ? ox * oy : 0; };
-  for (const it of items) {
-    const tagW = (it.tag.offsetWidth || 120) * tagSc, tagH = (it.tag.offsetHeight || 32) * tagSc, gap = 6;
-    let best = null;
-    for (let dy = -tagH - gap; dy <= (it.box.b - it.box.t) + tagH + gap; dy += 16) for (let dx = -tagW - gap; dx <= (it.box.r - it.box.l) + tagW + gap; dx += 24) {
-      const box = {l: Math.max(8, Math.min(1272 - tagW, it.box.l + dx)), t: it.box.t + dy, r: 0, b: 0}; box.r = box.l + tagW; box.b = box.t + tagH;
-      const cx = Math.max(it.box.l, Math.min(it.box.r, (box.l + box.r) / 2)), cy = Math.max(it.box.t, Math.min(it.box.b, (box.t + box.b) / 2));
-      let score = Math.hypot((box.l + box.r) / 2 - cx, (box.t + box.b) / 2 - cy) * 0.35;
-      if (box.t < 4 || box.b > 796 || box.l < 4 || box.r > 1276) score += 5000;
-      for (const sp of sprites) { const o = overlap(box, sp); if (o) score += (sp.hot === it.name ? 9000 : 5000) * o / area(box); }
-      for (const p of placed) { const o = overlap(box, p); if (o) score += 900 * o / area(box); }
-      if (!best || score < best.score) best = {box, score};
-    }
-    placed.push(best.box); it.tagW = tagW;
-  }
-  for (let pass = 0; pass < 6; pass++) for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
-    const A = placed[i], B = placed[j], ox = Math.min(A.r, B.r) - Math.max(A.l, B.l), oy = Math.min(A.b, B.b) - Math.max(A.t, B.t);
-    if (ox <= 2 || oy <= 2) continue;
-    for (const [idx, other, dir] of [[j, A, 1], [j, A, -1], [i, B, -1], [i, B, 1]]) {
-      const src = placed[idx], delta = dir > 0 ? other.r - src.l + 8 : src.r - other.l + 8;
-      const box = {l: src.l + dir * delta, t: src.t, r: src.r + dir * delta, b: src.b};
-      if (box.l < 8 || box.r > 1272) continue;
-      if (sprites.some(sp => overlap(box, sp) > 0)) continue;
-      if (placed.some((p, k) => k !== idx && overlap(box, p) > 0)) continue;
-      placed[idx] = box; break;
-    }
-  }
-  items.forEach((it, i) => {
-    const box = placed[i], cx = (it.box.l + it.box.r) / 2, dx = (box.l + it.tagW / 2) - cx;
-    it.tag.style.transform = `translateX(calc(-50% + ${dx.toFixed(1)}px)) rotate(${it.rot}deg) scale(var(--tag-sc,1))`;
-    it.tag.style.top = (box.t - it.box.t).toFixed(1) + 'px';
-    it.tag.style.bottom = 'auto';
-    it.tag.style.transformOrigin = 'center top';
-  }); }
+  // Each label sits centered against the bottom edge of its item, level even when the item is rotated.
+  // It flips above only when the item is at the bottom of the desk, and slides sideways only at the desk's edges.
+  const sc = S._sc || 1, dr = desk.getBoundingClientRect();
+  $$('.hot').forEach(b => { const tag = b.querySelector('.tag'); if (!tag || !(b.offsetWidth > 0)) return;
+    tag.classList.remove('above'); tag.style.setProperty('--dx', '0px');
+    const br = b.getBoundingClientRect(), tr = tag.getBoundingClientRect();
+    const bottom = (br.bottom - dr.top) / sc, tagH = tr.height / sc;
+    if (bottom + tagH > 792) tag.classList.add('above');
+    const t2 = tag.getBoundingClientRect(), l = (t2.left - dr.left) / sc, r = (t2.right - dr.left) / sc;
+    const dx = l < 6 ? 6 - l : r > 1274 ? 1274 - r : 0;
+    if (dx) tag.style.setProperty('--dx', dx.toFixed(1) + 'px'); });
+}
 function shiftedBox(name) { const b = propBox(name), o = placeOff(name); return {x: b.x + o[0], y: b.y + o[1], w: b.w, h: b.h}; }
 function separateProp(name) { if (!S.place) return; for (let n = 0; n < 3; n++) { const a = shiftedBox(name); let hit = false;
   for (const other of Object.keys(HOT[S.theme])) { if (other === name) continue; if (!$(`.hot[data-name="${other}"]`) && !$(`#spr img[data-hot="${other}"]`)) continue; const b = shiftedBox(other);
@@ -475,7 +447,7 @@ function renderDesk() {
     const next = ns.pulse === name; if (next) b.classList.add('pulse'); if (next && HELP.deskLabels === 'next') b.classList.add('label-on');
     b.setAttribute('aria-label', label + (em ? ', ' + em : ''));
     // Labels show on hover, keyboard focus, or press (see .hot .tag in player.css); never all at once.
-    b.innerHTML = `<span class="tag${next ? ' go' : ''}${amb ? ' sm' : ''}" aria-hidden="true">${icon(HOT_ICON(name, th))}<span class="tx">${label}</span>${em ? `<em>${em}</em>` : ''}</span>`;
+    b.innerHTML = `<span class="tag${next ? ' go' : ''}${amb ? ' sm' : ''}" aria-hidden="true">${icon(HOT_ICON(name, th))}<span class="tagtx">${label}</span>${em ? `<em>${em}</em>` : ''}</span>`;
     const lift = on => $$(`#spr img[data-hot="${name}"]`).forEach(im => im.classList.toggle('lift', on));
     b.addEventListener('pointerenter', () => lift(true)); b.addEventListener('pointerleave', () => { lift(false); b.classList.remove('show'); });
     b.addEventListener('focus', () => lift(true)); b.addEventListener('blur', () => lift(false));
@@ -529,8 +501,10 @@ function deskClick(n) {
     S.bites++; SFX.bite(); toast(['Lo mein from the Golden Dragon on Main.', 'Still warm.', 'Chopsticks in one hand, case notes in the other.', 'Last bite. There\'s a fortune cookie in the bag.'][S.bites - 1]); return render(); }
   if (n === 'lamp') { S.lampOff = !S.lampOff; SFX.click(); return render(); } }
 // ---------------- overlays ----------------
-function ov(html, onclose) { closePeek(); const o = $('#ov'); o.innerHTML = `<div class="back"><button class="btn2" id="ovx">← Put it back on the desk</button></div><div class="box">${html}</div>`; o.hidden = false;
-  const close = () => { closePeek(); o.hidden = true; o.innerHTML = ''; o.onpointerdown = o.onclick = null; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close;
+function ov(html, onclose) { closePeek(); const o = $('#ov'); const gen = o._gen = (o._gen || 0) + 1; o._beforeClose = null; $$('.foldfly').forEach(f => f.remove()); document.body.classList.remove('folder-out'); o._closing = false; o.innerHTML = `<div class="back"><button class="btn2" id="ovx">← Put it back on the desk</button></div><div class="box">${html}</div>`; o.hidden = false;
+  const close = () => { if (o._gen !== gen || o._closing) return;   /* a newer overlay owns #ov now */ const before = o._beforeClose;
+    if (before) { o._beforeClose = null; o._closing = true; closePeek(); return before(() => { if (o._gen !== gen) return; o._closing = false; close(); }); }
+    closePeek(); o.hidden = true; o.innerHTML = ''; o.onpointerdown = o.onclick = null; if (CUR_AUD) { CUR_AUD.pause(); CUR_AUD = null; } hush(); onclose && onclose(); render(); }; $('#ovx').onclick = close; o._close = close;
   // Click the dimmed desk around the item to put it back. The press has to start and end out there,
   // so a drag that begins on a list, pin, or tape control does not dismiss, and neither does the button.
   const outside = e => { const raw = e.target; const t = raw && raw.nodeType === 1 ? raw : raw && raw.parentElement; if (!t || !t.closest || t.closest('.back, .it, #peek, .peekbox, .inv')) return false; const box = o.querySelector('.box'); if (!box) return t === o;
@@ -594,11 +568,59 @@ function openFolder(src) { SFX.paper(); const F = (PACK.folders || {})[src] || {
     o._take = take;
     $$('.it .bt button', o).forEach(b => b.onclick = e => { e.stopPropagation(); take(b.closest('.it').dataset.id, b.dataset.to); });
     const fd = $('#fdone'); if (fd) fd.onclick = closeOv; };
-  const o = ov(`<div class="fold"></div>`); draw(); }
+  const o = ov(`<div class="fold"></div>`); draw(); if (src === 'folder') folderFly(o, String(title).split('·').pop().trim()); }
 function eventEl(t) { return t && t.nodeType === 1 ? t : t && t.parentElement; }
 function folderHit(e) { const el = eventEl(e.target); if (!el || !el.closest || !el.closest('#ov')) return null; if (el.closest('.bt, #peek, .back')) return null;
   const card = el.closest('#ov .it'); if (card && !card.classList.contains('gone')) return card.dataset.id;
   const li = el.closest('#ov .inv li'); if (li && !li.classList.contains('out') && li.dataset.id) return li.dataset.id; return null; }
+// ---------------- folder open / close ----------------
+// The desk folder lifts to the middle of the screen, then its cover swings open on the spine. Putting it back
+// plays it in reverse: the cover shuts and the folder settles into its spot on the desk. Phones get a plain
+// grow and shrink (the open folder stacks there), and reduced motion gets none.
+const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+function folderFly(o, label) {
+  const sprite = $('#spr img[data-hot="folder"]'), fold = o.querySelector('.fold'), box = o.querySelector('.box');
+  if (!sprite || !fold || !box || REDUCED() || PREVIEW || !sprite.offsetWidth) return;
+  const ease = 'cubic-bezier(.22,.8,.26,1)', from = sprite.getBoundingClientRect(), to = fold.getBoundingClientRect(), hinge = innerWidth > 760;
+  const shut = hinge ? {left: to.left + to.width / 2, top: to.top, width: to.width / 2, height: to.height} : to;
+  const fly = document.createElement('div'); fly.className = 'foldfly' + (hinge ? '' : ' flat');
+  fly.innerHTML = `<div class="ff-in"></div><div class="ff-cover"><div class="ff-front"><span class="ff-label">${esc(label || '')}</span></div><div class="ff-back"></div></div><img class="ff-photo" alt="" src="${sprite.src}">`;
+  document.body.appendChild(fly);
+  const place = r => ({left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px'});
+  const cover = fly.querySelector('.ff-cover');
+  box.style.opacity = '0'; box.style.animation = 'none'; (o.querySelector('.back') || {style: {}}).style.opacity = '0'; document.body.classList.add('folder-out');
+  const reveal = () => { box.animate([{opacity: 0}, {opacity: 1}], {duration: 160, fill: 'forwards'}).onfinish = () => { box.style.opacity = ''; };
+    (o.querySelector('.back') || {style: {}}).style.opacity = ''; fly.animate([{opacity: 1}, {opacity: 0}], {duration: 160, fill: 'forwards'}).onfinish = () => fly.remove(); };
+  const lift = fly.animate([place(from), place(shut)], {duration: 380, easing: ease, fill: 'forwards'});
+  fly.querySelector('.ff-photo').animate([{opacity: 1}, {opacity: 1, offset: .25}, {opacity: 0}], {duration: 380, fill: 'forwards'});
+  fly.querySelector('.ff-cover').animate([{opacity: 0}, {opacity: 1, offset: .6}, {opacity: 1}], {duration: 380, fill: 'forwards'});
+  lift.onfinish = () => { if (!hinge) return reveal();
+    Object.assign(fly.style, place(shut)); lift.cancel();
+    const swing = {duration: 460, easing: 'cubic-bezier(.4,.1,.25,1)', fill: 'forwards'};
+    fly.querySelector('.ff-label').animate([{opacity: 1}, {opacity: 1, offset: .5}, {opacity: 0, offset: .5}, {opacity: 0}], swing);   /* the label is on the outside of the cover */
+    cover.animate([{transform: 'rotateY(0deg)'}, {transform: 'rotateY(-180deg)'}], swing).onfinish = reveal; };
+  SFX.paper();
+  // the way back
+  o._beforeClose = done => {
+    const sp = $('#spr img[data-hot="folder"]'), back = sp && sp.offsetWidth ? sp : sprite, now = fold.isConnected ? fold.getBoundingClientRect() : to;
+    const sh = hinge ? {left: now.left + now.width / 2, top: now.top, width: now.width / 2, height: now.height} : now;
+    if (REDUCED() || !back) { document.body.classList.remove('folder-out'); return done(); }
+    const f2 = document.createElement('div'); f2.className = 'foldfly' + (hinge ? '' : ' flat');
+    f2.innerHTML = fly.innerHTML; document.body.appendChild(f2); Object.assign(f2.style, place(sh));
+    const c2 = f2.querySelector('.ff-cover'); if (hinge) c2.style.transform = 'rotateY(-180deg)';
+    box.animate([{opacity: 1}, {opacity: 0}], {duration: 140, fill: 'forwards'}); (o.querySelector('.back') || {style: {}}).style.opacity = '0';
+    const p2 = f2.querySelector('.ff-photo'); p2.style.opacity = '0';
+    const home = () => { const end = back.getBoundingClientRect();
+      p2.animate([{opacity: 0}, {opacity: 0, offset: .4}, {opacity: 1}], {duration: 380, fill: 'forwards'});
+      c2.animate([{opacity: 1}, {opacity: 1, offset: .4}, {opacity: 0}], {duration: 380, fill: 'forwards'});
+      f2.querySelector('.ff-in').animate([{opacity: 1}, {opacity: 0}], {duration: 200, fill: 'forwards'});
+      f2.animate([place(sh), place(end.width ? end : from)], {duration: 380, easing: ease, fill: 'forwards'}).onfinish = () => { done(); document.body.classList.remove('folder-out'); requestAnimationFrame(() => f2.remove()); }; };
+    SFX.paper();
+    if (!hinge) return home();
+    const swing2 = {duration: 420, easing: 'cubic-bezier(.4,.1,.25,1)', fill: 'forwards'};
+    f2.querySelector('.ff-label').animate([{opacity: 0}, {opacity: 0, offset: .5}, {opacity: 1, offset: .5}, {opacity: 1}], swing2);
+    c2.animate([{transform: 'rotateY(-180deg)'}, {transform: 'rotateY(0deg)'}], swing2).onfinish = home; };
+}
 function openFolderCard(id) { const ov = $('#ov'); if (!id || !ov || ov.hidden || !ov._take) return; const peek = $('#peek');
   if (peek && peek.dataset.open === '1' && peek.dataset.item === id && Date.now() - (peek._opened || 0) < 450) return; peekItem(id, ov._take); }
 function bindFolderPeek() { if (bindFolderPeek.done) return; bindFolderPeek.done = true; let press = null, skipClick = false;

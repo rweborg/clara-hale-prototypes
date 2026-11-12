@@ -439,6 +439,28 @@ async function main() {
       return bad;
     });
 
+    await step('folder: opens and closes with the animation, and leaves the desk clean', async () => {
+      await viewport(c, 1440, 900, false);
+      await freshLoad(c);
+      await c.evaluate(`window.__jp.jump('build')`); await sleep(400);
+      await c.evaluate(`window.__jp.openFolder('folder')`); await sleep(120);
+      const mid = await c.evaluate(`({ fly: document.querySelectorAll('.foldfly').length, out: document.body.classList.contains('folder-out') })`);
+      await sleep(1100);
+      const open = await c.evaluate(`({ fly: document.querySelectorAll('.foldfly').length, box: getComputedStyle(document.querySelector('#ov .box')).opacity })`);
+      await c.evaluate(`document.querySelector('#ovx').click()`); await sleep(150);
+      const closing = await c.evaluate(`({ hidden: document.querySelector('#ov').hidden, fly: document.querySelectorAll('.foldfly').length })`);
+      await sleep(1100);
+      const done = await c.evaluate(`({ hidden: document.querySelector('#ov').hidden, fly: document.querySelectorAll('.foldfly').length, out: document.body.classList.contains('folder-out') })`);
+      const bad = [];
+      if (!mid.fly || !mid.out) bad.push('opening the folder did not animate it off the desk');
+      if (open.fly) bad.push('the flying folder was left on screen after opening');
+      if (open.box !== '1') bad.push(`the open folder is not fully visible (opacity ${open.box})`);
+      if (closing.hidden || !closing.fly) bad.push('putting the folder back did not animate');
+      if (!done.hidden) bad.push('the folder did not close');
+      if (done.fly || done.out) bad.push('the folder animation left something behind on the desk');
+      return bad;
+    });
+
     await step('folder: tapping evidence opens its close-up', async () => {
       await viewport(c, 1440, 900, false);
       await freshLoad(c);
