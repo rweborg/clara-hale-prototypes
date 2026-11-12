@@ -13,7 +13,7 @@
   --ds-ink: #1D1B18;
   --ds-ink-soft: #4A443C;
   --ds-dim: #6B645B;
-  --ds-muted: #7A7268;
+  --ds-muted: #686056;   /* was #7A7268: 3.85:1 on paper, now 5.0:1 (AA) */
   --ds-paper: #ECE7DF;
   --ds-card: #fff;
   --ds-side: #F7F4EF;
@@ -72,13 +72,24 @@
   --ds-font-hand: Caveat, "Segoe Script", cursive;
   --ds-font-mono: CourierP, "Courier New", ui-monospace, monospace;
 
+  /* Type scale. 13px (small) is the floor for anything a player reads. micro is for numerals in badges and
+     the dev scrubber only; kicker is for short UPPERCASE labels only. Lint: _build/lint.js. */
+  --ds-fs-micro: 11px;
   --ds-fs-kicker: 12px;
-  --ds-fs-whisper: 15px;
+  --ds-fs-small: 13px;
+  --ds-fs-meta: 14px;
   --ds-fs-body: 15px;
   --ds-fs-ui: 16px;
+  --ds-fs-lead: 18px;
   --ds-fs-title: 20px;
-  --ds-fs-display: 44px;
   --ds-fs-hand: 22px;
+  --ds-fs-h3: 24px;
+  --ds-fs-h2: 28px;
+  --ds-fs-h1: 34px;
+  --ds-fs-display: 44px;
+  --ds-fs-hero: 64px;
+  --ds-fs-giant: 72px;
+  --ds-fs-whisper: var(--ds-fs-body);
   --ds-lh-body: 1.45;
   --ds-track-kicker: .08em;
   --ds-track-whisper: .16em;
@@ -129,4 +140,43 @@
   --ds-z-scene: 90;
   --ds-z-toast: 99;
   --ds-z-preview: 140;
+
+  /* Role colors that used to be one-off hexes in player.css. Name by role, never by hue alone. */
+  --ds-alarm-dark: #7A120C;
+  --ds-alarm-soft: #FF8A80;
+  --ds-bad-bg: #FBE3DF;
+  --ds-bad-ink: #7A1E15;
+  --ds-blue-mist: #DCE4F0;
+  --ds-blue-pale: #BFD0EA;
+  --ds-device-bezel: #2B2D31;
+  --ds-drawer-edge: #A88B67;
+  --ds-drawer-hi: #7B5636;
+  --ds-drawer-lo: #5A3C24;
+  --ds-folder-label: #7A6248;
+  --ds-gold-deep: #C4A15A;
+  --ds-gray-warm: #8E877C;
+  --ds-ink-mid: #5A524A;
+  --ds-ink-warm: #3A3028;
+  --ds-line: #CFC6B8;
+  --ds-line-soft: #D9D2C6;
+  --ds-manila-2: #E4D0A4;
+  --ds-manila-ink: #8A5A2A;
+  --ds-manila-pale: #F6E7C8;
+  --ds-navy: #1D2A55;
+  --ds-ok-bg: #DFF2E6;
+  --ds-ok-ink: #14532D;
+  --ds-pv-edge: #C4A574;
+  --ds-pv-ink: #6B5C48;
+  --ds-pv-line: #8C7352;
+  --ds-pv-tick: #C9B89A;
+  --ds-shelf-filed: #C9A46E;
+  --ds-tape-hi: #D7D3CC;
+  --ds-tape-key-hi: #5B5B58;
+  --ds-tape-key-lo: #2E2E2C;
+  --ds-tape-led: #8FE38F;
+  --ds-tape-lo: #A9A49B;
+  --ds-tape-screen: #2A2A26;
+  --ds-white: #FFFFFF;
+  --ds-note-edge: #D9CF8A;
+  --ds-scene-raised: #3A3632;
 }

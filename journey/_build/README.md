@@ -97,6 +97,7 @@ validator fails a portrait with no `type`, no `name`, or no `source`.
 | `proof` | Evidence ids that count as real proof. |
 | `recordings` | `[[recordingId, evidenceId]]` for the tape player. |
 | `solution` | `[text, evidenceTag]` steps for the reveal. |
+| `difficulty` | `{preset, overrides}` — the help level. See Help levels in `DESIGN_SYSTEM.md`. |
 | `objective1` | `{q, o, a}` — the one gate before Envelope A. |
 | `transcripts` | Recording id → `[{sp, x, t?, e?, tag?}]`. Audio is optional. |
 | `audio` | Recording id → mp3 path. |

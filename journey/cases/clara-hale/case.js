@@ -263,7 +263,7 @@ const COPY = {
         "Pin people and places to the board. Tie string between things. The right connection is a breakthrough."
       ]
     ],
-    "note": "Your next step is always on the right, from Ortiz. Want more help? Turn it up in Settings. Sealed envelopes open as you solve things.",
+    "note": "Your next step is always in Ortiz's card. Want more help? Turn it up in Settings. Sealed envelopes open as you solve things.",
     "cta": "Meet Detective Ortiz →"
   },
   "handoff": {
@@ -318,6 +318,8 @@ const COPY = {
   "report": {
     "title": "Report to Det. Ortiz",
     "sub": "Fill every blank. Ortiz checks it as a whole and tells you how many parts are right, not which ones.",
+    "subWhich": "Fill every blank. If it's not right yet, Ortiz tells you which parts to look at again.",
+    "subPass": "Fill every blank. Ortiz only tells you yes or no.",
     "rejected": "Ortiz reads it twice and hands it back.",
     "send": "📨 Send report to Ortiz",
     "closeCase": "Ortiz closes the case himself →",
@@ -330,20 +332,13 @@ const COPY = {
     "rankAssisted": "Rookie (assisted)",
     "rankClean": "Senior Detective",
     "rankNormal": "Detective",
-    "breakthroughTotal": 1,
+    // The same four cases the marketing site lists as coming soon (nextsteps.website).
     "shelf": [
-      [
-        "📁 Case 1",
-        "Clara Hale ✓"
-      ],
-      [
-        "Case 2",
-        "coming soon"
-      ],
-      [
-        "Case 3",
-        "coming soon"
-      ]
+      ["📁 Case 1", "Clara Hale ✓"],
+      ["The Keeper's Last Entry", "coming soon"],
+      ["The Quiet Vintage", "coming soon"],
+      ["The Unsigned Wall", "coming soon"],
+      ["After the Sign-off", "coming soon"]
     ]
   }
 };

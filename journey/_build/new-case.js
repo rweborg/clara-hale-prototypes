@@ -247,7 +247,7 @@ function steps(G) {
 }
 
 // Fill in state as if the player had reached this beat. ?preview=1 and the
-// Prototype panel's jump buttons call this.
+// Dev mode's jump buttons call this.
 function seed(b, G) {
   const pullAll = src => G.SRC[src].forEach(i => {
     G.S.pulled[i] = 1;

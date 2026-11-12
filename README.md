@@ -24,7 +24,9 @@ Then open <http://127.0.0.1:8137/journey/index.html>.
 
 - `?preview=1` adds the developer scrubber that walks every beat.
 - `?case=<id>` loads another case pack from `journey/cases/`.
-- Progress saves on the device and resumes. `⚙ Prototype → ↺ Start the case over`
+- Dev tools (jump to a beat, demo answers) show on a local host, in preview, and
+  for a signed-in admin on the live site. `?dev=0` shows exactly what players see.
+- Progress saves on the device and resumes. `⚙ Settings → ↺ Start the case over`
   clears it.
 
 ## How the journey is built
@@ -43,7 +45,7 @@ node _build/validate.js my-case
 node _build/check.js
 ```
 
-`check.js` is the gate: the contract (no browser, fast), the experience suite in
+`check.js` is the gate: the design-system lint and the contract (no browser, fast), the experience suite in
 headless Chromium (21 checks), then a full playthrough of the case from the intro
 to the filed record — including a wrong objective answer, three rejected reports,
 and a reload. `validate.js` checks the case pack and every file it points at. It

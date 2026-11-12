@@ -37,6 +37,12 @@ function run(label, script, args = []) {
   return r.status === 0;
 }
 
+const okLint = run('design system', 'lint.js', []);
+if (!okLint) {
+  console.error('\n\x1b[31mdesign-system lint failed — stopping before the browser run\x1b[0m\n');
+  process.exit(1);
+}
+
 const okValidate = run('contract', 'validate.js', caseArg ? [caseArg] : []);
 if (!okValidate) {
   console.error('\n\x1b[31mcontract failed — stopping before the browser run\x1b[0m\n');

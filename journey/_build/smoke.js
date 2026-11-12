@@ -406,6 +406,21 @@ async function main() {
       return bad;
     });
 
+    await step('images: every image has alt text (empty only when decorative)', async () => {
+      await viewport(c, 1440, 900, false);
+      await freshLoad(c);
+      const bad = [];
+      for (const beat of ['build', 'realize', 'accuse']) {
+        await c.evaluate(`window.__jp.jump(${JSON.stringify(beat)})`); await sleep(350);
+        for (const v of ['desk', 'board']) {
+          await c.evaluate(`window.__jp.setView(${JSON.stringify(v)})`); await sleep(250);
+          const miss = await c.evaluate(`[...document.querySelectorAll('img')].filter(i => !i.hasAttribute('alt')).map(i => (i.getAttribute('src') || '').split('/').pop().split('?')[0])`);
+          for (const m of miss) bad.push(`${beat}/${v}: <img> with no alt attribute (${m})`);
+        }
+      }
+      return [...new Set(bad)];
+    });
+
     await step('help level: Standard is clean, More help adds the nudges', async () => {
       await viewport(c, 1440, 900, false);
       await freshLoad(c);

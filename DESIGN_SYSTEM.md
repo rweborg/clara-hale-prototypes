@@ -66,7 +66,35 @@ Four families, already embedded in the player. The style guide loads the same ou
 | `--ds-font-mono` | Courier Prime (`CourierP`) | Folder inventory, cold open, case number. |
 | `--ds-font-hand` | Caveat | The player’s notes and pinned index cards. |
 
-Kickers are 12px, bold, uppercase, tracked out (`--ds-track-kicker`), in copper. The case title is about 44px (`--ds-fs-display`) with a tight line height. Body copy in the side column is 15px.
+Every size is a step on the scale in `tokens.css`. `_build/lint.js` fails the build on any other px font size in `player.css`, or on a hard-coded size in an inline style.
+
+| Token | px | Use |
+| --- | --- | --- |
+| `--ds-fs-micro` | 11 | Numerals in badges and step circles, the dev scrubber. Never for reading. |
+| `--ds-fs-kicker` | 12 | Short UPPERCASE labels only, tracked out (`--ds-track-kicker`). |
+| `--ds-fs-small` | 13 | **The floor for anything a player reads.** Captions, meta, chips. |
+| `--ds-fs-meta` | 14 | Secondary text in panels. |
+| `--ds-fs-body` | 15 | Body copy, the side column. |
+| `--ds-fs-ui` | 16 | Buttons and controls. |
+| `--ds-fs-lead` | 18 | Lead paragraphs in scenes. |
+| `--ds-fs-title` | 20 | Card titles. |
+| `--ds-fs-hand` | 22 | Handwritten notes and index cards. |
+| `--ds-fs-h3` / `h2` / `h1` | 24 / 28 / 34 | Scene and panel headings. |
+| `--ds-fs-display` | 44 | The case title. |
+| `--ds-fs-hero` / `giant` | 64 / 72 | One-off big moments (the dossier card, the peek emoji). |
+
+### Color
+
+Every color in `player.css` is a `--ds-` token; the player has no hex values and no fallbacks, so `index.html` must load `tokens.css` first (the lint checks that too). Name new tokens by role (`--ds-bad-bg`, `--ds-tape-screen`), never by hue alone. The lint also computes contrast for the text pairs players read and fails anything under WCAG AA 4.5:1. `--ds-muted` is `#686056` for that reason (it was `#7A7268`, 3.85:1 on paper).
+
+### Button roles
+
+| Role | Class | Rule |
+| --- | --- | --- |
+| Primary | `.btn.gold` | The next step. One per screen. Gold means "the next thing" everywhere: buttons, desk labels, the current beat. |
+| Confirm | `.btn` (pine) | Confirms inside a panel: Put on desk, Send report. |
+| Secondary | `.btn2` | Outline. Tools and alternatives: Connect two things, Put it back on the desk. |
+| Quiet | `.skip`, text links | Skip, Start over. |
 
 A newline in `CASE.title` is a real line break on the album cover. Clara’s title is `The Vanishing of\nClara Hale`.
 
@@ -190,7 +218,7 @@ The groups for Clara’s folder are: read this first (the briefing), interviews,
 
 ### Next-step hints
 
-Two surfaces, one next step, both filled from `nextStep()` for the current beat.
+One voice. At the Standard help level, the side card is the only place the next step appears. The desk whisper is a More help feature. All surfaces are filled from the case's `steps(G)` for the current beat.
 
 | Surface | Where | What it says |
 | --- | --- | --- |
@@ -201,6 +229,33 @@ Two surfaces, one next step, both filled from `nextStep()` for the current beat.
 Examples once the folder has landed: title “Open the case folder”, whisper “The file is closed. Open it and start with the briefing.”
 
 Hint sentences are still written inside `nextStep()`, not stored on `CASE`. Keep the two surfaces. Write new lines for the new beats.
+
+## Help levels
+
+How much the game helps is a setting, not a rewrite. The engine (`LEVELS` in `player.js`) owns three presets, and a case picks one in its pack:
+
+```js
+difficulty: {preset: 'standard', overrides: {}},   // 'beginner' | 'standard' | 'advanced'
+```
+
+| Knob | More help (`beginner`) | Standard | Less help (`advanced`) |
+| --- | --- | --- | --- |
+| `whisper` — the desk whisper | on | off | off |
+| `nextButton` — do-it button on the side card | on | on | off |
+| `idleNudge` — seconds before Ortiz checks in | 45 | 120 | never |
+| `hintLimit` — Hint presses (0 = unlimited) | 0 | 0 | 3 |
+| `objHints` — Objective 1 hint ladder length | 3 | 2 | 0 |
+| `reviewNext` — "Suggested next" in the folder | on | off | off |
+| `boardPulse` — the breakthrough pair glows | always | after one wrong string | never |
+| `reportFeedback` | which parts are wrong | how many are right | pass or fail |
+| `reportTries` | 5 | 3 | 2 |
+| `evidenceCount` — evidence bar in the side panel | on | off | off |
+
+Build the clean Standard journey first. More help only adds to it; Less help only takes away. Override single knobs only when the story needs it (`overrides: {reportTries: 4}`); `validate.js` rejects unknown knob names. Players can turn help up any time in Settings, and down only before the case starts. The case record shows the level played.
+
+## Dev mode
+
+Beat jumping, the demo answers, and the ambience preview skip the case or give away the answer, so players never see them. They show in `?preview=1`, on a local host (localhost, 127.0.0.1, or opened from disk), and for a signed-in admin (`ADMIN_EMAILS`). `?dev=0` forces the player view anywhere. The smoke suite checks the player view has none of it.
 
 ## Phones and tablets
 
@@ -216,7 +271,7 @@ The case plays on the same 1280×800 desk and cork. A wide window still fits tha
 
 **Whole desk** / **Whole board** frames the entire surface. **Look closer** returns to the slice (the folder on the desk, the middle of the cork). A pinch does the same zoom. Dragging empty desk pans while the surface is bigger than the stage. A drag that starts on a pin, a thread, or a tape control does not pan. A drag on a desk prop moves that prop and does not open it; a short tap still opens it. The offset is saved on this device in `jp-save-v2` as `place` (hotspot name to `[dx, dy]` in desk pixels). It does not change the case.
 
-The top bar drops the case title and the beat rail. Desk, Board, volume, and Prototype stay. Under 560px the words hide and the icons remain, each at least 44px. The beat rail is still in ⚙ Prototype.
+The top bar drops the case title and the beat rail. Desk, Board, volume, and Settings stay. Under 560px the words hide and the icons remain, each at least 44px.
 
 ### Reading and touching
 
@@ -325,7 +380,7 @@ Keep click-outside dismiss, the shared volume control, and click-a-thread-to-rem
 - The photo spec (desaturated real-photo characters, ragged props) and a stand-in CSS grade that the player does not apply.
 - Specimens and live markup for the character card, evidence card, closed folder, open folder with review order, envelope, pin and thread, next-step hint, dismiss scrim, album-cover opener, desk ambience, and volume.
 - The case-file shape, asset folders, and the copy steps above.
-- The player’s existing color variables (`--bg`, `--ink`, `--accent`, `--btn`, `--side`, `--card`, `--dim`, `--bar`, and the repeated palette hexes in its stylesheet) read these tokens, with the previous hex as the fallback.
+- Every color and font size in `player.css` is a token (`_build/lint.js` enforces it). Inline styles in `player.js` are token-only and on a budget that only goes down.
 
 **Still one-off in `journey/app/player.js`**
 

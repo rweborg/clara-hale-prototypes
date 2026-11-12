@@ -109,7 +109,7 @@ function fresh() { return {theme: localStorage.getItem('jp-theme') || 'b', beat:
 S = fresh();
 // ---------------- save / resume ----------------
 // The whole case state is saved on this device; reopening the page lands you back at the desk, mid-case.
-const SAVE = PACK.id === 'clara-hale' ? 'jp-save-v2' : 'jp-save-v2:' + PACK.id, TRANSIENT = ['sel', 'connect', 'strSel', 'fresh', '_sc'];
+const SAVE = PACK.id === 'clara-hale' ? 'jp-save-v2' : 'jp-save-v2:' + PACK.id, TRANSIENT = ['sel', 'connect', 'strSel', 'fresh', '_sc', 'invOpen'];
 // ?preview=1 is the developer journey scrubber (initPreview). It must not touch a real playthrough.
 const PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
 // Dev tools (jumping between beats, the demo answers, the ambience preview) are for building and testing the
@@ -448,7 +448,7 @@ function otherOf(name, a) { let best = null, bestA = 0; for (const other of Obje
 function renderDesk() {
   const th = S.theme, D = CFG.desk[th], set = deskSet(); $('#bare').src = D.bare;
   const spr = $('#spr'); spr.innerHTML = '';
-  for (const k of ZORD[th]) { const key = k === 'mug' ? MUGS[S.mug] : k === 'takeout' ? takeoutKey() : k; if (!set.has(key)) continue; const d = D.spr[key]; const im = document.createElement('img');
+  for (const k of ZORD[th]) { const key = k === 'mug' ? MUGS[S.mug] : k === 'takeout' ? takeoutKey() : k; if (!set.has(key)) continue; const d = D.spr[key]; const im = document.createElement('img'); im.alt = '';   /* decorative: the labeled hotspot button above it is what people use */
     im.draggable = false; im.src = d.src; im.dataset.k = k; im.dataset.spr = key; im.dataset.theme = th; im.dataset.hot = hotForSprite(k); im.addEventListener('load', () => prepSprite(im)); layoutSprite(im); if (im.complete) prepSprite(im);
     if (d.rot) im.style.transform = `rotate(${d.rot}deg)`;
     if (!prevSet.has(key) && !MUGS.includes(key) && !(TAKEOUTS.includes(key) && TAKEOUTS.some(t => prevSet.has(t))) && S.beat !== 'intro') im.classList.add('in');
@@ -572,7 +572,8 @@ function openFolder(src) { SFX.paper(); const F = (PACK.folders || {})[src] || {
     for (const i of left) { const m = rev.meta[i]; if (m.g !== lastG) { lastG = m.g; items += `<div class="grp">${esc(m.g)}</div>`; }
       items += `<div class="it${i === nxt && HELP.reviewNext ? ' up' : ''}" data-id="${i}"><button type="button" class="look"><span class="ord">${m.n}</span>${thumb(i)}<b>${esc(IT[i].n)}</b>${i === nxt && HELP.reviewNext ? '<em class="why">Suggested next</em>' : ''}</button><div class="bt">${IT[i].dest !== 'board' ? '<button type="button" data-to="desk">🗂 Put on desk</button>' : ''}${IT[i].dest !== 'desk' ? `<button type="button" data-to="board" class="${IT[i].dest === 'both' ? 'alt' : ''}">📌 Pin to board</button>` : ''}</div></div>`; }
     const fold = o.querySelector('.fold'); if (!fold) return;   // the folder was closed while a redraw was queued
-  fold.innerHTML = `<div class="lp"><h3>${title}</h3><p class="guide">${blurb}</p><ol class="order">${steps}</ol><p style="font-size:12.5px;color:#6B645B;margin-bottom:6px">${pulledFrom(src)} of ${rev.ids.length} taken out.</p><ul class="inv">${rev.ids.map(i => `<li data-id="${i}" class="${S.pulled[i] ? 'out' : i === nxt ? 'now' : ''}"><span class="n">${rev.meta[i].n}</span>${esc(IT[i].n)}</li>`).join('')}</ul></div>
+  fold.innerHTML = `<div class="lp"><h3>${title}</h3><p class="guide">${blurb}</p><ol class="order">${steps}</ol><details class="invd"${S.invOpen ? ' open' : ''}><summary>${pulledFrom(src)} of ${rev.ids.length} taken out · list them all</summary><ul class="inv">${rev.ids.map(i => `<li data-id="${i}" class="${S.pulled[i] ? 'out' : i === nxt && HELP.reviewNext ? 'now' : ''}"><span class="n">${rev.meta[i].n}</span>${esc(IT[i].n)}</li>`).join('')}</ul></details></div>
+  const invd = fold.querySelector('.invd'); if (invd) invd.ontoggle = () => { S.invOpen = invd.open; };
     <div class="rp"><div class="items">${items || '<div class="allout">✓ Everything is out of here.<br><br><button class="btn" id="fdone">Back to the desk</button></div>'}</div></div>`;
     const take = (id, to) => { const card = $(`.it[data-id="${id}"]`, o); if (card && card.classList.contains('gone')) return; closePeek(); if (card) card.classList.add('gone');
     pull(id, to);   // take it now: closing the folder must not lose the action
@@ -627,9 +628,9 @@ function openPlayer(rid) { const L = recs(); if (!rid) return; const isB = S.the
   const en = $('#end'); if (en) en.onclick = () => { au.pause(); S.played[rid] = 1; $('#tx .key').scrollIntoView({block: 'center', behavior: 'smooth'}); renderSide(); };
   $$('.sv', o).forEach(b => b.onclick = () => { if (b.dataset.key) S.saved[b.dataset.key] = 1; $$('.sv', o).forEach(x => { x.textContent = '✓ In notes'; x.classList.add('done'); }); note(b.dataset.save); SFX.paper(); toast('✏️ Saved: ' + b.dataset.save); renderSide(); });
   setTimeout(() => pp.click(), 250); }
-function openNotes() { SFX.paper(); const o = ov(`<div class="panel" style="max-width:560px;margin:0 auto;background:#FFF6B8"><h2>✏️ My notes</h2><p class="sub">Starred lines and breakthroughs land here automatically. Write your own too.</p>
-  <ul style="list-style:none;font:26px/1.3 Caveat,cursive;color:#2B3A67">${S.notes.map(n => `<li class="${n.cls}">${n.cls === 'aha' ? '★ ' : ''}${esc(n.t)}</li>`).join('') || '<li style="opacity:.6">(nothing yet)</li>'}</ul>
-  <div style="display:flex;gap:8px;margin-top:12px"><input id="nin" placeholder="Write a note…" style="flex:1;font:22px Caveat;padding:8px 10px;border-radius:8px;border:1px solid #D9CF8A"><button class="btn" style="width:auto;margin:0" id="nadd">Add</button></div></div>`);
+function openNotes() { SFX.paper(); const o = ov(`<div class="panel" style="max-width:560px;margin:0 auto;background:var(--ds-note-paper)"><h2>✏️ My notes</h2><p class="sub">Starred lines and breakthroughs land here automatically. Write your own too.</p>
+  <ul style="list-style:none;font:var(--ds-fs-h3)/1.3 var(--ds-font-hand);color:var(--ds-note-ink)">${S.notes.map(n => `<li class="${n.cls}">${n.cls === 'aha' ? '★ ' : ''}${esc(n.t)}</li>`).join('') || '<li style="opacity:.6">(nothing yet)</li>'}</ul>
+  <div style="display:flex;gap:8px;margin-top:12px"><input id="nin" placeholder="Write a note…" style="flex:1;font:var(--ds-fs-hand) var(--ds-font-hand);padding:8px 10px;border-radius:8px;border:1px solid var(--ds-note-edge)"><button class="btn" style="width:auto;margin:0" id="nadd">Add</button></div></div>`);
   $('#nadd').onclick = () => { const v = $('#nin').value.trim(); if (v) { note(v); closeOv(); openNotes(); } }; }
 // ---------------- envelopes ----------------
 function openEnv(L) { const items = (SRC['env' + L] || []).length; const o = ov(`<div class="envw"><div class="e ${L === 'B' ? 'blue' : ''}" id="env" style="background-image:url(${A.env})"><div class="line"></div><div class="tear" id="tear"></div><div class="hand">👆</div></div>
@@ -643,7 +644,7 @@ function openEnv(L) { const items = (SRC['env' + L] || []).length; const o = ov(
   e.onpointerup = () => { x0 = null; e._s = 0; if (!done) tr.style.width = '0'; }; $('#tap1').onclick = fin; }
 // ---------------- objective 1 ----------------
 function openObj() { const O = COPY.objective1 || {}; const o = ov(`<div class="panel" style="max-width:720px;margin:0 auto"><div class="next"><span class="k">${esc(O.kicker || 'Objective')}</span></div><h2>${esc(OBJ1.q)}</h2><p class="sub">${esc(O.sub || '')}</p>
-  <div class="chips" style="flex-direction:column;align-items:stretch">${OBJ1.o.map((t, i) => `<button data-i="${i}" style="text-align:left;border-radius:12px;padding:12px 14px;font-size:16px">${esc(t)}</button>`).join('')}</div><div id="ores"></div>
+  <div class="chips" style="flex-direction:column;align-items:stretch">${OBJ1.o.map((t, i) => `<button data-i="${i}" style="text-align:left;border-radius:12px;padding:12px 14px;font-size:var(--ds-fs-ui)">${esc(t)}</button>`).join('')}</div><div id="ores"></div>
   ${DEV ? `<p style="margin-top:12px"><button class="demo" id="owrong">${esc(O.demoWrong || 'Demo: answer wrong')}</button> · <button class="demo" id="oright">${esc(O.demoRight || 'Demo: answer right')}</button></p>` : ''}</div>`);
   const ans = i => { const r = $('#ores');
     if (i !== OBJ1.a) { S.obj1wrong++; SFX.buzz(); const t = O.wrong || '';
@@ -703,14 +704,14 @@ async function aha(a, b) { S.real = true; const s = S.strings.find(s => [s[0], s
   const bv = $('#boardV'); bv.classList.add('ahaing'); $$('.pin').forEach(p => p.classList.toggle('hero', p.dataset.id === a || p.dataset.id === b));
   SFX.sting(); const f = document.createElement('div'); f.className = 'flash'; document.body.appendChild(f); setTimeout(() => f.remove(), 1200); await sleep(1100);
   const H = COPY.aha || {};
-  const c = document.createElement('div'); c.className = 'aha-card'; c.innerHTML = `<div class="k">${esc(H.kicker || 'Breakthrough')}</div><h2>${esc(H.title || '')}</h2><p>${esc(H.body || '')}</p><div class="q"><b>${esc(DET)}:</b> “${esc(H.line || '')}”</div><p style="font-size:13px;color:#7A7268">${esc(H.footer || '')}</p><button class="btn gold" id="ahax">${esc(H.cta || 'Continue →')}</button>`;
+  const c = document.createElement('div'); c.className = 'aha-card'; c.innerHTML = `<div class="k">${esc(H.kicker || 'Breakthrough')}</div><h2>${esc(H.title || '')}</h2><p>${esc(H.body || '')}</p><div class="q"><b>${esc(DET)}:</b> “${esc(H.line || '')}”</div><p style="font-size:var(--ds-fs-small);color:var(--ds-muted)">${esc(H.footer || '')}</p><button class="btn gold" id="ahax">${esc(H.cta || 'Continue →')}</button>`;
   S.env.B = 'ready'; document.body.appendChild(c); ortiz('aha'); if (H.tag) S.notes = S.notes.filter(n => n.t !== H.tag); if (H.note) note(H.note, 'aha ink'); S.env.B = 'ready';
   $('#ahax').onclick = () => { c.remove(); bv.classList.remove('ahaing'); $$('.pin').forEach(p => p.classList.remove('hero')); hush(); setView('desk'); render(); }; }
 // ---------------- accusation ----------------
 const REPORT_PARTS = (PACK.report || []).length + 1;   // every question, plus the proof pick
 function openReport() { const pins = Object.keys(S.board).concat(Object.keys(S.pulled).filter(id => IT[id] && IT[id].rec && !S.board[id])); S.rep.proof = S.rep.proof || [];
   const draw = () => { const left = REPORT_TRIES - S.tries;
-    o.querySelector('.report').innerHTML = `<h2>${esc(REPORTC.title || 'Report')}</h2><div class="sub">${esc(REPORTC.sub || '')}</div>
+    o.querySelector('.report').innerHTML = `<h2>${esc(REPORTC.title || 'Report')}</h2><div class="sub">${esc((HELP.reportFeedback === 'which' ? REPORTC.subWhich : HELP.reportFeedback === 'pass' ? REPORTC.subPass : '') || REPORTC.sub || '')}</div>
     <div class="tries">Report attempts: ${Array.from({length: REPORT_TRIES}, (_, i) => `<i class="${i < S.tries ? 'x' : ''}"></i>`).join('')} <span class="left">${left} left</span></div>
     ${REPORT.map(q => `<div class="q"><b>${q.l}</b><div class="chips" data-k="${q.k}">${q.o.map(([v, t]) => `<button data-v="${v}" class="${S.rep[q.k] === v ? 'on' : ''}">${q.o === SUS ? `<img src="${A['p_' + v]}" alt="">` : ''}${esc(t)}</button>`).join('')}</div></div>`).join('')}
     <div class="q"><b>Pick the 3 pieces of evidence that prove it</b><div class="chips" data-k="proof">${pins.map(v => { const face = IT[v] && IT[v].face && A[IT[v].face]; return `<button data-v="${v}" class="${S.rep.proof.includes(v) ? 'on' : ''}">${face ? `<img src="${A[IT[v].face]}" alt="">` : ''}${esc((BP[v] || [0, 0, 0, IT[v].n])[3])}</button>`; }).join('')}</div></div>
@@ -737,15 +738,15 @@ async function reveal() { const R = COPY.reveal || {};
   const s = scene(`<div class="reveal"><div class="kick">${esc(R.kicker || 'Case solved')}</div><h1>${esc(R.who || '')}</h1><p class="lead">${esc(R.lead || '')}</p><div id="sols"></div><div class="row"><button class="btn gold" id="sn">Next ▸</button></div></div>`);
   let i = 0; const sols = $('#sols');
   const step = () => { if (i < SOL.length) { const p = document.createElement('p'); p.className = 'sol'; p.innerHTML = `${esc(SOL[i][0])}<span class="ev">${esc(SOL[i][1])}</span>`; sols.appendChild(p); requestAnimationFrame(() => p.classList.add('on')); ortiz('sol' + (i + 1)); i++; return; }
-    if (i === SOL.length) { i++; sols.innerHTML = `<p class="sol on" style="font-size:22px">${esc(R.closingTitle || '')}</p><p class="sol on" style="opacity:.75">${esc(R.closingCharge || '')}</p>`; ortiz('found'); $('#sn').textContent = '✉️ Open Envelope C'; return; }
+    if (i === SOL.length) { i++; sols.innerHTML = `<p class="sol on" style="font-size:var(--ds-fs-hand)">${esc(R.closingTitle || '')}</p><p class="sol on" style="opacity:.75">${esc(R.closingCharge || '')}</p>`; ortiz('found'); $('#sn').textContent = '✉️ Open Envelope C'; return; }
     const C = R.envC || {};
     S.env.C = 'open'; hush(); SFX.tear(); save(); s.querySelector('.sc').innerHTML = `<div class="kick">${esc(C.kicker || 'The wrap-up')}</div><div class="wrap"><div class="paper"><div class="mast">${esc(C.mast || '')}</div><h3>${esc(C.headline || '')}</h3><p>${esc(C.body || '')}</p></div>
       <div class="paper note">${C.note || ''}</div></div><div class="row" style="margin-top:24px"><button class="btn gold" id="nm">📁 File the case away →</button></div>`;
     $('#nm').onclick = () => { unscene(); S.beat = 'file'; render(); toast('📁 One last thing: pack it up and file it away.', 3000); }; };
   $('#sn').onclick = step; step(); }
 function softFail() { const F = COPY.softFail || {}; S.assisted = true; S.solved = true; save(); setTimeout(() => ortiz('softfail'), 300);
-  scene(`<div class="kick" style="color:#FF8A80">${esc(F.kicker || 'Case closed')}</div><h1>${esc(F.who || '')}</h1><p class="lead">${esc(F.lead || '')}</p>
-  <div class="card" style="background:#1E1C1A;color:#F3EEE6;max-width:720px"><b>${esc(F.title || 'What you missed')}</b><ul style="margin:10px 0 0 18px;line-height:1.7">${(F.bullets || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+  scene(`<div class="kick" style="color:var(--ds-alarm-soft)">${esc(F.kicker || 'Case closed')}</div><h1>${esc(F.who || '')}</h1><p class="lead">${esc(F.lead || '')}</p>
+  <div class="card" style="background:var(--ds-ink);color:var(--ds-scene-ink);max-width:720px"><b>${esc(F.title || 'What you missed')}</b><ul style="margin:10px 0 0 18px;line-height:1.7">${(F.bullets || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
   <div class="row" style="margin-top:22px"><button class="btn gold" id="nm">📁 File the case away →</button><button class="skip" id="rt">Rewind and try the report again</button></div>`);
   $('#nm').onclick = () => { unscene(); S.beat = 'file'; render(); toast('📁 ' + esc(DET) + ' closed it. You still have to file it away.', 3000); };
   $('#rt').onclick = () => { S.tries = 0; S.assisted = false; S.solved = false; unscene(); openReport(); }; }
@@ -769,7 +770,7 @@ function rankCard() { const K = COPY.rank || {};
   scene(`<div class="kick">${esc(K.kicker || 'Case record · filed')}</div><div class="rank"><div><h1>${esc(CASE.title.replace(/\n/g, ' '))}</h1><p class="lead">${esc(S.assisted ? (K.assisted || '') : (K.solved || ''))}</p>
     <div class="shelf">${shelf}</div></div>
     <div><div class="stat"><span>Rank</span><b>${esc(rank)}</b></div><div class="stat"><span>Time since you opened the case</span><b>${mins} min</b></div><div class="stat"><span>Wrong answers / reports</span><b>${S.obj1wrong} / ${S.tries}</b></div><div class="stat"><span>Objectives solved</span><b>${[S.obj1, S.real, S.solved].filter(Boolean).length} of 3</b></div><div class="stat"><span>Help level</span><b>${esc(S.helped ? LEVELS.beginner.label : LEVELS[(S.level || CASE_LEVEL)].label)}</b></div><div class="stat"><span>Evidence taken out</span><b>${got} of ${total}</b></div>
-    <div class="row" style="margin-top:20px"><button class="btn gold" id="bk">Back to my desk</button><button class="btn" id="again" style="background:#3A3632">↺ Play the journey again</button></div></div></div>`);
+    <div class="row" style="margin-top:20px"><button class="btn gold" id="bk">Back to my desk</button><button class="btn" id="again" style="background:var(--ds-scene-raised)">↺ Play the journey again</button></div></div></div>`);
   $('#bk').onclick = () => { unscene(); toast(mealFor(amb()) === 'takeout' ? '🥡 A clean desk. The takeout\'s still warm.' : '☕ A clean desk. Coffee\'s still hot.'); }; $('#again').onclick = () => { unscene(); clearSave(); jump('intro'); }; }
 // ---------------- next step / side ----------------
 
@@ -785,7 +786,7 @@ function nextStep() { return PACK.steps(CASE_API); }
 function renderSide() { const ns = nextStep(); const a = amb(), ph = AMB[a];
   const st = S.filed ? 'Filed' : S.solved ? 'Solved' : S.beat === 'intro' ? 'New' : 'Open';
   $('#day').innerHTML = `<span class="ic">${ph[0]}</span>Case ${PACK.number || ''} · ${st}<small title="Desk ambience follows your real clock">${ph[1]} · ${new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}${AMB_PREVIEW ? ' (preview)' : ''}</small>`;
-  $('#next').innerHTML = `<span class="k">${esc(DET)}</span><h3>${esc(ns.t)}</h3><p>${esc(ns.p)}</p>${ns.go && HELP.nextButton ? `<button class="btn" id="nsb">${esc(ns.btn || 'Go')}</button>` : ''}`; const nb = $('#nsb'); if (nb) nb.onclick = ns.go; renderWhisper(ns);
+  $('#next').innerHTML = `<span class="k">${esc(DET)}</span><h3>${esc(ns.t)}</h3><p>${esc(ns.p)}</p>${ns.go && HELP.nextButton ? `<button class="btn gold" id="nsb">${esc(ns.btn || 'Go')}</button>` : ''}`; const nb = $('#nsb'); if (nb) nb.onclick = ns.go; renderWhisper(ns);
   const tot = Object.values(SRC).reduce((n, a) => n + a.length, 0), got = Object.keys(S.pulled).length;
   // Objectives are the one progress unit: a breakthrough is the moment an objective is solved, not a second counter.
   const ob = [S.obj1, S.real, S.solved];
@@ -823,7 +824,7 @@ $$('#helprow button').forEach(b => b.onclick = () => setLevel(b.dataset.lv));
 $('#voiceb').onclick = () => { S.voice = !S.voice; hush(); renderSide(); };
 $('#jumprow').innerHTML = BEATS.map(([k, l]) => `<button data-j="${k}">${l}</button>`).join(''); $$('#jumprow button').forEach(b => b.onclick = () => { $('#dz').hidden = true; jump(b.dataset.j); });
 // ---------------- scenes: intro, handoff, day card ----------------
-function caseCard(kick, recap, btn, then) { SFX.paper(); const s = scene(`<div class="dcard"><div class="kick">${kick}</div><div class="big" style="font-size:44px">★</div><p class="recap">${esc(recap)}</p><button class="btn gold" id="dc">${btn}</button></div>`);
+function caseCard(kick, recap, btn, then) { SFX.paper(); const s = scene(`<div class="dcard"><div class="kick">${kick}</div><div class="big" style="font-size:var(--ds-fs-display)">★</div><p class="recap">${esc(recap)}</p><button class="btn gold" id="dc">${btn}</button></div>`);
   $('#dc').onclick = () => { unscene(); then(); }; }
 function paintCaseCover(s) { if (!CASE.cover) return; s.classList.add('album');
   const bg = document.createElement('div'); bg.className = 'album-bg'; bg.setAttribute('aria-hidden', 'true');
@@ -832,7 +833,7 @@ function paintCaseCover(s) { if (!CASE.cover) return; s.classList.add('album');
   s.prepend(bg, scrim); }
 function intro() { clearSave(); S.beat = 'intro'; render();
   const s = scene(`<div class="kick">${esc(CASE.kick)}</div><h1>${esc(CASE.title).replace(/\n/g, '<br>')}</h1><p class="lead">${esc(CASE.lead)}</p>
-    <div class="row"><button class="btn gold" id="i1">▶ Begin</button><span style="opacity:.78;font-size:14px">${esc((COPY.intro && COPY.intro.hint) || '')}</span></div>`);
+    <div class="row"><button class="btn gold" id="i1">▶ Begin</button><span style="opacity:.78;font-size:var(--ds-fs-meta)">${esc((COPY.intro && COPY.intro.hint) || '')}</span></div>`);
   paintCaseCover(s); $('#i1').onclick = cold; }
 async function cold() { const C = COPY.cold || {}, L = C.lines || [];
   scene(`<div class="kick">${esc(C.kicker || 'Cold open')}</div><div class="cold">${L.map(l => `<span>${esc(l)} </span>`).join('<br>')}</div><div class="row" style="margin-top:26px"><button class="btn gold" id="c1">${esc(C.cta || 'Continue')}</button><button class="skip" id="c2">${esc(C.skip || 'Skip')}</button></div>`);
@@ -841,19 +842,19 @@ async function cold() { const C = COPY.cold || {}, L = C.lines || [];
   ortiz('cold'); const sp = $$('.cold span'), tot = L.join('').length; for (const [k, e] of sp.entries()) { if (stop) break; e.classList.add('on'); await sleep(Math.max(1200, L[k].length / tot * 27000)); } }
 // The desk is not a choice before the case: it defaults to daylight and lives in Settings.
 function howTo() { const H = COPY.howTo || {};
-  scene(`<div class="kick">${esc(H.kicker || 'How it works')}</div><h1 style="font-size:34px">${esc(H.title || '')}</h1>
+  scene(`<div class="kick">${esc(H.kicker || 'How it works')}</div><h1 style="font-size:var(--ds-fs-h1)">${esc(H.title || '')}</h1>
   <div class="how">${(H.steps || []).map(([icon, head, body]) => `<div><b>${icon}</b><h3>${esc(head)}</h3><p>${esc(body)}</p></div>`).join('')}</div>
   <p class="lead" style="margin-top:0">${esc(H.note || '')}</p><button class="btn gold" id="h1">${esc(H.cta || 'Continue →')}</button>`);
   $('#h1').onclick = handoff; }
 async function handoff() { const H = COPY.handoff || {}, L = H.lines || [];
   S = Object.assign(fresh(), {theme: S.theme, voice: S.voice, beat: 'handoff', t0: S.t0}); prevSet = new Set(); setView('desk'); render();
   const face = A[H.portrait] || '';
-  const s = scene(`<div class="talk">${face ? `<img src="${face}" alt="">` : ''}<div class="bub"><div class="who">${esc(H.speaker || '')}${H.role ? ' · ' + esc(H.role) : ''}</div><div class="t" id="ht"></div><div class="ctl"><button class="btn" id="hn">${esc(H.next || 'Next ▸')}</button><button class="skip" id="hs" style="color:#7A7268">${esc(H.skip || 'Skip')}</button><small id="hc"></small></div></div></div>`, true);
+  const s = scene(`<div class="talk">${face ? `<img src="${face}" alt="">` : ''}<div class="bub"><div class="who">${esc(H.speaker || '')}${H.role ? ' · ' + esc(H.role) : ''}</div><div class="t" id="ht"></div><div class="ctl"><button class="btn" id="hn">${esc(H.next || 'Next ▸')}</button><button class="skip" id="hs" style="color:var(--ds-muted)">${esc(H.skip || 'Skip')}</button><small id="hc"></small></div></div></div>`, true);
   let i = -1, typing = null; const T = $('#ht');
   const show = async () => { i++; if (i >= L.length) return done(); const [t, ev] = L[i]; $('#hc').textContent = `${i + 1} / ${L.length}${H.voiceNote ? ' · ' + H.voiceNote : ''}`; ortiz(L[i][2] || 'h' + (i + 1));
     if (ev === 'folder') { S.folderOnDesk = true; render(); SFX.paper(); } if (ev === 'env') { S.env = {A: 'sealed', B: 'sealed', C: 'sealed'}; render(); SFX.paper(); }
     T.innerHTML = ''; const my = typing = {}; for (let k = 0; k <= t.length; k += 2) { if (typing !== my) return; T.textContent = t.slice(0, k); await sleep(14); } T.textContent = t;
-    if (ev === 'obj' && H.objective) T.innerHTML += `<div style="margin-top:10px;background:#F2C14E;border-radius:10px;padding:8px 12px;font:700 15px Atkinson">${esc(H.objective)}</div>`;
+    if (ev === 'obj' && H.objective) T.innerHTML += `<div style="margin-top:10px;background:var(--ds-gold);border-radius:10px;padding:8px 12px;font:700 var(--ds-fs-body) var(--ds-font-ui)">${esc(H.objective)}</div>`;
     if (i === L.length - 1) $('#hn').textContent = H.start || 'Continue →'; };
   const done = () => { typing = null; hush(); S.folderOnDesk = true; if (S.env.A === 'hidden') S.env = {A: 'sealed', B: 'sealed', C: 'sealed'}; S.beat = 'build'; note(H.objectiveNote || H.objective || ''); unscene(); render(); const f = $('.hot[data-name="folder"]'); if (f) f.focus({preventScroll: true}); if (H.toast) toast(esc(H.toast), 3400); };
   $('#hn').onclick = show; $('#hs').onclick = done; show(); }
@@ -910,7 +911,7 @@ function showAha() {
   $$('.pin').forEach(p => p.classList.toggle('hero', btPair.includes(p.dataset.id)));
   const c = document.createElement('div'); c.className = 'aha-card';
   const HA = COPY.aha || {};
-  c.innerHTML = `<div class="k">${esc(HA.kicker || '')}</div><h2>${esc(HA.title || '')}</h2><p>${esc(HA.body || '')}</p><div class="q"><b>${esc(DET)}:</b> \u201c${esc(HA.line || '')}\u201d</div><p style="font-size:13px;color:#7A7268">${esc(HA.footer || '')}</p><button class="btn gold" id="ahax" type="button">${esc(HA.cta || 'Continue →')}</button>`;
+  c.innerHTML = `<div class="k">${esc(HA.kicker || '')}</div><h2>${esc(HA.title || '')}</h2><p>${esc(HA.body || '')}</p><div class="q"><b>${esc(DET)}:</b> \u201c${esc(HA.line || '')}\u201d</div><p style="font-size:var(--ds-fs-small);color:var(--ds-muted)">${esc(HA.footer || '')}</p><button class="btn gold" id="ahax" type="button">${esc(HA.cta || 'Continue →')}</button>`;
   document.body.appendChild(c);
   $('#ahax').onclick = () => previewGoto(idIndex('envB'), {user: true});
 }
@@ -940,7 +941,7 @@ function stageHandoff() {
   const HF = COPY.handoff || {}, HL = HF.lines || [];
   const line = HL[4] ? HL[4][0] : '';
   const face = A[HF.portrait] || '';
-  scene(`<div class="talk">${face ? `<img src="${face}" alt="">` : ''}<div class="bub"><div class="who">${esc(HF.speaker || '')}${HF.role ? ' \u00b7 ' + esc(HF.role) : ''}</div><div class="t">${esc(line)}</div><div class="ctl"><button class="btn" id="hn" type="button">${esc(HF.next || 'Next \u25b8')}</button><button class="skip" id="hs" type="button" style="color:#7A7268">${esc(HF.skip || 'Skip')}</button><small>5 / ${HL.length}</small></div></div></div>`, true);
+  scene(`<div class="talk">${face ? `<img src="${face}" alt="">` : ''}<div class="bub"><div class="who">${esc(HF.speaker || '')}${HF.role ? ' \u00b7 ' + esc(HF.role) : ''}</div><div class="t">${esc(line)}</div><div class="ctl"><button class="btn" id="hn" type="button">${esc(HF.next || 'Next \u25b8')}</button><button class="skip" id="hs" type="button" style="color:var(--ds-muted)">${esc(HF.skip || 'Skip')}</button><small>5 / ${HL.length}</small></div></div></div>`, true);
   const go = () => previewGoto(idIndex('folder'), {user: true});
   $('#hn').onclick = go; $('#hs').onclick = go;
 }
@@ -975,7 +976,7 @@ function stageEnvB() {
   S.env.B = 'ready';
   previewFinish('board');
   const recap = COPY.accuseRecap || '';
-  scene(`<div class="dcard"><div class="kick">Realization</div><div class="big" style="font-size:44px">\u2605</div><p class="recap">${esc(recap)}</p><button class="btn gold" id="dc" type="button">Back to the desk \u2192</button></div>`);
+  scene(`<div class="dcard"><div class="kick">Realization</div><div class="big" style="font-size:var(--ds-fs-display)">\u2605</div><p class="recap">${esc(recap)}</p><button class="btn gold" id="dc" type="button">Back to the desk \u2192</button></div>`);
   $('#dc').onclick = () => { unscene(); setView('desk'); };
 }
 function stageWrong() {

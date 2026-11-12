@@ -16,13 +16,14 @@ Preview mode does not read or write the real playthrough (`localStorage` key `jp
 
 ## Rules this build follows
 - **No in-game days.** The case moves forward only through play: Ortiz hands over the case → take items out of the folder onto the desk or the corkboard → solve Objective 1 → tear open Envelope A → realization on the board (seat + Marcy's height) → Envelope B → write the accusation report (3 attempts, a wrong answer gets Ortiz's pushback) → reveal / Envelope C → pack up, stamp, and file the case in the drawer.
-- **Save and resume.** Progress saves automatically to this device (`localStorage` key `jp-save-v2`). That covers the current beat, items taken out, board pin positions and strings, notes, objectives, envelopes, played tapes, report attempts, and file-away steps. Reopen the page and you land back at your desk where you left off. To start over: ⚙ Prototype → ↺ Start the case over. Signed-in play on the platform server also keeps that save on your account. Without an account, nothing about this changes.
-- **Desk ambience follows the player's real clock and is cosmetic only.** 5–11 AM morning and 11 AM–5 PM daytime get coffee and a cherry danish. 5–9 PM evening and 9 PM–5 AM night get Chinese takeout, and the lamp comes on. The coffee, danish, and takeout respond to sips and bites, and that's all they do: they never gate progress. The ⚙ Prototype panel can preview each look without saving it.
+- **Save and resume.** Progress saves automatically to this device (`localStorage` key `jp-save-v2`). That covers the current beat, items taken out, board pin positions and strings, notes, objectives, envelopes, played tapes, report attempts, and file-away steps. Reopen the page and you land back at your desk where you left off. To start over: ⚙ Settings → ↺ Start the case over. Signed-in play on the platform server also keeps that save on your account. Without an account, nothing about this changes.
+- **Desk ambience follows the player's real clock and is cosmetic only.** 5–11 AM morning and 11 AM–5 PM daytime get coffee and a cherry danish. 5–9 PM evening and 9 PM–5 AM night get Chinese takeout, and the lamp comes on. The coffee, danish, and takeout respond to sips and bites, and that's all they do: they never gate progress. Dev mode (see `DESIGN_SYSTEM.md`) can preview each look without saving it.
 - **Voices are ElevenLabs only.** Clara's voicemail, the interview tapes (Daniel, Reed, Dunn, Jesse, Marcy), and all of Det. Ortiz's lines (cold open, handoff, pushbacks, breakthrough, reveal, welcome back) play bundled MP3s. The game never uses device or Mac text-to-speech. If a line has no sample, it shows as text only.
 
-Jump to any beat from the top rail (prototype). Research: `../research/journey-research.md`. Screenshots: `shots/` (`v2-*` = this revision).
+In dev mode, jump to any beat from the top rail. Players see it as read-only progress. Research: `../research/journey-research.md`. Screenshots: `shots/` (`v2-*` = this revision).
 
 ## Tools
+- `node _build/lint.js` — the design-system gate: tokens only, type on the scale, AA contrast.
 - `node _build/validate.js [case-id]` — checks a case pack against the contract and every file it points at. No browser.
 - `node _build/smoke.js` — headless browser: boot, every beat, both desks, the folder, the board, preview mode, a phone viewport. `--shots` writes screenshots to `_build/out/`.
 - `node _build/new-case.js <case-id>` — scaffolds a valid pack.
