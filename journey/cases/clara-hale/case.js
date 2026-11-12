@@ -263,7 +263,7 @@ const COPY = {
         "Pin people and places to the board. Tie string between things. The right connection is a breakthrough."
       ]
     ],
-    "note": "Ortiz leaves a quiet note on the desk, and the same next step sits on the right. Sealed envelopes open as you solve things.",
+    "note": "Your next step is always on the right, from Ortiz. Want more help? Turn it up in Settings. Sealed envelopes open as you solve things.",
     "cta": "Meet Detective Ortiz →"
   },
   "handoff": {
@@ -278,30 +278,12 @@ const COPY = {
     "objectiveNote": "Objective 1: where did Clara go? Did she drive?",
     "toast": "The folder is closed on your desk. Open it. Briefing first.",
     "lines": [
-      [
-        "You must be the one Helena sent. Sam Ortiz, state police."
-      ],
-      [
-        "Clara Hale. Thirty-four. Owns the bakery on Main Street. Last seen at the Harvest Festival, Saturday, a little after nine."
-      ],
-      [
-        "Her car turned up at the Copper Lake trailhead Sunday morning. Keys in it. Phone gone. Three days now."
-      ],
-      [
-        "I've done the interviews. Everything I have is in this folder.",
-        "folder"
-      ],
-      [
-        "These three envelopes stay sealed. Each one opens when you crack a piece of this. Not before.",
-        "env"
-      ],
-      [
-        "First question. Where did Clara go Saturday night, and did she drive there herself?",
-        "obj"
-      ],
-      [
-        "Start with the folder. Take out what you need. I'll check in."
-      ]
+      // [line, desk event, voice clip]. The cold open already told the story, so Ortiz goes straight to the job.
+      ["You must be the one Helena sent. Sam Ortiz, state police.", "", "h1"],
+      ["I've done the interviews. Everything I have is in this folder.", "folder", "h4"],
+      ["These three envelopes stay sealed. Each one opens when you crack a piece of this. Not before.", "env", "h5"],
+      ["First question. Where did Clara go Saturday night, and did she drive there herself?", "obj", "h6"],
+      ["Start with the folder. Take out what you need. I'll check in.", "", "h7"]
     ]
   },
   "objective1": {
@@ -426,7 +408,6 @@ const ONPULL = {
 const PREVIEW_TITLES = {
   "intro": 'Album cover. The case has not started.',
   "cold": 'Ortiz narrates Saturday night in Pine Hollow.',
-  "desk": 'Choose the Clean Daylight desk or the Kitchen Table.',
   "how": 'Listen, look, and pin. One next step on the right.',
   "handoff": 'Ortiz sets down the folder and three sealed envelopes.',
   "closed": 'The case folder sits closed on the desk. Ortiz says to open it.',

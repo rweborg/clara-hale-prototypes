@@ -59,15 +59,10 @@ const fail = m => { throw new Error(m); };
       if (!(await exists('.cold'))) fail('the cold open did not render');
     });
 
-    await step(c, 'cold open → desk picker', async () => {
+    await step(c, 'cold open → how it works (no desk picker)', async () => {
       await mustClick('#c2', 'Skip intro');
       await sleep(500);
-      if (!(await exists('.pick'))) fail('the desk picker did not render');
-    });
-
-    await step(c, 'desk picker → how it works', async () => {
-      await mustClick('.pick[data-t="b"]', 'daylight desk choice');
-      await sleep(500);
+      if (await exists('.pick')) fail('the desk picker is back: the desk lives in Settings now');
       const n = await c.evaluate(`document.querySelectorAll('.how > div').length`);
       if (n !== 3) fail(`the how-it-works card shows ${n} steps, expected 3`);
     });

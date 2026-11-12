@@ -836,13 +836,10 @@ function intro() { clearSave(); S.beat = 'intro'; render();
   paintCaseCover(s); $('#i1').onclick = cold; }
 async function cold() { const C = COPY.cold || {}, L = C.lines || [];
   scene(`<div class="kick">${esc(C.kicker || 'Cold open')}</div><div class="cold">${L.map(l => `<span>${esc(l)} </span>`).join('<br>')}</div><div class="row" style="margin-top:26px"><button class="btn gold" id="c1">${esc(C.cta || 'Continue')}</button><button class="skip" id="c2">${esc(C.skip || 'Skip')}</button></div>`);
-  let stop = false; $('#c1').onclick = () => { stop = true; pickDesk(); }; $('#c2').onclick = () => { stop = true; pickDesk(); };
+  let stop = false; $('#c1').onclick = () => { stop = true; hush(); howTo(); }; $('#c2').onclick = () => { stop = true; hush(); howTo(); };
   if (!L.length) return;
   ortiz('cold'); const sp = $$('.cold span'), tot = L.join('').length; for (const [k, e] of sp.entries()) { if (stop) break; e.classList.add('on'); await sleep(Math.max(1200, L[k].length / tot * 27000)); } }
-function pickDesk() { hush(); scene(`<div class="kick">Choose your desk</div><h1 style="font-size:34px">Where do you want to work this case?</h1><p class="lead">Same case, same evidence. Change it any time under ⚙ Settings.</p>
-  <div class="picks"><button class="pick ${S.theme === 'b' ? 'on' : ''}" data-t="b"><img src="${A.thumb_b}" alt=""><div><h3>☀️ Clean Daylight desk</h3><p>Bright, calm and tidy. Recordings play on a phone.</p></div></button>
-  <button class="pick ${S.theme === 'd' ? 'on' : ''}" data-t="d"><img src="${A.thumb_d}" alt=""><div><h3>🍳 Kitchen Table</h3><p>Warm and homey, with morning sun. Recordings play on a tape recorder.</p></div></button></div>`);
-  $$('.pick').forEach(b => b.onclick = () => { S.theme = b.dataset.t; localStorage.setItem('jp-theme', S.theme); render(); howTo(); }); }
+// The desk is not a choice before the case: it defaults to daylight and lives in Settings.
 function howTo() { const H = COPY.howTo || {};
   scene(`<div class="kick">${esc(H.kicker || 'How it works')}</div><h1 style="font-size:34px">${esc(H.title || '')}</h1>
   <div class="how">${(H.steps || []).map(([icon, head, body]) => `<div><b>${icon}</b><h3>${esc(head)}</h3><p>${esc(body)}</p></div>`).join('')}</div>
@@ -853,7 +850,7 @@ async function handoff() { const H = COPY.handoff || {}, L = H.lines || [];
   const face = A[H.portrait] || '';
   const s = scene(`<div class="talk">${face ? `<img src="${face}" alt="">` : ''}<div class="bub"><div class="who">${esc(H.speaker || '')}${H.role ? ' · ' + esc(H.role) : ''}</div><div class="t" id="ht"></div><div class="ctl"><button class="btn" id="hn">${esc(H.next || 'Next ▸')}</button><button class="skip" id="hs" style="color:#7A7268">${esc(H.skip || 'Skip')}</button><small id="hc"></small></div></div></div>`, true);
   let i = -1, typing = null; const T = $('#ht');
-  const show = async () => { i++; if (i >= L.length) return done(); const [t, ev] = L[i]; $('#hc').textContent = `${i + 1} / ${L.length}${H.voiceNote ? ' · ' + H.voiceNote : ''}`; ortiz('h' + (i + 1));
+  const show = async () => { i++; if (i >= L.length) return done(); const [t, ev] = L[i]; $('#hc').textContent = `${i + 1} / ${L.length}${H.voiceNote ? ' · ' + H.voiceNote : ''}`; ortiz(L[i][2] || 'h' + (i + 1));
     if (ev === 'folder') { S.folderOnDesk = true; render(); SFX.paper(); } if (ev === 'env') { S.env = {A: 'sealed', B: 'sealed', C: 'sealed'}; render(); SFX.paper(); }
     T.innerHTML = ''; const my = typing = {}; for (let k = 0; k <= t.length; k += 2) { if (typing !== my) return; T.textContent = t.slice(0, k); await sleep(14); } T.textContent = t;
     if (ev === 'obj' && H.objective) T.innerHTML += `<div style="margin-top:10px;background:#F2C14E;border-radius:10px;padding:8px 12px;font:700 15px Atkinson">${esc(H.objective)}</div>`;
@@ -927,14 +924,10 @@ function stageCold() {
   previewBlank(); S.beat = 'intro'; previewFinish('desk');
   const L = (COPY.cold && COPY.cold.lines) || [];
   scene(`<div class="kick">${esc((COPY.cold && COPY.cold.kicker) || 'Cold open')}</div><div class="cold">${L.map(l => `<span class="on">${esc(l)} </span>`).join('<br>')}</div><div class="row" style="margin-top:26px"><button class="btn gold" id="c1" type="button">Continue</button><button class="skip" id="c2" type="button">Skip intro</button></div>`);
-  const go = () => previewGoto(idIndex('desk'), {user: true});
+  const go = () => previewGoto(idIndex('how'), {user: true});
   $('#c1').onclick = go; $('#c2').onclick = go;
 }
-function stageDesk() {
-  previewBlank(); S.beat = 'intro'; previewFinish('desk');
-  pickDesk();
-  $$('.pick').forEach(b => b.onclick = () => { S.theme = b.dataset.t; previewGoto(idIndex('how'), {user: true}); });
-}
+
 function stageHow() {
   previewBlank(); S.beat = 'intro'; previewFinish('desk');
   howTo();
@@ -1029,7 +1022,6 @@ function stageFiled() {
 const STAGES = [
   {id: 'intro', label: 'Intro', title: '', apply: stageIntro},
   {id: 'cold', label: 'Cold open', title: '', apply: stageCold},
-  {id: 'desk', label: 'Desk pick', title: '', apply: stageDesk},
   {id: 'how', label: 'How it works', title: '', apply: stageHow},
   {id: 'handoff', label: 'Handoff', title: '', apply: stageHandoff},
   {id: 'closed', label: 'Closed file', title: '', apply: stageClosed},
@@ -1160,7 +1152,7 @@ function initPreview() {
     else if (e.key === ' ' && (e.target === document.body || e.target.id === 'pvscrub')) { e.preventDefault(); previewToggle(); }
   });
   previewReady = true;
-  const hashStage = {intro: 'intro', cold: 'cold', desk: 'desk', how: 'how', handoff: 'handoff', closed: 'closed', review: 'review', build: 'folder', folder: 'folder', envA: 'envA', realize: 'realize', accuse: 'envB', envB: 'envB', wrong: 'wrong', right: 'right', envC: 'envC', file: 'file', filed: 'filed'};
+  const hashStage = {intro: 'intro', cold: 'cold', desk: 'how', how: 'how', handoff: 'handoff', closed: 'closed', review: 'review', build: 'folder', folder: 'folder', envA: 'envA', realize: 'realize', accuse: 'envB', envB: 'envB', wrong: 'wrong', right: 'right', envC: 'envC', file: 'file', filed: 'filed'};
   const mapped = hashStage[location.hash.slice(1)];
   previewGoto(mapped ? idIndex(mapped) : 0);
 }
