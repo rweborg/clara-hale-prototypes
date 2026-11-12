@@ -397,3 +397,11 @@ body.pv-on .verpop{bottom:134px}
 body:not(.dev) .devonly{display:none!important}
 .rail button.bt{cursor:pointer}.rail span.bt{cursor:default}
 .dz .devonly{margin-top:14px;padding-top:12px;border-top:1px dashed var(--ds-spine,rgba(80,52,24,.22))}
+.prog .envs{flex:1;margin-left:8px}
+.envs span.ob{background:var(--ds-muted,#7A7268)}.envs span.ob.done{background:var(--accent);opacity:1}
+.envs span.env-A{background:var(--ds-env-a,#B83A2E)}.envs span.env-B{background:var(--ds-env-b,#2E5C9A)}.envs span.env-C{background:var(--ds-env-c,#2F7A4A)}
+.tries .left{font-weight:400;color:var(--ds-dim,#6B645B)}
+/* Help level: the breakthrough pair pulses when the level allows it */
+.pin.nudge{animation:pinNudge 1.8s ease-in-out infinite}
+@keyframes pinNudge{0%,100%{filter:none}50%{filter:drop-shadow(0 0 10px var(--ds-gold,#F2C14E)) drop-shadow(0 0 3px var(--ds-gold,#F2C14E))}}
+@media (prefers-reduced-motion:reduce){.pin.nudge{animation:none;outline:3px solid var(--ds-gold,#F2C14E);outline-offset:3px}}

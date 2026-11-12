@@ -322,7 +322,7 @@ const COPY = {
     "note": "Clara walked. Someone else drove her car."
   },
   "aha": {
-    "kicker": "★ BREAKTHROUGH · 1 OF 3",
+    "kicker": "★ Breakthrough",
     "title": "Someone short drove Clara's car.",
     "body": "Clara is 5′10″ and drives with the seat all the way back. It was jammed all the way forward. Marcy is 5′2″.",
     "line": "Whoever drove her car to that trailhead needed it that way to reach the pedals.",
@@ -654,6 +654,9 @@ return {
   recordings: RECS,
   proof: PROOF_OK,
   solution: SOL,
+  // How much help this case gives: 'beginner', 'standard', or 'advanced' (presets live in the engine).
+  // Override single knobs only when the story needs it, e.g. overrides: {reportTries: 4}.
+  difficulty: {preset: 'standard', overrides: {}},
   objective1: OBJ1,
   transcripts: TR,
   audio: AU,

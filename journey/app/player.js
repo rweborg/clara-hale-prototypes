@@ -104,7 +104,7 @@ function nextReviewId(src) { for (const id of reviewOf(src).ids) if (!S.pulled[i
 // ---------------- state ----------------
 let S; const T0 = Date.now();
 function fresh() { return {theme: localStorage.getItem('jp-theme') || 'b', beat: 'intro', meal: null, pulled: {}, board: {}, place: {}, stack: [], strings: [], notes: [], viewed: {}, played: {}, saved: {},
-  obj1: 0, obj1wrong: 0, env: {A: 'hidden', B: 'hidden', C: 'hidden'}, real: false, tries: 0, hints: 0, mug: 0, bites: 0, lampOff: false, solved: false, assisted: false,
+  obj1: 0, obj1wrong: 0, env: {A: 'hidden', B: 'hidden', C: 'hidden'}, real: false, tries: 0, hints: 0, mug: 0, bites: 0, lampOff: false, solved: false, assisted: false, level: null, helped: false, wrongStrings: 0,
   folderOnDesk: false, packed: false, stamped: false, filed: false, fresh: {}, voice: S ? S.voice : true, view: 'desk', sel: null, connect: false, strSel: null, rep: {}, t0: Date.now()}; }
 S = fresh();
 // ---------------- save / resume ----------------
@@ -119,6 +119,32 @@ const PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
 let DEV = new URLSearchParams(location.search).get('dev') === '0' ? false : PREVIEW || /^(localhost|127\.0\.0\.1|\[::1\]|)$/.test(location.hostname);
 function setDev(on) { DEV = !!on; document.body.classList.toggle('dev', DEV); if (S) render(); }
 document.body.classList.toggle('dev', DEV);
+// ---------------- help level ----------------
+// How much the game helps is a setting, not a rewrite. The engine owns three presets; a case picks one
+// (PACK.difficulty.preset) and may override single knobs (PACK.difficulty.overrides). Build the clean
+// Standard journey first: Beginner only adds help on top of it, Advanced only takes it away.
+// The player can always ask for more help (Settings -> Help); that is recorded on the case record.
+const LEVELS = {
+  beginner: {label: 'More help', whisper: true, nextButton: true, idleNudge: 45, hintLimit: 0, objHints: 3, reviewNext: true, boardPulse: 'always', reportFeedback: 'which', reportTries: 5, evidenceCount: true},
+  standard: {label: 'Standard', whisper: false, nextButton: true, idleNudge: 120, hintLimit: 0, objHints: 2, reviewNext: false, boardPulse: 'afterMiss', reportFeedback: 'count', reportTries: 3, evidenceCount: false},
+  advanced: {label: 'Less help', whisper: false, nextButton: false, idleNudge: 0, hintLimit: 3, objHints: 0, reviewNext: false, boardPulse: 'never', reportFeedback: 'pass', reportTries: 2, evidenceCount: false}};
+const CASE_LEVEL = ((PACK.difficulty || {}).preset in LEVELS) ? PACK.difficulty.preset : 'standard';
+let HELP = LEVELS[CASE_LEVEL], REPORT_TRIES = HELP.reportTries;
+function applyLevel(lv) { const base = LEVELS[lv] || LEVELS[CASE_LEVEL]; HELP = Object.assign({}, base, lv === CASE_LEVEL ? (PACK.difficulty || {}).overrides || {} : {}); REPORT_TRIES = HELP.reportTries; }
+applyLevel(CASE_LEVEL);
+let LEVEL_NOW = CASE_LEVEL;
+function syncLevel() { const lv = (S && S.level) || CASE_LEVEL; if (lv !== LEVEL_NOW) { LEVEL_NOW = lv; applyLevel(lv); } }
+// More help can be turned on at any time. Less help only before the case really starts, so nobody games the rank.
+function setLevel(lv) { if (!(lv in LEVELS)) return; const order = ['beginner', 'standard', 'advanced'], cur = (S.level || CASE_LEVEL);
+  const started = S.beat !== 'intro' && S.beat !== 'handoff' && Object.keys(S.pulled).length > 0;
+  if (order.indexOf(lv) > order.indexOf(cur) && started) return toast('You can turn help down when you start the case over.', 3200);
+  S.level = lv; if (order.indexOf(lv) < order.indexOf(CASE_LEVEL)) S.helped = true; syncLevel(); render(); nudgeReset(); }
+// Ortiz checks in when the desk goes quiet. How soon (or never) is a help-level knob.
+let nudgeT = null, nudgedFor = '';
+function nudgeReset() { clearTimeout(nudgeT); if (!HELP.idleNudge || PREVIEW) return; nudgeT = setTimeout(nudgeFire, HELP.idleNudge * 1000); }
+function nudgeFire() { if (!S || !['build', 'envA', 'realize', 'accuse'].includes(S.beat)) return nudgeReset(); if (!$('#ov').hidden || !$('#scene').hidden) return nudgeReset();
+  const ns = nextStep(); const key = S.beat + ':' + (ns && ns.t); if (!ns || key === nudgedFor) return; nudgedFor = key; toast(esc(DET) + ': ' + (ns.w || ns.p), 5200); }
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, nudgeReset, {passive: true}));
 function deskSnapshot() { const o = {}; for (const k in S) if (!TRANSIENT.includes(k)) o[k] = S[k]; o.savedAt = Date.now(); return o; }
 function save() { if (PREVIEW || !S || S.beat === 'intro') return; let o; try { o = deskSnapshot(); localStorage.setItem(SAVE, JSON.stringify(o)); } catch (e) { return; } const hook = window.CaseDesk && window.CaseDesk.onLocalSave; if (typeof hook === 'function') { try { hook(o); } catch (e) {} } }
 function loadSave() { try { const o = JSON.parse(localStorage.getItem(SAVE) || 'null'); if (!o || !o.beat || o.beat === 'intro' || !BEATS.some(b => b[0] === o.beat)) return null; return Object.assign(fresh(), o, {sel: null, connect: false, fresh: {}}); } catch (e) { return null; } }
@@ -544,7 +570,7 @@ function openFolder(src) { SFX.paper(); const F = (PACK.folders || {})[src] || {
     const steps = rev.groups.map(g => { const done = g.ids.every(i => S.pulled[i]), now = nxt && g.ids.includes(nxt); return `<li class="${done ? 'done' : now ? 'now' : ''}">${esc(g.g.replace(/^\d+ · /, ''))}</li>`; }).join('');
     let items = '', lastG = '';
     for (const i of left) { const m = rev.meta[i]; if (m.g !== lastG) { lastG = m.g; items += `<div class="grp">${esc(m.g)}</div>`; }
-      items += `<div class="it${i === nxt ? ' up' : ''}" data-id="${i}"><button type="button" class="look"><span class="ord">${m.n}</span>${thumb(i)}<b>${esc(IT[i].n)}</b>${i === nxt ? '<em class="why">Suggested next</em>' : ''}</button><div class="bt">${IT[i].dest !== 'board' ? '<button type="button" data-to="desk">🗂 Put on desk</button>' : ''}${IT[i].dest !== 'desk' ? `<button type="button" data-to="board" class="${IT[i].dest === 'both' ? 'alt' : ''}">📌 Pin to board</button>` : ''}</div></div>`; }
+      items += `<div class="it${i === nxt && HELP.reviewNext ? ' up' : ''}" data-id="${i}"><button type="button" class="look"><span class="ord">${m.n}</span>${thumb(i)}<b>${esc(IT[i].n)}</b>${i === nxt && HELP.reviewNext ? '<em class="why">Suggested next</em>' : ''}</button><div class="bt">${IT[i].dest !== 'board' ? '<button type="button" data-to="desk">🗂 Put on desk</button>' : ''}${IT[i].dest !== 'desk' ? `<button type="button" data-to="board" class="${IT[i].dest === 'both' ? 'alt' : ''}">📌 Pin to board</button>` : ''}</div></div>`; }
     const fold = o.querySelector('.fold'); if (!fold) return;   // the folder was closed while a redraw was queued
   fold.innerHTML = `<div class="lp"><h3>${title}</h3><p class="guide">${blurb}</p><ol class="order">${steps}</ol><p style="font-size:12.5px;color:#6B645B;margin-bottom:6px">${pulledFrom(src)} of ${rev.ids.length} taken out.</p><ul class="inv">${rev.ids.map(i => `<li data-id="${i}" class="${S.pulled[i] ? 'out' : i === nxt ? 'now' : ''}"><span class="n">${rev.meta[i].n}</span>${esc(IT[i].n)}</li>`).join('')}</ul></div>
     <div class="rp"><div class="items">${items || '<div class="allout">✓ Everything is out of here.<br><br><button class="btn" id="fdone">Back to the desk</button></div>'}</div></div>`;
@@ -620,10 +646,11 @@ function openObj() { const O = COPY.objective1 || {}; const o = ov(`<div class="
   <div class="chips" style="flex-direction:column;align-items:stretch">${OBJ1.o.map((t, i) => `<button data-i="${i}" style="text-align:left;border-radius:12px;padding:12px 14px;font-size:16px">${esc(t)}</button>`).join('')}</div><div id="ores"></div>
   ${DEV ? `<p style="margin-top:12px"><button class="demo" id="owrong">${esc(O.demoWrong || 'Demo: answer wrong')}</button> · <button class="demo" id="oright">${esc(O.demoRight || 'Demo: answer right')}</button></p>` : ''}</div>`);
   const ans = i => { const r = $('#ores');
-    if (i !== OBJ1.a) { S.obj1wrong++; SFX.buzz(); const t = O.wrong || '', hint = (O.hints || [])[Math.min(2, S.obj1wrong - 1)] || '';
-      r.innerHTML = `<div class="res bad"><b>${esc(DET)}:</b> “${esc(t)}”<br><br>💡 <b>Hint ${Math.min(3, S.obj1wrong)} unlocked:</b> ${esc(hint)}</div>`; ortiz('obj1_wrong'); return; }
+    if (i !== OBJ1.a) { S.obj1wrong++; SFX.buzz(); const t = O.wrong || '';
+      const hs = (O.hints || []).slice(0, HELP.objHints), hn = Math.min(hs.length, S.obj1wrong), ht = hn ? hs[hn - 1] : '';
+      r.innerHTML = `<div class="res bad"><b>${esc(DET)}:</b> “${esc(t)}”${ht ? `<br><br>💡 <b>Hint ${hn} of ${hs.length}:</b> ${esc(ht)}` : ''}</div>`; ortiz('obj1_wrong'); return; }
     S.obj1 = 1; SFX.ding(); ortiz('obj1_right'); if (O.note) note(O.note, 'ink');
-    r.innerHTML = `<div class="res good"><b>${esc(O.solvedTitle || 'Solved.')}</b><br><b>${esc(DET)}</b> <span class="real" style="background:#1F5E4E;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px">real voice sample</span>: “${esc(O.solvedLine || '')}”<br><br>${esc(O.solvedNote || '')}</div><button class="btn gold" id="onext">${esc(O.solvedCta || 'Continue →')}</button>`;
+    r.innerHTML = `<div class="res good"><b>${esc(O.solvedTitle || 'Solved.')}</b><br><b>${esc(DET)}</b>: “${esc(O.solvedLine || '')}”<br><br>${esc(O.solvedNote || '')}</div><button class="btn gold" id="onext">${esc(O.solvedCta || 'Continue →')}</button>`;
     S.env.A = 'ready'; S.beat = 'envA'; renderSide(); $('#onext').onclick = () => { closeOv(); openEnv('A'); }; };
   $$('.chips button', o).forEach(b => b.onclick = () => { $$('.chips button', o).forEach(x => x.classList.toggle('on', x === b)); ans(+b.dataset.i); });
   if (DEV) { $('#owrong').onclick = () => ans(0); $('#oright').onclick = () => ans(1); } }
@@ -635,6 +662,8 @@ function renderBoard() { $('#cork').src = A.cork; const P = $('#pins'); P.innerH
     Object.assign(d.style, {left: p.x - w / 2 + 'px', top: p.y + 'px', width: w + 'px', transform: `rotate(${(id.length * 7 % 7) - 3}deg)`});
     const th = IT[id].th; const pinface = IT[id].face && IT[id].face !== th && A[IT[id].face] ? `<img class="pinface" src="${A[IT[id].face]}" alt=""${fStyle(IT[id].face)}>` : ''; const snap = CARDS[id] && A[th] ? `<img class="snap" src="${A[th]}" alt="">` : ''; d.innerHTML = (CARDS[id] ? `<div class="cardx">${snap}<b>${CARDS[id][0]}</b>${CARDS[id][1]}</div>` : `<img src="${A[th]}" alt="">`) + pinface + `<span class="nm ${lc || ''}">${esc(lab)}</span>` + pinTag(id);
     P.appendChild(d); dragPin(d); }
+  const BTp = PACK.breakthrough || {}, pulse = !S.real && BTp.pair && (!BTp.requiresSaved || S.saved[BTp.requiresSaved]) && (HELP.boardPulse === 'always' || (HELP.boardPulse === 'afterMiss' && S.wrongStrings > 0));
+  $$('#pins .pin').forEach(d => d.classList.toggle('nudge', !!pulse && BTp.pair.includes(d.dataset.id)));
   S.fresh = {}; drawStrings(); $('#connectb').classList.toggle('on', S.connect); $('#connectb').textContent = S.connect ? '✕ Stop connecting' : '🧶 Connect two things';
   const cut = $('#cutb'); if (cut) cut.hidden = !S.strSel; const nStr = S.strings.filter(([a, b]) => S.board[a] && S.board[b]).length;
   const act = finger() ? 'Tap' : 'Click';
@@ -666,6 +695,7 @@ function pinTap(id) { S.strSel = null; if (!S.connect) { S.connect = true; S.sel
     if (BT.requiresSaved && !S.saved[BT.requiresSaved]) { renderBoard(); return toast(BT.locked || '', 3600); }
     return aha(a, b);
   }
+  if (!tied && !S.real) S.wrongStrings = (S.wrongStrings || 0) + 1;
   const near = (BT.near || []).find(n => [...n.pair].sort().join('+') === pair);
   if (near && !S.real) { renderBoard(); return toast(near.hint || '', 3200); }
   renderBoard(); toast(tied ? 'Those two are already tied.' : `🧶 String tied. ${finger() ? 'Tap' : 'Click'} that red thread to remove it.`, tied ? 1800 : 2800); }
@@ -679,9 +709,9 @@ async function aha(a, b) { S.real = true; const s = S.strings.find(s => [s[0], s
 // ---------------- accusation ----------------
 const REPORT_PARTS = (PACK.report || []).length + 1;   // every question, plus the proof pick
 function openReport() { const pins = Object.keys(S.board).concat(Object.keys(S.pulled).filter(id => IT[id] && IT[id].rec && !S.board[id])); S.rep.proof = S.rep.proof || [];
-  const draw = () => { const left = 3 - S.tries;
+  const draw = () => { const left = REPORT_TRIES - S.tries;
     o.querySelector('.report').innerHTML = `<h2>${esc(REPORTC.title || 'Report')}</h2><div class="sub">${esc(REPORTC.sub || '')}</div>
-    <div class="tries">Report attempts: ${[0, 1, 2].map(i => `<i class="${i < S.tries ? 'x' : ''}"></i>`).join('')} <span style="font-weight:400;color:#7A7268">${left} left</span></div>
+    <div class="tries">Report attempts: ${Array.from({length: REPORT_TRIES}, (_, i) => `<i class="${i < S.tries ? 'x' : ''}"></i>`).join('')} <span class="left">${left} left</span></div>
     ${REPORT.map(q => `<div class="q"><b>${q.l}</b><div class="chips" data-k="${q.k}">${q.o.map(([v, t]) => `<button data-v="${v}" class="${S.rep[q.k] === v ? 'on' : ''}">${q.o === SUS ? `<img src="${A['p_' + v]}" alt="">` : ''}${esc(t)}</button>`).join('')}</div></div>`).join('')}
     <div class="q"><b>Pick the 3 pieces of evidence that prove it</b><div class="chips" data-k="proof">${pins.map(v => { const face = IT[v] && IT[v].face && A[IT[v].face]; return `<button data-v="${v}" class="${S.rep.proof.includes(v) ? 'on' : ''}">${face ? `<img src="${A[IT[v].face]}" alt="">` : ''}${esc((BP[v] || [0, 0, 0, IT[v].n])[3])}</button>`; }).join('')}</div></div>
     <div id="rres"></div><div class="rfoot"><button class="btn" id="send">${esc(REPORTC.send || '📨 Send report')}</button>${DEV ? `<button class="demo" id="dw">Demo: fill a wrong report</button><button class="demo" id="dr">Demo: fill the right report</button>${S.tries ? '<button class="demo" id="d3">Demo: use up all attempts</button>' : ''}` : ''}</div>`;
@@ -691,13 +721,15 @@ function openReport() { const pins = Object.keys(S.board).concat(Object.keys(S.p
     const fill = spec => { if (!spec) return; const c = Object.assign({}, spec, {proof: (spec.proof || []).filter(x => pins.includes(x)).slice(0, 3)}); Object.assign(S.rep, c); draw(); };
     $('#send').onclick = send;
     if (DEV) { $('#dw').onclick = () => fill(DEMO.wrong); $('#dr').onclick = () => fill(DEMO.right); }
-    const d3 = $('#d3'); if (d3) d3.onclick = () => { S.tries = 3; closeOv(); softFail(); }; };
+    const d3 = $('#d3'); if (d3) d3.onclick = () => { S.tries = REPORT_TRIES; closeOv(); softFail(); }; };
   const send = () => { const miss = REPORT.filter(q => !S.rep[q.k]); if (miss.length || S.rep.proof.length < 3) { SFX.buzz(); return toast('Fill every blank and pick 3 pieces of evidence first.'); }
     const okProof = S.rep.proof.filter(p => PROOF_OK.includes(p)).length >= 2; const right = REPORT.filter(q => S.rep[q.k] === q.a).length + (okProof ? 1 : 0);
     if (right === REPORT_PARTS) { S.solved = true; SFX.ding(); closeOv(); return reveal(); }
     S.tries++; S.hints++; SFX.buzz(); const first = REPORT.find(q => S.rep[q.k] !== q.a); const push = first ? first.push : (REPORTC.fallbackPush || 'Your evidence does not prove it.');
-    draw(); $('#rres').innerHTML = `<div class="res bad"><b>${right} of ${REPORT_PARTS} parts are right.</b> ${esc(REPORTC.rejected || '')}<br><b>${esc(DET)}:</b> “${esc(push)}”${S.tries >= 3 ? '<br><br>That was your last attempt.' : '<br>💡 That line is your hint. The case stays open.'}</div>${S.tries >= 3 ? `<button class="btn red" id="sf">${esc(REPORTC.closeCase || 'Close the case →')}</button>` : ''}`;
-    ortiz(first ? 'push_' + first.k : 'push_proof'); const sf = $('#sf'); if (sf) sf.onclick = () => { closeOv(); softFail(); }; };
+    const last = S.tries >= REPORT_TRIES, wrongParts = REPORT.filter(q => S.rep[q.k] !== q.a).map(q => q.l).concat(okProof ? [] : [REPORTC.proofLabel || 'The evidence']);
+    const verdict = HELP.reportFeedback === 'which' ? `<b>Not yet. Look again at:</b> ${wrongParts.map(esc).join(' · ')}` : HELP.reportFeedback === 'pass' ? `<b>Not accepted.</b>` : `<b>${right} of ${REPORT_PARTS} parts are right.</b>`;
+    draw(); $('#rres').innerHTML = `<div class="res bad">${verdict} ${esc(REPORTC.rejected || '')}${HELP.reportFeedback === 'pass' ? '' : `<br><b>${esc(DET)}:</b> “${esc(push)}”`}${last ? '<br><br>That was your last attempt.' : HELP.reportFeedback === 'pass' ? '<br>The case stays open.' : '<br>💡 That line is your hint. The case stays open.'}</div>${last ? `<button class="btn red" id="sf">${esc(REPORTC.closeCase || 'Close the case →')}</button>` : ''}`;
+    if (HELP.reportFeedback !== 'pass') ortiz(first ? 'push_' + first.k : 'push_proof'); const sf = $('#sf'); if (sf) sf.onclick = () => { closeOv(); softFail(); }; };
   const o = ov(`<div class="report"></div>`); draw(); }
 function scene(html, lite) { const s = $('#scene'); s.className = lite ? 'lite' : ''; s.innerHTML = `<div class="sc">${html}</div>`; s.hidden = false; return s; }
 const unscene = () => { $('#scene').hidden = true; $('#scene').innerHTML = ''; hush(); };
@@ -736,7 +768,7 @@ function rankCard() { const K = COPY.rank || {};
   const shelf = (K.shelf || []).map((s, i) => `<div${i === 0 ? ' class="f"' : ''}>${esc(s[0])}<br>${esc(s[1])}</div>`).join('');
   scene(`<div class="kick">${esc(K.kicker || 'Case record · filed')}</div><div class="rank"><div><h1>${esc(CASE.title.replace(/\n/g, ' '))}</h1><p class="lead">${esc(S.assisted ? (K.assisted || '') : (K.solved || ''))}</p>
     <div class="shelf">${shelf}</div></div>
-    <div><div class="stat"><span>Rank</span><b>${esc(rank)}</b></div><div class="stat"><span>Time since you opened the case</span><b>${mins} min</b></div><div class="stat"><span>Wrong answers / reports</span><b>${S.obj1wrong} / ${S.tries}</b></div><div class="stat"><span>Breakthroughs</span><b>${S.real ? 1 : 0} of ${K.breakthroughTotal || 1}</b></div><div class="stat"><span>Evidence taken out</span><b>${got} of ${total}</b></div>
+    <div><div class="stat"><span>Rank</span><b>${esc(rank)}</b></div><div class="stat"><span>Time since you opened the case</span><b>${mins} min</b></div><div class="stat"><span>Wrong answers / reports</span><b>${S.obj1wrong} / ${S.tries}</b></div><div class="stat"><span>Objectives solved</span><b>${[S.obj1, S.real, S.solved].filter(Boolean).length} of 3</b></div><div class="stat"><span>Help level</span><b>${esc(S.helped ? LEVELS.beginner.label : LEVELS[(S.level || CASE_LEVEL)].label)}</b></div><div class="stat"><span>Evidence taken out</span><b>${got} of ${total}</b></div>
     <div class="row" style="margin-top:20px"><button class="btn gold" id="bk">Back to my desk</button><button class="btn" id="again" style="background:#3A3632">↺ Play the journey again</button></div></div></div>`);
   $('#bk').onclick = () => { unscene(); toast(mealFor(amb()) === 'takeout' ? '🥡 A clean desk. The takeout\'s still warm.' : '☕ A clean desk. Coffee\'s still hot.'); }; $('#again').onclick = () => { unscene(); clearSave(); jump('intro'); }; }
 // ---------------- next step / side ----------------
@@ -753,13 +785,13 @@ function nextStep() { return PACK.steps(CASE_API); }
 function renderSide() { const ns = nextStep(); const a = amb(), ph = AMB[a];
   const st = S.filed ? 'Filed' : S.solved ? 'Solved' : S.beat === 'intro' ? 'New' : 'Open';
   $('#day').innerHTML = `<span class="ic">${ph[0]}</span>Case ${PACK.number || ''} · ${st}<small title="Desk ambience follows your real clock">${ph[1]} · ${new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}${AMB_PREVIEW ? ' (preview)' : ''}</small>`;
-  $('#next').innerHTML = `<span class="k">${esc(DET)}</span><h3>${esc(ns.t)}</h3><p>${esc(ns.p)}</p>${ns.go ? `<button class="btn" id="nsb">${esc(ns.btn || 'Go')}</button>` : ''}`; const nb = $('#nsb'); if (nb) nb.onclick = ns.go; renderWhisper(ns);
+  $('#next').innerHTML = `<span class="k">${esc(DET)}</span><h3>${esc(ns.t)}</h3><p>${esc(ns.p)}</p>${ns.go && HELP.nextButton ? `<button class="btn" id="nsb">${esc(ns.btn || 'Go')}</button>` : ''}`; const nb = $('#nsb'); if (nb) nb.onclick = ns.go; renderWhisper(ns);
   const tot = Object.values(SRC).reduce((n, a) => n + a.length, 0), got = Object.keys(S.pulled).length;
-  const ob = [S.obj1, S.real, S.solved]; const E = {A: '#B83A2E', B: '#2E5C9A', C: '#2F7A4A'};
-  $('#prog').innerHTML = `<h5>Case progress</h5><div class="r">Objectives <span class="envs" style="flex:1;margin-left:8px">${ob.map((o, i) => `<span style="background:${o ? 'var(--accent)' : '#9A9187'};opacity:${o ? 1 : .35}">${o ? '✓' : i + 1}</span>`).join('')}</span></div>
-    <div class="r">Envelopes <span class="envs" style="flex:1;margin-left:8px">${'ABC'.split('').map(L => `<span class="${S.env[L]}" style="background:${E[L]}">${L}${S.env[L] === 'sealed' || S.env[L] === 'hidden' ? ' 🔒' : ''}</span>`).join('')}</span></div>
-    <div class="r">Evidence out <span class="bar"><i style="width:${got / tot * 100}%"></i></span><b>${got}/${tot}</b></div>
-    <div class="r">Breakthroughs <b>${S.real ? '★' : '☆'}☆☆</b></div>${S.beat === 'accuse' || S.tries ? `<div class="r">Report attempts left <b>${3 - S.tries}</b></div>` : ''}`;
+  // Objectives are the one progress unit: a breakthrough is the moment an objective is solved, not a second counter.
+  const ob = [S.obj1, S.real, S.solved];
+  $('#prog').innerHTML = `<h5>Case progress</h5><div class="r">Objectives <span class="envs">${ob.map((o, i) => `<span class="ob ${o ? 'done' : ''}">${o ? '✓' : i + 1}</span>`).join('')}</span></div>
+    <div class="r">Envelopes <span class="envs">${'ABC'.split('').map(L => `<span class="env-${L} ${S.env[L]}">${L}${S.env[L] === 'sealed' || S.env[L] === 'hidden' ? ' 🔒' : ''}</span>`).join('')}</span></div>
+    ${HELP.evidenceCount ? `<div class="r">Evidence out <span class="bar"><i style="width:${got / tot * 100}%"></i></span><b>${got}/${tot}</b></div>` : ''}${S.beat === 'accuse' || S.tries ? `<div class="r">Report attempts left <b>${REPORT_TRIES - S.tries}</b></div>` : ''}`;
   $('#notelist').innerHTML = S.notes.map(n => `<li class="${n.cls}${n.isnew ? ' new' : ''}">${esc(n.t)}</li>`).join('') || '<li style="opacity:.5">(nothing yet)</li>'; S.notes.forEach(n => n.isnew = false);
   const bi = BEATS.findIndex(x => x[0] === S.beat);
   // Players see progress here, not a menu: only dev mode can click a beat and jump to it.
@@ -767,17 +799,18 @@ function renderSide() { const ns = nextStep(); const a = amb(), ph = AMB[a];
   $('#rail').innerHTML = BEATS.map(([k, l], i) => `${i ? '<b class="sep"></b>' : ''}<${tag} data-j="${k}" class="bt ${i < bi ? 'done' : i === bi ? 'cur' : ''}"${i === bi ? ' aria-current="step"' : ''}><i>${i < bi ? '✓' : i + 1}</i>${l}</${tag}>`).join('');
   if (DEV) $$('#rail button').forEach(b => b.onclick = () => jump(b.dataset.j));
   const n = Object.keys(S.board).length, bb = $('#bbadge'); bb.hidden = !n; bb.textContent = n;
-  $$('#dz [data-theme]').forEach(b => b.classList.toggle('on', b.dataset.theme === S.theme)); $$('#todrow button').forEach(b => b.classList.toggle('on', (b.dataset.p || null) === AMB_PREVIEW)); $('#voiceb').textContent = S.voice ? '🔊 On' : '🔇 Off'; save(); }
-function renderWhisper(ns) { const el = $('#whisper'); if (!el) return; const show = !!(ns && ns.w && S.beat !== 'intro' && S.beat !== 'handoff'); el.hidden = !show; if (!show) return;
+  $$('#dz [data-theme]').forEach(b => b.classList.toggle('on', b.dataset.theme === S.theme)); $$('#todrow button').forEach(b => b.classList.toggle('on', (b.dataset.p || null) === AMB_PREVIEW)); $('#voiceb').textContent = S.voice ? '🔊 On' : '🔇 Off'; $$('#helprow button').forEach(b => b.classList.toggle('on', b.dataset.lv === (S.level || CASE_LEVEL))); save(); }
+function renderWhisper(ns) { const el = $('#whisper'); if (!el) return; const show = !!(HELP.whisper && ns && ns.w && S.beat !== 'intro' && S.beat !== 'handoff'); el.hidden = !show; if (!show) return;
   el.innerHTML = `<span class="who">${esc(DET)}</span><span class="line">${esc(ns.w)}</span>`; el.onclick = () => { if (ns.go) ns.go(); }; }
-function render() { document.body.classList.remove('th-b', 'th-d'); document.body.classList.add('th-' + S.theme); document.body.classList.toggle('preview', !!PREVIEW); syncMeal(); renderDesk(); if (S.view === 'board') renderBoard(); renderSide(); fitAll(); }
+function render() { syncLevel(); document.body.classList.remove('th-b', 'th-d'); document.body.classList.add('th-' + S.theme); document.body.classList.toggle('preview', !!PREVIEW); syncMeal(); renderDesk(); if (S.view === 'board') renderBoard(); renderSide(); fitAll(); }
 function setView(v) { S.view = v; $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); $('#deskV').classList.toggle('on', v === 'desk'); $('#boardV').classList.toggle('on', v === 'board'); if (v === 'board') renderBoard(); if (v !== 'board') { S.connect = false; S.sel = null; } fitAll(); }
 $$('#seg button').forEach(b => b.onclick = () => setView(b.dataset.v));
 $('#connectb').onclick = () => { S.connect = !S.connect; S.sel = null; S.strSel = null; renderBoard(); };
 $('#cutb').onclick = () => cutThread();
 $('#board').onclick = e => { if (window.__jpPan) return; if (e.target.closest('.pin') || e.target.closest('.thread')) return; if (!S.strSel) return; S.strSel = null; renderBoard(); };
 paintVol();
-$('#hintb').onclick = () => { S.hints++; const ns = nextStep(); toast(esc(DET) + ': ' + (ns.w || ns.p), 4200); };
+$('#hintb').onclick = () => { if (HELP.hintLimit && S.hints >= HELP.hintLimit) return toast(`${esc(DET)}: You've had your ${HELP.hintLimit} hints on this one. Trust your board.`, 3600);
+  S.hints++; const ns = nextStep(); const left = HELP.hintLimit ? ` (${HELP.hintLimit - S.hints} left)` : ''; toast(esc(DET) + ': ' + (ns.w || ns.p) + left, 4200); };
 $('#dzb').onclick = () => { const dz = $('#dz'); dz.hidden = !dz.hidden; $('#dzb').setAttribute('aria-expanded', String(!dz.hidden)); };
 $$('#dz [data-theme]').forEach(b => b.onclick = () => { S.theme = b.dataset.theme; localStorage.setItem('jp-theme', S.theme); prevSet = new Set(deskSet()); render(); });
 $('#todrow').innerHTML = `<button data-p="">🕰 My clock</button>` + Object.keys(AMB).map(p => `<button data-p="${p}">${AMB[p][0]} ${AMB[p][1]}</button>`).join(''); $$('#todrow button').forEach(b => b.onclick = () => setAmb(b.dataset.p));
@@ -785,6 +818,8 @@ $('#newb').onclick = () => {
   if (PREVIEW) { if (!confirm('Restart the preview from the intro? Your real saved game on this device is left alone.')) return; $('#dz').hidden = true; previewGoto(0, {user: true}); return; }
   const onAccount = window.CaseDesk && window.CaseDesk.signedIn;
   if (!confirm(onAccount ? 'Start the case over? Your saved progress on this device and on your Case Desk will be erased.' : 'Start the case over? Your saved progress on this device will be erased.')) return; $('#dz').hidden = true; clearSave(); jump('intro'); };
+$('#helprow').innerHTML = ['beginner', 'standard', 'advanced'].map(lv => `<button data-lv="${lv}">${esc(LEVELS[lv].label)}</button>`).join('');
+$$('#helprow button').forEach(b => b.onclick = () => setLevel(b.dataset.lv));
 $('#voiceb').onclick = () => { S.voice = !S.voice; hush(); renderSide(); };
 $('#jumprow').innerHTML = BEATS.map(([k, l]) => `<button data-j="${k}">${l}</button>`).join(''); $$('#jumprow button').forEach(b => b.onclick = () => { $('#dz').hidden = true; jump(b.dataset.j); });
 // ---------------- scenes: intro, handoff, day card ----------------
@@ -1129,7 +1164,7 @@ function initPreview() {
   const mapped = hashStage[location.hash.slice(1)];
   previewGoto(mapped ? idIndex(mapped) : 0);
 }
-window.__jp = {setDev, dev: () => DEV, jump, S: () => S, openFolder, openPlayer, openEnv, openObj, openReport, aha, pinTap, fileStep, setAmb, setView, deskClick, save, loadSave, clearSave, resume, packId: PACK.id, amb, clockAmb, AU: () => AU, preview: () => PREVIEW, previewGoto: (i) => previewGoto(typeof i === 'number' ? i : idIndex(i), {user: true}), previewPlay: () => { if (!previewPlaying) previewToggle(); }, previewPause: () => previewPause(), previewStop: () => previewStop(), previewState: () => ({index: previewIndex, id: STAGES[previewIndex] && STAGES[previewIndex].id, playing: previewPlaying, n: STAGES.length})};
+window.__jp = {setDev, dev: () => DEV, setLevel, help: () => Object.assign({level: LEVEL_NOW}, HELP), jump, S: () => S, openFolder, openPlayer, openEnv, openObj, openReport, aha, pinTap, fileStep, setAmb, setView, deskClick, save, loadSave, clearSave, resume, packId: PACK.id, amb, clockAmb, AU: () => AU, preview: () => PREVIEW, previewGoto: (i) => previewGoto(typeof i === 'number' ? i : idIndex(i), {user: true}), previewPlay: () => { if (!previewPlaying) previewToggle(); }, previewPause: () => previewPause(), previewStop: () => previewStop(), previewState: () => ({index: previewIndex, id: STAGES[previewIndex] && STAGES[previewIndex].id, playing: previewPlaying, n: STAGES.length})};
 // ---------------- resume ----------------
 function resume(o, opts) {
   const scene = $('#scene');

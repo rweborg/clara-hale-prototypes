@@ -273,6 +273,7 @@ return {
   number: '${number}',
   case: CASE, beats: BEATS, evidence: IT, sources: SRC, review: REVIEW, faces: FACE,
   cards: CARDS, board: BP, suspects: SUS, report: REPORT, recordings: RECS,
+  difficulty: {preset: 'standard', overrides: {}},
   proof: PROOF_OK, solution: SOL, objective1: OBJ1, transcripts: TR, audio: AU,
   art: ART, previewNotes: PV_NOTES, previewMid: MID, titles: TITLES, copy: COPY,
   docs: DOCS, folders: FOLDERS, notes: NOTES, onPull: ONPULL,

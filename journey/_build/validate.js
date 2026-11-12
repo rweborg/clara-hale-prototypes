@@ -60,6 +60,12 @@ function validate(id, pack) {
     if (hit >= 0) fail(`case.js line ${hit + 1} still says "${word}": finish the copy before it ships`);
   }
 
+  const DIFF = pack.difficulty || {};
+  if (!pack.difficulty) soft('difficulty is unset: the case plays at the Standard help level');
+  else if (!['beginner', 'standard', 'advanced'].includes(DIFF.preset)) fail(`difficulty.preset is "${DIFF.preset}": use beginner, standard, or advanced`);
+  const KNOBS = ['whisper', 'nextButton', 'idleNudge', 'hintLimit', 'objHints', 'reviewNext', 'boardPulse', 'reportFeedback', 'reportTries', 'evidenceCount'];
+  for (const k of Object.keys(DIFF.overrides || {})) if (!KNOBS.includes(k)) fail(`difficulty.overrides.${k} is not a help knob (${KNOBS.join(', ')})`);
+
   if (pack.id !== id) fail(`pack.id is "${pack.id}" but it lives in cases/${id}`);
   if (typeof pack.steps !== 'function') fail('steps(G) is missing — a case must supply its own hints');
 

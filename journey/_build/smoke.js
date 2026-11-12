@@ -406,6 +406,30 @@ async function main() {
       return bad;
     });
 
+    await step('help level: Standard is clean, More help adds the nudges', async () => {
+      await viewport(c, 1440, 900, false);
+      await freshLoad(c);
+      await c.evaluate(`window.__jp.jump('build')`); await sleep(400);
+      const std = await c.evaluate(`({ level: window.__jp.help().level, whisper: !document.querySelector('#whisper').hidden, tries: window.__jp.help().reportTries,
+        btns: document.querySelectorAll('#helprow button').length })`);
+      await c.evaluate(`window.__jp.setLevel('beginner')`); await sleep(300);
+      const beg = await c.evaluate(`({ level: window.__jp.help().level, whisper: !document.querySelector('#whisper').hidden, tries: window.__jp.help().reportTries, helped: window.__jp.S().helped })`);
+      await c.evaluate(`window.__jp.openFolder('folder')`); await sleep(300);
+      await c.evaluate(`document.querySelector('#ov [data-to]') && document.querySelector('#ov [data-to]').click()`); await sleep(300);
+      await c.evaluate(`window.__jp.setLevel('advanced')`); await sleep(300);
+      const after = await c.evaluate(`window.__jp.help().level`);
+      const bad = [];
+      if (std.level !== 'standard') bad.push(`Clara should play at standard, got ${std.level}`);
+      if (std.whisper) bad.push('Standard shows the desk whisper (one guidance voice only)');
+      if (std.tries !== 3) bad.push(`Standard report attempts should be 3, got ${std.tries}`);
+      if (std.btns !== 3) bad.push(`Settings shows ${std.btns} help buttons, expected 3`);
+      if (beg.level !== 'beginner' || !beg.whisper) bad.push('More help did not turn on the desk whisper');
+      if (beg.tries !== 5) bad.push(`More help report attempts should be 5, got ${beg.tries}`);
+      if (!beg.helped) bad.push('turning on More help is not recorded for the case record');
+      if (after !== 'beginner') bad.push('help could be turned down mid-case');
+      return bad;
+    });
+
     await step('mobile: 390x844 does not overflow', async () => {
       await viewport(c, 390, 844, true);
       await freshLoad(c);
