@@ -557,7 +557,7 @@ const PEEK_BIG = {news: 'news_big', bag: 'ledger_big', report: 'report_big'};
 function thumb(id) { const it = IT[id], t = it.th; const inset = it.face && A[it.face] && it.face !== t ? `<img class="inset" src="${A[it.face]}" alt="">` : ''; const face = FACE_TH.has(t) ? ' face' : ''; const doc = !face && A[t] ? ' doc' : ''; const fpos = focusOf(t); return A[t] ? `<div class="th${face}${doc}" style="background-image:url(${A[t]})${fpos && face ? `;background-position:${fpos}` : ''}">${inset}</div>` : `<div class="th">${inset || t}</div>`; }
 function closePeek() { const el = $('#peek'); if (!el) return; el.hidden = true; el.style.display = 'none'; el.removeAttribute('data-open'); el.innerHTML = ''; el.onclick = el.onpointerdown = null; }
 function showPeek(el) { document.body.appendChild(el); el.hidden = false; el.style.display = 'flex'; el.style.zIndex = '220'; el.dataset.open = '1'; el._opened = Date.now(); }
-function peekItem(id, onTake) { const it = IT[id]; if (!it) return; SFX.paper(); const key = it.big && A[it.big] ? it.big : PEEK_BIG[id] && A[PEEK_BIG[id]] ? PEEK_BIG[id] : it.th;   // a case names its close-up with evidence.big const src = A[key]; const portrait = /^p_/.test(String(key || ''));
+function peekItem(id, onTake) { const it = IT[id]; if (!it) return; SFX.paper(); const key = it.big && A[it.big] ? it.big : PEEK_BIG[id] && A[PEEK_BIG[id]] ? PEEK_BIG[id] : it.th;   /* a case names its close-up with evidence.big */ const src = A[key]; const portrait = /^p_/.test(String(key || ''));
   const lines = it.read ? `<div class="read">${it.read.map(l => `<p>${esc(l)}</p>`).join('')}</div>` : '';
   let shot = '';
   if (!src && CARDS[id]) shot = `<div class="peekcard"><b>${esc(CARDS[id][0])}</b><p>${esc(CARDS[id][1])}</p></div>`;

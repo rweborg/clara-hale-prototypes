@@ -439,6 +439,24 @@ async function main() {
       return bad;
     });
 
+    await step('folder: tapping evidence opens its close-up', async () => {
+      await viewport(c, 1440, 900, false);
+      await freshLoad(c);
+      await c.evaluate(`window.__jp.jump('build')`); await sleep(300);
+      await c.evaluate(`window.__jp.openFolder('folder')`); await sleep(500);
+      const bad = [];
+      for (const n of [1, 2, 5]) {
+        await c.evaluate(`(() => { const b = document.querySelectorAll('#ov .it .look')[${n - 1}]; if (b) b.click(); })()`); await sleep(500);
+        const r = await c.evaluate(`(() => { const p = document.querySelector('#peek'); if (!p) return {open: false};
+          const img = p.querySelector('.peekscroll img'); return { open: !p.hidden && p.dataset.open === '1', title: (p.querySelector('h2') || {}).textContent || '',
+            img: !!(img && img.getAttribute('src')), text: (p.querySelector('.peekscroll') || {}).textContent || '' }; })()`);
+        if (!r.open) bad.push(`card ${n}: the close-up did not open`);
+        else if (!r.img && r.text.trim().length < 20) bad.push(`card ${n} (${r.title}): the close-up shows no image or text`);
+        await c.evaluate(`document.querySelector('#peekx') && document.querySelector('#peekx').click()`); await sleep(300);
+      }
+      return bad;
+    });
+
     await step('desk: labels hide until hover, and the UI has no emoji', async () => {
       await viewport(c, 1440, 900, false);
       await freshLoad(c, withParam(BASE_URL, 'dev', '0'));
