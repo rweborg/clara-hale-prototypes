@@ -171,7 +171,7 @@ const OPENING = {
   cold: {kicker: 'Cold open', cta: 'Continue', skip: 'Skip intro',
          lines: ['TODO where and when this is.', 'TODO what happened.']},
   howTo: {kicker: 'How it works', title: 'TODO the one-line pitch',
-          steps: [['🎧', 'Listen', 'TODO'], ['🔍', 'Look', 'TODO'], ['📌', 'Pin & connect', 'TODO']],
+          steps: [['headphones', 'Listen', 'TODO'], ['search', 'Look', 'TODO'], ['pin', 'Pin & connect', 'TODO']],
           note: 'TODO the quiet hint about the side column.', cta: 'Meet the detective →'},
   handoff: {speaker: 'TODO Detective', role: 'TODO department', portrait: 'p_detective',
             voiceNote: '', next: 'Next ▸', skip: 'Skip', start: 'Start investigating →',
@@ -197,11 +197,11 @@ const COPY = {
     wrong: 'TODO what the detective says when the player is wrong.',
     hints: ['TODO hint one.', 'TODO hint two.', 'TODO hint three.'],
     solvedTitle: '✓ Objective 1 solved.', solvedLine: 'TODO what the detective confirms.',
-    solvedNote: 'TODO what just unlocked.', solvedCta: '✉️ Open Envelope A →',
+    solvedNote: 'TODO what just unlocked.', solvedCta: 'Open Envelope A →',
     note: 'TODO the note that goes into the notes in ink.'
   },
   aha: {
-    kicker: '★ BREAKTHROUGH · 1 OF 1', title: 'TODO the breakthrough',
+    kicker: 'Breakthrough', title: 'TODO the breakthrough',
     body: 'TODO why the two things you connected prove it.',
     line: 'TODO what the detective says out loud.',
     footer: 'TODO the reward line.', tag: 'TODO the short pin tag',
@@ -213,7 +213,7 @@ const COPY = {
   },
   rank: {
     kicker: 'Case record · filed', solved: 'Solved. The folder is stamped and filed.',
-    assisted: 'Closed with help.', shelf: [['📁 Case 1', 'TODO ✓'], ['Case 2', 'coming soon']]
+    assisted: 'Closed with help.', shelf: [['Case 1', 'TODO ✓'], ['Case 2', 'coming soon']]
   }
 };
 

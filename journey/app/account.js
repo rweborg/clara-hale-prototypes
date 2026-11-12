@@ -110,7 +110,7 @@
   btn.id = 'acctb';
   btn.setAttribute('aria-haspopup', 'dialog');
   btn.setAttribute('aria-expanded', 'false');
-  btn.innerHTML = '<span class="glyph" aria-hidden="true">🗂</span><span class="lbl">Desk</span>';
+  btn.innerHTML = '<span class="glyph" aria-hidden="true">' + (window.icon ? window.icon('circle-user-round') : '') + '</span><span class="lbl">Desk</span>';
   const gear = document.getElementById('dzb');
   if (gear && gear.parentNode) gear.parentNode.insertBefore(btn, gear);
   else document.body.appendChild(btn);

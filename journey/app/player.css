@@ -35,20 +35,20 @@ body.th-d{--bg:var(--ds-wood);--bar:var(--ds-wood-bar,rgba(255,250,242,.94));--b
 #tod,#glow{position:absolute;inset:0;pointer-events:none;transition:background 1.4s,opacity 1.4s}
 #tod{mix-blend-mode:multiply}#glow{mix-blend-mode:screen}
 .hot{position:absolute;border:none;background:transparent;border-radius:8px;outline:2px solid transparent;transition:outline-color .15s,box-shadow .15s;pointer-events:auto;cursor:grab;touch-action:none}.hot .tag{pointer-events:auto;cursor:grab;touch-action:none}#spr>img{cursor:grab;touch-action:none}#spr>img:active,.hot:active{cursor:grabbing}
-.hot:hover,.hot:focus-visible{outline-color:rgba(255,200,60,.95);box-shadow:0 0 0 6px rgba(255,200,60,.25)}
-.hot.pulse{animation:pulse 1.6s ease-in-out infinite}
+.hot:focus-visible{outline:2px solid var(--ds-gold);outline-offset:4px;border-radius:12px}
+.hot.pulse{animation:none}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 12px rgba(242,193,78,.55);outline-color:rgba(242,193,78,.95)}}
-.tag{position:absolute;left:50%;top:calc(100% + 6px);transform:translateX(-50%);transform-origin:center top;white-space:nowrap;background:rgba(17,17,17,.82);color:var(--ds-white);font:700 var(--ds-fs-body) var(--ds-font-ui);padding:7px 13px;border-radius:999px;display:flex;gap:7px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
-.tag em{font-style:normal;font-weight:400;opacity:.85;font-size:var(--ds-fs-small);border-left:1px solid rgba(255,255,255,.35);padding-left:7px}
-.tag.go{background:var(--ds-gold);color:var(--ds-ink)}.tag.sm{font-size:var(--ds-fs-small);padding:5px 10px}
-.hot.amb .tag{opacity:0;transition:opacity .2s}.hot.amb:hover .tag,.hot.amb:focus-visible .tag{opacity:1}
+.tag{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);transform-origin:center top;white-space:nowrap}
+
+
+
 .bite{position:absolute;pointer-events:none;border-radius:50%;background:var(--bitebg,var(--ds-scene));}
 #fly img{position:absolute;pointer-events:none;z-index:9;filter:drop-shadow(0 18px 18px rgba(0,0,0,.35))}
 /* side */
 #side{position:fixed;right:0;top:var(--bar-h);bottom:0;width:340px;background:var(--side);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:auto}
 .card{background:var(--card);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:16px}
 .day{display:flex;align-items:center;gap:10px;font:700 var(--ds-fs-meta) var(--ds-font-ui);color:var(--ink);background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.day .ic{font-size:var(--ds-fs-title)}.day small{font-weight:400;color:var(--dim);margin-left:auto}
+.day small{font-weight:400;color:var(--dim);margin-left:auto}
 .next .k{font:700 var(--ds-fs-kicker) var(--ds-font-ui);letter-spacing:.08em;color:var(--ds-copper);text-transform:uppercase}
 .next h3{font:700 var(--ds-fs-title) var(--ds-font-ui);margin:6px 0 6px;line-height:1.2}.next p{font-size:var(--ds-fs-body);line-height:1.45;color:var(--ds-ink-soft)}
 .btn{display:block;width:100%;margin-top:14px;min-height:50px;border:none;border-radius:12px;background:var(--btn);color:var(--ds-white);font:700 var(--ds-fs-ui) var(--ds-font-ui);padding:0 16px}
@@ -268,7 +268,7 @@ body.preview .aha-card{bottom:calc(6% + var(--pvh, 78px))}
 .sheetb{align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;padding:4px 10px 0;border:none;background:transparent;color:inherit;font:700 var(--ds-fs-small)/1.2 var(--ds-font-ui)}
 .sheetb::before{content:"";width:42px;height:4px;border-radius:4px;background:currentColor;opacity:.35;flex:none}
 html.can-pan #desk,html.can-pan #board{cursor:grab}
-@media (hover:none){.hot.amb .tag{opacity:1}}
+@media (hover:none){}
 @media (max-width:900px),(max-height:500px) and (max-width:1100px){
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{--bar-h:52px;display:flex;flex-direction:column;height:100vh;height:100dvh;padding-top:calc(var(--bar-h) + env(safe-area-inset-top));overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
@@ -411,3 +411,76 @@ body:not(.dev) .devonly{display:none!important}
 
 /* Button roles. primary = .btn.gold: the next step, one per screen. secondary = .btn2 (outline). quiet = .skip / text.
    .btn without a role (pine) is for confirming inside a panel, e.g. Put on desk, Send report. */
+
+/* Desk labels: a small paper card that appears on hover, keyboard focus, or press. Never all at once.
+   The next step is marked on the prop itself (a soft warm glow), not with a label, except at More help. */
+.tag{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 8px;border-radius:4px;background:var(--ds-sheet);color:var(--ds-ink);
+  border:1px solid rgba(29,27,24,.14);box-shadow:0 1px 1px rgba(0,0,0,.08),0 8px 20px rgba(20,14,8,.22);
+  font:600 var(--ds-fs-small)/1.2 var(--ds-font-ui);letter-spacing:.01em;pointer-events:none;
+  opacity:0;translate:0 -3px;transition:opacity .14s ease,translate .14s ease}
+.tag .ico{width:15px;height:15px;color:var(--ds-dim);flex:none}
+.tag em{font-style:normal;font-weight:400;color:var(--ds-dim);padding-left:8px;border-left:1px solid var(--ds-line-soft)}
+.tag.go{border-color:var(--ds-gold-deep);box-shadow:inset 3px 0 0 var(--ds-gold),0 1px 1px rgba(0,0,0,.08),0 8px 20px rgba(20,14,8,.22)}
+.tag.go .ico{color:var(--ds-manila-ink)}
+.hot:hover .tag,.hot:focus-visible .tag,.hot.show .tag,.hot.label-on .tag{opacity:1;translate:0 0}
+/* the prop under the pointer lifts a little; the next step glows */
+#spr>img{transition:opacity .5s,filter .18s ease}
+#spr>img.lift{filter:brightness(1.04) drop-shadow(0 10px 14px rgba(20,14,8,.35))}
+#spr>img.next{animation:nextGlow 2.4s ease-in-out infinite}
+#spr>img.next.lift{animation:none;filter:brightness(1.05) drop-shadow(0 0 12px rgba(242,193,78,.75)) drop-shadow(0 10px 14px rgba(20,14,8,.3))}
+@keyframes nextGlow{0%,100%{filter:drop-shadow(0 0 0 rgba(242,193,78,0))}50%{filter:drop-shadow(0 0 14px rgba(242,193,78,.85))}}
+@media (prefers-reduced-motion:reduce){#spr>img.next{animation:none;filter:drop-shadow(0 0 10px rgba(242,193,78,.8))}}
+/* icons: line icons in the text color, sized to the text */
+.ico{width:1.15em;height:1.15em;flex:none;vertical-align:-0.2em}
+button .ico,.btn .ico,.btn2 .ico{margin-right:.45em}
+.tb .ico,.seg .ico{width:18px;height:18px;margin-right:6px;vertical-align:-4px}
+.voltop .tb .ico,[data-volmute] .ico{margin:0}
+.ico.fill{fill:currentColor}
+.ico.big{width:34px;height:34px;opacity:.7}
+.day .ico.phase{width:20px;height:20px;color:var(--ds-copper)}
+.how b .ico{width:28px;height:28px;color:var(--ds-gold)}
+.envs .ico{width:12px;height:12px;margin-left:3px;vertical-align:-1px}
+.hand .ico{width:40px;height:40px;color:var(--ds-white);filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+/* Open folder. Left: the index sheet clipped inside the cover. Right: the evidence itself. */
+.fold .lp{display:flex;flex-direction:column;padding:18px 20px 14px}
+.fold .lp h3{margin:0 0 10px}
+.fold .ixs{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+.fold .ix h4{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 4px;padding-bottom:4px;border-bottom:1.5px solid var(--ds-spine);
+  font:700 var(--ds-fs-kicker) var(--ds-font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--ds-folder-label)}
+.fold .ix h4 small{font:400 var(--ds-fs-small) var(--ds-font-ui);letter-spacing:0;text-transform:none;color:var(--ds-dim)}
+.fold .ix .inv{margin:0;padding:0}
+.fold .ix .inv li{border-bottom:1px dashed rgba(29,27,24,.12);padding:5px 4px;border-radius:3px;align-items:center;gap:8px}
+.fold .ix .inv li:last-child{border-bottom:none}
+.fold .ix .inv li.out{text-decoration:none;opacity:.55}
+.fold .ix .inv li.out:before{content:none}
+.fold .ix .inv li.out .n{background:transparent;color:var(--ds-pine)}
+.fold .ix .inv li.now{font-weight:700;background:rgba(242,193,78,.22)}
+.fold .ix .inv .n{min-width:18px;height:18px}
+.fold .ix .inv .n .ico{width:14px;height:14px;margin:0}
+.fold .ixfoot{margin:auto 0 0;padding-top:12px;font:var(--ds-fs-small) var(--ds-font-ui);color:var(--ds-dim)}
+.fold .rp{padding:14px}
+.fold .items{grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:12px;align-content:start}
+.fold .grp{padding-top:4px}
+.fold .it{border-radius:8px;box-shadow:0 1px 2px rgba(20,14,8,.12),0 4px 12px rgba(20,14,8,.08)}
+.fold .it .look{padding:8px 8px 0}
+.fold .it .th{height:96px;border-radius:5px}
+.fold .it b{font:600 var(--ds-fs-small)/1.25 var(--ds-font-ui)}
+.fold .it .bt{gap:6px;padding:6px 8px 8px}
+.fold .it .bt button{min-height:34px;border-radius:6px;background:transparent;color:var(--ds-pine);border:1px solid rgba(31,94,78,.45);font:600 var(--ds-fs-small) var(--ds-font-ui);display:flex;align-items:center;justify-content:center}
+.fold .it .bt button:hover{background:var(--ds-pine);color:var(--ds-white);border-color:var(--ds-pine)}
+.fold .it .bt button.alt{background:transparent;color:var(--ds-ink-soft);border-color:var(--ds-line)}
+.fold .it .bt button .ico{width:15px;height:15px;margin-right:5px}
+.fold .it.up{outline:2px solid var(--ds-gold);outline-offset:2px;background:var(--ds-white)}
+/* thin, quiet scrollbars inside the folder and panels */
+.fold .lp,.fold .rp,#ov .box,.peekscroll{scrollbar-width:thin;scrollbar-color:rgba(90,60,30,.35) transparent}
+.fold .lp::-webkit-scrollbar,.fold .rp::-webkit-scrollbar,#ov .box::-webkit-scrollbar,.peekscroll::-webkit-scrollbar{width:8px;height:8px}
+.fold .lp::-webkit-scrollbar-thumb,.fold .rp::-webkit-scrollbar-thumb,#ov .box::-webkit-scrollbar-thumb,.peekscroll::-webkit-scrollbar-thumb{background:rgba(90,60,30,.35);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+.fold .lp::-webkit-scrollbar-track,.fold .rp::-webkit-scrollbar-track,#ov .box::-webkit-scrollbar-track,.peekscroll::-webkit-scrollbar-track{background:transparent}
+.prog h5 .ico,.notes h5 .ico,.panel h2 .ico{margin-right:6px;vertical-align:-3px}
+.aha-card .k .ico{width:14px;height:14px;margin-right:6px;vertical-align:-2px}
+.notes li .ico.fill{width:13px;height:13px;margin-right:4px;color:var(--ds-gold-deep);vertical-align:-1px}
+/* Board name tags: a strip of label tape under each pin, same family as the desk labels */
+.pin .nm{background:var(--ds-sheet);color:var(--ds-ink);font:600 var(--ds-fs-small) var(--ds-font-ui);padding:4px 9px;border-radius:2px;
+  border:1px solid rgba(29,27,24,.16);box-shadow:0 1px 1px rgba(0,0,0,.12),0 3px 8px rgba(20,14,8,.2)}
+.pin .nm.x{background:var(--ds-sheet);color:var(--ds-alarm-deep);border-color:rgba(179,38,30,.45);box-shadow:inset 3px 0 0 var(--ds-alarm),0 1px 1px rgba(0,0,0,.12),0 3px 8px rgba(20,14,8,.2);padding-left:11px}
+.pin .tag2{border-radius:2px;box-shadow:0 1px 1px rgba(0,0,0,.15),0 3px 6px rgba(20,14,8,.25)}

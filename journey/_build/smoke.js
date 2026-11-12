@@ -421,6 +421,42 @@ async function main() {
       return [...new Set(bad)];
     });
 
+    await step('folder: both pages are real pages, no stray text', async () => {
+      await viewport(c, 1536, 864, false);
+      await freshLoad(c);
+      await c.evaluate(`window.__jp.jump('build')`); await sleep(300);
+      await c.evaluate(`window.__jp.openFolder('folder')`); await sleep(500);
+      const r = await c.evaluate(`(() => { const f = document.querySelector('#ov .fold'); if (!f) return null;
+        const lp = f.querySelector('.lp').getBoundingClientRect().width, rp = f.querySelector('.rp').getBoundingClientRect().width, w = f.getBoundingClientRect().width;
+        const stray = [...f.childNodes].filter(n => n.nodeType === 3 && n.textContent.trim()).map(n => n.textContent.trim().slice(0, 40));
+        return { lp: lp / w, rp: rp / w, stray, index: f.querySelectorAll('.lp .inv li').length, cards: f.querySelectorAll('.rp .it').length }; })()`);
+      const bad = [];
+      if (!r) return ['the folder did not open'];
+      if (r.stray.length) bad.push(`stray text inside the folder: ${r.stray.join(' | ')}`);
+      if (r.rp < 0.4 || r.lp < 0.3) bad.push(`folder pages are lopsided: left ${(r.lp * 100) | 0}%, right ${(r.rp * 100) | 0}%`);
+      if (!r.index) bad.push('the index sheet lists nothing');
+      if (!r.cards) bad.push('the evidence page shows no cards');
+      return bad;
+    });
+
+    await step('desk: labels hide until hover, and the UI has no emoji', async () => {
+      await viewport(c, 1440, 900, false);
+      await freshLoad(c, withParam(BASE_URL, 'dev', '0'));
+      await c.evaluate(`window.__jp.jump('envA')`); await sleep(600);
+      const r = await c.evaluate(`(() => {
+        const shown = [...document.querySelectorAll('.hot .tag')].filter(t => parseFloat(getComputedStyle(t).opacity) > 0.5).length;
+        const emo = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
+        const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); const hits = [];
+        while (walk.nextNode()) { const t = walk.currentNode.textContent.replace(/[\u2713\u2714]/g, ''); const el = walk.currentNode.parentElement;
+          if (emo.test(t) && el && el.offsetParent !== null && !el.closest('#pv')) hits.push(t.trim().slice(0, 30)); }
+        return { tags: document.querySelectorAll('.hot .tag').length, shown, hits: hits.slice(0, 5) }; })()`);
+      const bad = [];
+      if (!r.tags) bad.push('the desk has no labels at all');
+      if (r.shown) bad.push(`${r.shown} desk labels are visible without hovering`);
+      if (r.hits.length) bad.push(`emoji in the UI: ${r.hits.join(' | ')}`);
+      return bad;
+    });
+
     await step('help level: Standard is clean, More help adds the nudges', async () => {
       await viewport(c, 1440, 900, false);
       await freshLoad(c);

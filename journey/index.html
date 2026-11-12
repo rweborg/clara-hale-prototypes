@@ -3,18 +3,18 @@
 <header class="top" id="top">
   <div class="ttl"><b id="title">The Vanishing of Clara Hale</b><span id="subtitle">The Case Desk · Case # 25-0412</span></div>
   <nav class="rail" id="rail" aria-label="Journey beats"></nav>
-  <nav class="seg" id="seg" aria-label="View"><button data-v="desk" class="on"><span class="glyph" aria-hidden="true">🗂</span><span class="lbl">Desk</span></button><button data-v="board"><span class="glyph" aria-hidden="true">📌</span><span class="lbl">Board</span> <i id="bbadge" hidden>0</i></button></nav>
-  <div class="voltop" title="Volume for interviews, voicemail, and voices"><button type="button" class="tb" data-volmute aria-label="Mute" aria-pressed="false">🔊</button><input type="range" data-vol min="0" max="100" step="1" value="100" aria-label="Volume"></div>
-  <button class="tb" id="caseb" type="button" aria-expanded="false" aria-controls="side"><span class="glyph" aria-hidden="true">📋</span><span class="lbl">Case</span></button>
-  <button class="tb" id="hintb"><span class="glyph" aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
-  <button class="tb" id="dzb" aria-haspopup="true" aria-expanded="false" aria-controls="dz"><span class="glyph" aria-hidden="true">⚙</span><span class="lbl">Settings</span></button>
+  <nav class="seg" id="seg" aria-label="View"><button data-v="desk" class="on"><span class="glyph" aria-hidden="true" data-icon="lamp-desk"></span><span class="lbl">Desk</span></button><button data-v="board"><span class="glyph" aria-hidden="true" data-icon="pin"></span><span class="lbl">Board</span> <i id="bbadge" hidden>0</i></button></nav>
+  <div class="voltop" title="Volume for interviews, voicemail, and voices"><button type="button" class="tb" data-volmute aria-label="Mute" aria-pressed="false" data-icon="volume-2"></button><input type="range" data-vol min="0" max="100" step="1" value="100" aria-label="Volume"></div>
+  <button class="tb" id="caseb" type="button" aria-expanded="false" aria-controls="side"><span class="glyph" aria-hidden="true" data-icon="clipboard-list"></span><span class="lbl">Case</span></button>
+  <button class="tb" id="hintb"><span class="glyph" aria-hidden="true" data-icon="lightbulb"></span><span class="lbl">Hint</span></button>
+  <button class="tb" id="dzb" aria-haspopup="true" aria-expanded="false" aria-controls="dz"><span class="glyph" aria-hidden="true" data-icon="settings"></span><span class="lbl">Settings</span></button>
 </header>
 <div id="dz" class="dz" hidden>
   <h4>Settings</h4>
-  <label>Desk style</label><div class="row"><button data-theme="b">☀️ Clean Daylight</button><button data-theme="d">🍳 Kitchen Table</button></div>
+  <label>Desk style</label><div class="row"><button data-theme="b"><i data-icon="sun"></i>Clean Daylight</button><button data-theme="d"><i data-icon="coffee"></i>Kitchen Table</button></div>
   <label>Help</label><div class="row" id="helprow"></div><p class="small">More help adds Ortiz's nudges and hints. You can turn help up any time.</p>
-  <label>Character voices</label><div class="row"><button id="voiceb">🔊 On</button></div>
-  <label>Your progress</label><p class="small">Saves automatically and picks up where you left off.</p><div class="row"><button id="newb">↺ Start the case over</button></div>
+  <label>Character voices</label><div class="row"><button id="voiceb">On</button></div>
+  <label>Your progress</label><p class="small">Saves automatically and picks up where you left off.</p><div class="row"><button id="newb"><i data-icon="rotate-ccw"></i>Start the case over</button></div>
   <div class="devonly" id="devtools">
     <h4>Dev tools</h4>
     <p class="small">Only in preview, on a local host, or for a signed-in admin. Players never see this.</p>
@@ -27,7 +27,7 @@
 <main id="stage">
   <section id="deskV" class="view on"><div class="fit" id="desk"><img id="bare" alt="" draggable="false"><div id="spr"></div><div id="tod"></div><div id="glow"></div><div id="hots"></div><div id="fly"></div><div id="drawer" hidden><div class="dfront"><span>PINE HOLLOW CASE FILES</span><i></i></div></div></div></section>
   <section id="boardV" class="view"><div class="fit" id="board"><img id="cork" alt=""><svg id="strings" viewBox="0 0 1280 800"></svg><div id="pins"></div><svg id="stringhits" viewBox="0 0 1280 800"></svg><div id="bempty">The board is empty. Pin evidence from the case folder and it shows up here.</div></div>
-    <div class="btools"><button class="btn2" id="connectb">🧶 Connect two things</button><button class="btn2" id="cutb" type="button" hidden>✂ Remove thread</button><span id="ctip"></span></div></section>
+    <div class="btools"><button class="btn2" id="connectb"><i data-icon="spline"></i>Connect two things</button><button class="btn2" id="cutb" type="button" hidden><i data-icon="scissors"></i>Remove thread</button><span id="ctip"></span></div></section>
 <button type="button" id="whisper" class="whisper" hidden aria-live="polite"></button>
 <button type="button" id="reframe" class="reframe" hidden>Whole desk</button>
 </main>
@@ -37,7 +37,7 @@
   <div class="card next" id="next"></div>
   <div id="sidemore">
     <div class="card prog" id="prog"></div>
-    <div class="card notes" id="notes"><h5>✏️ My notes</h5><ul id="notelist"></ul></div>
+    <div class="card notes" id="notes"><h5><i data-icon="notebook-pen"></i>My notes</h5><ul id="notelist"></ul></div>
   </div>
 </aside>
 <div id="ov" hidden></div>
@@ -77,6 +77,7 @@
   var id = new URLSearchParams(location.search).get('case') || 'clara-hale';
   document.write('<script src="app/brand.js"><\/script>');
   document.write('<script src="app/version.js"><\/script>');
+  document.write('<script src="app/icons.js"><\/script>');
   document.write('<script src="cases/' + id + '/case.js"><\/script>');
   document.write('<script src="app/player.js"><\/script>');
   document.write('<script src="app/account.js"><\/script>');

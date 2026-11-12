@@ -41,7 +41,7 @@ const IT = {
   seat: {n: 'Sticky: driver seat pulled forward', th: 'sticky-seat', dest: 'board'},
   camera: {n: 'Gas-N-Go camera still, 10:40 PM', th: 'camera_still', face: 'p_marcy', dest: 'board'},
   lantern: {n: 'Smashed lantern, booth 14', th: 'lantern', dest: 'board'},
-  ping: {n: "Phone ping record: Clara's phone", th: '📡', dest: 'board'}};
+  ping: {n: "Phone ping record: Clara's phone", th: 'ping-record', big: 'ping_big', dest: 'board'}};
 
 const SRC = {folder: ['briefing', 'voicemail', 'clara', 'news', 'daniel', 'dtape', 'dock', 'trailhead', 'festival', 'rtape', 'report', 'utape', 'bag', 'map', 'jtape'], envA: ['marcytape', 'marcy', 'seat', 'camera', 'lantern'], envB: ['ping']};
 
@@ -128,6 +128,8 @@ const ART = {
   "news_big": "assets/evidence/news-big.jpg",
   "ledger_big": "assets/evidence/ledger_big.jpg",
   "report_big": "assets/evidence/report_big.jpg",
+  "ping-record": "assets/evidence/ping-record.jpg",
+  "ping_big": "assets/evidence/ping-record-big.jpg",
   "bag": "assets/evidence/bag.webp"
 };
 
@@ -229,7 +231,7 @@ const COPY = {
     ]
   },
   "intro": {
-    "hint": "🎧 Headphones help · about 2 hours, at your own pace · your progress saves on this device"
+    "hint": "Headphones help · about 2 hours, at your own pace · your progress saves on this device"
   },
   "cold": {
     "kicker": "Cold open · narrated by Det. Sam Ortiz",
@@ -248,17 +250,17 @@ const COPY = {
     "title": "You're the fresh eyes on this case.",
     "steps": [
       [
-        "🎧",
+        "headphones",
         "Listen",
         "Ortiz recorded every interview. Play them, and save the lines that matter."
       ],
       [
-        "🔍",
+        "search",
         "Look",
         "The case folder starts closed. Open it and follow Ortiz's order: interviews, then photos, then the places."
       ],
       [
-        "📌",
+        "pin",
         "Pin & connect",
         "Pin people and places to the board. Tie string between things. The right connection is a breakthrough."
       ]
@@ -270,7 +272,7 @@ const COPY = {
     "speaker": "Det. Sam Ortiz",
     "role": "Montana State Police",
     "portrait": "p_ortiz",
-    "voiceNote": "🔊 ElevenLabs",
+    "voiceNote": "",
     "next": "Next ▸",
     "skip": "Skip",
     "start": "Start investigating →",
@@ -300,11 +302,11 @@ const COPY = {
     "solvedTitle": "✓ Objective 1 solved.",
     "solvedLine": "Her car's at the trailhead. She didn't drive anywhere.",
     "solvedNote": "Envelope A is unlocked on your desk.",
-    "solvedCta": "✉️ Open Envelope A →",
+    "solvedCta": "Open Envelope A →",
     "note": "Clara walked. Someone else drove her car."
   },
   "aha": {
-    "kicker": "★ Breakthrough",
+    "kicker": "Breakthrough",
     "title": "Someone short drove Clara's car.",
     "body": "Clara is 5′10″ and drives with the seat all the way back. It was jammed all the way forward. Marcy is 5′2″.",
     "line": "Whoever drove her car to that trailhead needed it that way to reach the pedals.",
@@ -321,7 +323,7 @@ const COPY = {
     "subWhich": "Fill every blank. If it's not right yet, Ortiz tells you which parts to look at again.",
     "subPass": "Fill every blank. Ortiz only tells you yes or no.",
     "rejected": "Ortiz reads it twice and hands it back.",
-    "send": "📨 Send report to Ortiz",
+    "send": "Send report to Ortiz",
     "closeCase": "Ortiz closes the case himself →",
     "fallbackPush": "Your evidence does not prove it. Pick the things that put Marcy on that path."
   },
@@ -334,7 +336,7 @@ const COPY = {
     "rankNormal": "Detective",
     // The same four cases the marketing site lists as coming soon (nextsteps.website).
     "shelf": [
-      ["📁 Case 1", "Clara Hale ✓"],
+      ["Case 1", "Clara Hale ✓"],
       ["The Keeper's Last Entry", "coming soon"],
       ["The Quiet Vintage", "coming soon"],
       ["The Unsigned Wall", "coming soon"],
@@ -541,21 +543,21 @@ const BREAKTHROUGH = {
     "seat"
   ],
   "requiresSaved": "height",
-  "locked": "🤔 Something's there… but you don't know enough about Marcy yet. Play her tape to the end.",
+  "locked": "Something's there… but you don't know enough about Marcy yet. Play her tape to the end.",
   "near": [
     {
       "pair": [
         "camera",
         "seat"
       ],
-      "hint": "🧶 Close. The seat matters. Who was short enough to need it there?"
+      "hint": "Close. The seat matters. Who was short enough to need it there?"
     },
     {
       "pair": [
         "clara",
         "seat"
       ],
-      "hint": "🧶 Close. The seat matters. Who was short enough to need it there?"
+      "hint": "Close. The seat matters. Who was short enough to need it there?"
     }
   ]
 };

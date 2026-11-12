@@ -54,6 +54,9 @@ function validate(id, pack) {
 
   // Unfinished copy must never ship. Player-facing text is checked by the words a writer leaves behind.
   const src = fs.readFileSync(path.join(CASES, id, 'case.js'), 'utf8');
+  // No emoji in a case: icons come from app/icons.js by name (how-it-works steps), and evidence is a photo.
+  { const emo = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/u; const ln = src.split('\n').findIndex(l => emo.test(l.replace(/[\u2713\u2714]/g, '')));
+    if (ln >= 0) fail(`case.js line ${ln + 1} uses an emoji: name an icon from app/icons.js, or use a photo for evidence`); }
   for (const word of ['placeholder', 'TODO', 'TBD', 'lorem ipsum', 'FIXME']) {
     const re = new RegExp(word.replace(' ', '\\s+'), 'i');
     const hit = src.split('\n').findIndex(line => re.test(line) && !/^\s*(\/\/|\/?\*)/.test(line));
@@ -63,7 +66,7 @@ function validate(id, pack) {
   const DIFF = pack.difficulty || {};
   if (!pack.difficulty) soft('difficulty is unset: the case plays at the Standard help level');
   else if (!['beginner', 'standard', 'advanced'].includes(DIFF.preset)) fail(`difficulty.preset is "${DIFF.preset}": use beginner, standard, or advanced`);
-  const KNOBS = ['whisper', 'nextButton', 'idleNudge', 'hintLimit', 'objHints', 'reviewNext', 'boardPulse', 'reportFeedback', 'reportTries', 'evidenceCount'];
+  const KNOBS = ['deskLabels', 'whisper', 'nextButton', 'idleNudge', 'hintLimit', 'objHints', 'reviewNext', 'boardPulse', 'reportFeedback', 'reportTries', 'evidenceCount'];
   for (const k of Object.keys(DIFF.overrides || {})) if (!KNOBS.includes(k)) fail(`difficulty.overrides.${k} is not a help knob (${KNOBS.join(', ')})`);
 
   if (pack.id !== id) fail(`pack.id is "${pack.id}" but it lives in cases/${id}`);

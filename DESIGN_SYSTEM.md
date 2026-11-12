@@ -87,6 +87,19 @@ Every size is a step on the scale in `tokens.css`. `_build/lint.js` fails the bu
 
 Every color in `player.css` is a `--ds-` token; the player has no hex values and no fallbacks, so `index.html` must load `tokens.css` first (the lint checks that too). Name new tokens by role (`--ds-bad-bg`, `--ds-tape-screen`), never by hue alone. The lint also computes contrast for the text pairs players read and fails anything under WCAG AA 4.5:1. `--ds-muted` is `#686056` for that reason (it was `#7A7268`, 3.85:1 on paper).
 
+### Icons
+
+One line-icon set for the whole app: [Lucide](https://lucide.dev) (ISC license), inlined in `journey/app/icons.js`. Icons draw in `currentColor` at a 1.75px stroke, so they take the color of the text next to them. No emoji anywhere in the UI or in a case pack. `validate.js` fails a case that uses one.
+
+- In the engine: `icon('pin')`. In static markup: `<i data-icon="pin"></i>`, filled in at boot.
+- A case names icons by Lucide name (how-it-works steps: `['headphones', 'Listen', '…']`).
+- Evidence is never an icon. It is a photo or a document image (the phone ping record is a carrier printout).
+- To add an icon, copy its inner SVG from `lucide-static/icons/<name>.svg` into `ICON_PATHS`.
+
+### Desk labels
+
+Labels are a small paper card (sheet white, hairline border, 4px corner, line icon, name, optional detail such as "4 tapes"). They appear on hover, keyboard focus, or press, never all at once, so the desk reads as a desk. The prop under the pointer lifts with a soft shadow. The next step is marked on the prop itself with a warm glow; its label shows on its own only at More help (`deskLabels: 'next'`). Board name tags use the same paper-tape style; a missing person's tag keeps a red edge.
+
 ### Button roles
 
 | Role | Class | Rule |
@@ -240,6 +253,7 @@ difficulty: {preset: 'standard', overrides: {}},   // 'beginner' | 'standard' | 
 
 | Knob | More help (`beginner`) | Standard | Less help (`advanced`) |
 | --- | --- | --- | --- |
+| `deskLabels` — the next item's desk label shows without hovering | on | off | off |
 | `whisper` — the desk whisper | on | off | off |
 | `nextButton` — do-it button on the side card | on | on | off |
 | `idleNudge` — seconds before Ortiz checks in | 45 | 120 | never |
