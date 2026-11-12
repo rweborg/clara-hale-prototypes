@@ -7,16 +7,20 @@
   <div class="voltop" title="Volume for interviews, voicemail, and voices"><button type="button" class="tb" data-volmute aria-label="Mute" aria-pressed="false">🔊</button><input type="range" data-vol min="0" max="100" step="1" value="100" aria-label="Volume"></div>
   <button class="tb" id="caseb" type="button" aria-expanded="false" aria-controls="side"><span class="glyph" aria-hidden="true">📋</span><span class="lbl">Case</span></button>
   <button class="tb" id="hintb"><span class="glyph" aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
-  <button class="tb" id="dzb" aria-haspopup="true"><span class="glyph" aria-hidden="true">⚙</span><span class="lbl">Prototype</span></button>
+  <button class="tb" id="dzb" aria-haspopup="true" aria-expanded="false" aria-controls="dz"><span class="glyph" aria-hidden="true">⚙</span><span class="lbl">Settings</span></button>
 </header>
 <div id="dz" class="dz" hidden>
-  <h4>Prototype controls</h4>
+  <h4>Settings</h4>
   <label>Desk style</label><div class="row"><button data-theme="b">☀️ Clean Daylight</button><button data-theme="d">🍳 Kitchen Table</button></div>
-  <label>Desk ambience · follows your real clock (preview only, cosmetic)</label><div class="row" id="todrow"></div>
-  <label>Character voices (ElevenLabs samples)</label><div class="row"><button id="voiceb">🔊 On</button></div>
-  <label>Jump to a beat</label><div class="row" id="jumprow"></div>
-  <p class="small">Every beat can be jumped to; state is filled in as if you played up to it. Progress saves automatically and resumes on reload.</p>
-  <label>Save</label><div class="row"><button id="newb">↺ Start the case over</button></div>
+  <label>Character voices</label><div class="row"><button id="voiceb">🔊 On</button></div>
+  <label>Your progress</label><p class="small">Saves automatically and picks up where you left off.</p><div class="row"><button id="newb">↺ Start the case over</button></div>
+  <div class="devonly" id="devtools">
+    <h4>Dev tools</h4>
+    <p class="small">Only in preview, on a local host, or for a signed-in admin. Players never see this.</p>
+    <label>Desk ambience · follows the real clock (preview only, cosmetic)</label><div class="row" id="todrow"></div>
+    <label>Jump to a beat</label><div class="row" id="jumprow"></div>
+    <p class="small" id="jumpnote">Every beat can be jumped to; state is filled in as if you played up to it.</p>
+  </div>
   <p class="small" id="verline"></p>
 </div>
 <main id="stage">

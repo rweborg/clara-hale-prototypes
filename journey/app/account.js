@@ -344,6 +344,8 @@
     if (!res.ok || !res.data.user) { me = null; window.CaseDesk.signedIn = false; paint(); return; }
     me = res.data;
     window.CaseDesk.signedIn = true;
+    // Admins get the dev tools (beat jumping, demo answers) on the live site. Players never do.
+    if (me.admin && window.__jp && window.__jp.setDev) window.__jp.setDev(true);
     paint();
     const shop = await api('GET', '/api/commerce/etsy?slug=' + encodeURIComponent(slug));
     if (!shop.ok || !shop.data.practice) {

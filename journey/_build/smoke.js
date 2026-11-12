@@ -378,6 +378,34 @@ async function main() {
       return bad;
     });
 
+    await step('player view: no dev tools, no way to skip the case', async () => {
+      await viewport(c, 1440, 900, false);
+      await freshLoad(c, withParam(BASE_URL, 'dev', '0'));
+      await c.evaluate(`window.__jp.jump('accuse')`);
+      await sleep(400);
+      const r = await c.evaluate(`({
+        dev: window.__jp.dev(),
+        railButtons: document.querySelectorAll('#rail button').length,
+        railSteps: document.querySelectorAll('#rail .bt').length,
+        devtoolsShown: !!(document.querySelector('#devtools') && document.querySelector('#devtools').offsetParent !== null),
+        label: (document.querySelector('#dzb') || {}).textContent || ''
+      })`);
+      await c.evaluate(`window.__jp.openObj()`); await sleep(250);
+      const objDemo = await c.evaluate(`document.querySelectorAll('#ov .demo').length`);
+      await c.evaluate(`document.querySelector('#ov') && (document.querySelector('#ov').hidden = true)`);
+      await c.evaluate(`window.__jp.openReport()`); await sleep(250);
+      const repDemo = await c.evaluate(`document.querySelectorAll('#ov .demo').length`);
+      const bad = [];
+      if (r.dev) bad.push('?dev=0 still reports dev mode');
+      if (r.railButtons) bad.push(`the beat rail has ${r.railButtons} clickable buttons for players`);
+      if (!r.railSteps) bad.push('the beat rail shows no progress at all');
+      if (r.devtoolsShown) bad.push('dev tools are visible to players');
+      if (!/Settings/.test(r.label)) bad.push(`the gear button says "${r.label.trim()}", not Settings`);
+      if (objDemo) bad.push('Objective 1 shows demo answer links to players');
+      if (repDemo) bad.push('the report shows demo fill links to players');
+      return bad;
+    });
+
     await step('mobile: 390x844 does not overflow', async () => {
       await viewport(c, 390, 844, true);
       await freshLoad(c);

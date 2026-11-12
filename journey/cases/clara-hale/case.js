@@ -212,7 +212,7 @@ const COPY = {
       "kicker": "Envelope C · the wrap-up",
       "mast": "The Pine Hollow Courier",
       "headline": "Bakery Partner Charged in Death of Clara Hale",
-      "body": "State police say Marcy Tolliver, 40, was charged Wednesday after investigators linked her to the Copper Lake trailhead… (placeholder article)",
+      "body": "Marcy Tolliver, 40, Clara Hale\u2019s business partner of six years, was charged Wednesday in Hale\u2019s death. State police say the two argued on the lake path after the Harvest Festival, two days before Hale planned to report missing bakery money to the sheriff. Investigators say Tolliver drove Hale\u2019s Subaru to the Copper Lake trailhead, then walked back into town along Route 9.",
       "note": "You saw what the rest of us walked past. The seat.<br>Thank you, Detective.<br><br>— S. Ortiz"
     }
   },

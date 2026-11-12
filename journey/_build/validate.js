@@ -52,6 +52,14 @@ function validate(id, pack) {
   const soft = (m) => warn(`${id}: ${m}`);
   const COPY = pack.copy || {};
 
+  // Unfinished copy must never ship. Player-facing text is checked by the words a writer leaves behind.
+  const src = fs.readFileSync(path.join(CASES, id, 'case.js'), 'utf8');
+  for (const word of ['placeholder', 'TODO', 'TBD', 'lorem ipsum', 'FIXME']) {
+    const re = new RegExp(word.replace(' ', '\\s+'), 'i');
+    const hit = src.split('\n').findIndex(line => re.test(line) && !/^\s*(\/\/|\/?\*)/.test(line));
+    if (hit >= 0) fail(`case.js line ${hit + 1} still says "${word}": finish the copy before it ships`);
+  }
+
   if (pack.id !== id) fail(`pack.id is "${pack.id}" but it lives in cases/${id}`);
   if (typeof pack.steps !== 'function') fail('steps(G) is missing — a case must supply its own hints');
 

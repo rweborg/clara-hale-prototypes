@@ -112,6 +112,13 @@ S = fresh();
 const SAVE = PACK.id === 'clara-hale' ? 'jp-save-v2' : 'jp-save-v2:' + PACK.id, TRANSIENT = ['sel', 'connect', 'strSel', 'fresh', '_sc'];
 // ?preview=1 is the developer journey scrubber (initPreview). It must not touch a real playthrough.
 const PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+// Dev tools (jumping between beats, the demo answers, the ambience preview) are for building and testing the
+// game, never for players: they skip the case or hand over the answer. They are on in ?preview=1, on a local
+// host (localhost, 127.0.0.1, or opened from disk), and for a signed-in admin (account.js calls __jp.setDev).
+// ?dev=0 forces the player view anywhere, so it can be tested.
+let DEV = new URLSearchParams(location.search).get('dev') === '0' ? false : PREVIEW || /^(localhost|127\.0\.0\.1|\[::1\]|)$/.test(location.hostname);
+function setDev(on) { DEV = !!on; document.body.classList.toggle('dev', DEV); if (S) render(); }
+document.body.classList.toggle('dev', DEV);
 function deskSnapshot() { const o = {}; for (const k in S) if (!TRANSIENT.includes(k)) o[k] = S[k]; o.savedAt = Date.now(); return o; }
 function save() { if (PREVIEW || !S || S.beat === 'intro') return; let o; try { o = deskSnapshot(); localStorage.setItem(SAVE, JSON.stringify(o)); } catch (e) { return; } const hook = window.CaseDesk && window.CaseDesk.onLocalSave; if (typeof hook === 'function') { try { hook(o); } catch (e) {} } }
 function loadSave() { try { const o = JSON.parse(localStorage.getItem(SAVE) || 'null'); if (!o || !o.beat || o.beat === 'intro' || !BEATS.some(b => b[0] === o.beat)) return null; return Object.assign(fresh(), o, {sel: null, connect: false, fresh: {}}); } catch (e) { return null; } }
@@ -611,7 +618,7 @@ function openEnv(L) { const items = (SRC['env' + L] || []).length; const o = ov(
 // ---------------- objective 1 ----------------
 function openObj() { const O = COPY.objective1 || {}; const o = ov(`<div class="panel" style="max-width:720px;margin:0 auto"><div class="next"><span class="k">${esc(O.kicker || 'Objective')}</span></div><h2>${esc(OBJ1.q)}</h2><p class="sub">${esc(O.sub || '')}</p>
   <div class="chips" style="flex-direction:column;align-items:stretch">${OBJ1.o.map((t, i) => `<button data-i="${i}" style="text-align:left;border-radius:12px;padding:12px 14px;font-size:16px">${esc(t)}</button>`).join('')}</div><div id="ores"></div>
-  <p style="margin-top:12px"><button class="demo" id="owrong">${esc(O.demoWrong || 'Demo: answer wrong')}</button> · <button class="demo" id="oright">${esc(O.demoRight || 'Demo: answer right')}</button></p></div>`);
+  ${DEV ? `<p style="margin-top:12px"><button class="demo" id="owrong">${esc(O.demoWrong || 'Demo: answer wrong')}</button> · <button class="demo" id="oright">${esc(O.demoRight || 'Demo: answer right')}</button></p>` : ''}</div>`);
   const ans = i => { const r = $('#ores');
     if (i !== OBJ1.a) { S.obj1wrong++; SFX.buzz(); const t = O.wrong || '', hint = (O.hints || [])[Math.min(2, S.obj1wrong - 1)] || '';
       r.innerHTML = `<div class="res bad"><b>${esc(DET)}:</b> “${esc(t)}”<br><br>💡 <b>Hint ${Math.min(3, S.obj1wrong)} unlocked:</b> ${esc(hint)}</div>`; ortiz('obj1_wrong'); return; }
@@ -619,7 +626,7 @@ function openObj() { const O = COPY.objective1 || {}; const o = ov(`<div class="
     r.innerHTML = `<div class="res good"><b>${esc(O.solvedTitle || 'Solved.')}</b><br><b>${esc(DET)}</b> <span class="real" style="background:#1F5E4E;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px">real voice sample</span>: “${esc(O.solvedLine || '')}”<br><br>${esc(O.solvedNote || '')}</div><button class="btn gold" id="onext">${esc(O.solvedCta || 'Continue →')}</button>`;
     S.env.A = 'ready'; S.beat = 'envA'; renderSide(); $('#onext').onclick = () => { closeOv(); openEnv('A'); }; };
   $$('.chips button', o).forEach(b => b.onclick = () => { $$('.chips button', o).forEach(x => x.classList.toggle('on', x === b)); ans(+b.dataset.i); });
-  $('#owrong').onclick = () => ans(0); $('#oright').onclick = () => ans(1); }
+  if (DEV) { $('#owrong').onclick = () => ans(0); $('#oright').onclick = () => ans(1); } }
 // ---------------- board ----------------
 const PIN_TAGS = PACK.pinTags || {};
 function pinTag(id) { const t = PIN_TAGS[id]; if (!t) return ''; if (t.saved && !S.saved[t.saved]) return ''; return `<span class="tag2">${esc(t.text)}</span>`; }
@@ -677,13 +684,13 @@ function openReport() { const pins = Object.keys(S.board).concat(Object.keys(S.p
     <div class="tries">Report attempts: ${[0, 1, 2].map(i => `<i class="${i < S.tries ? 'x' : ''}"></i>`).join('')} <span style="font-weight:400;color:#7A7268">${left} left</span></div>
     ${REPORT.map(q => `<div class="q"><b>${q.l}</b><div class="chips" data-k="${q.k}">${q.o.map(([v, t]) => `<button data-v="${v}" class="${S.rep[q.k] === v ? 'on' : ''}">${q.o === SUS ? `<img src="${A['p_' + v]}" alt="">` : ''}${esc(t)}</button>`).join('')}</div></div>`).join('')}
     <div class="q"><b>Pick the 3 pieces of evidence that prove it</b><div class="chips" data-k="proof">${pins.map(v => { const face = IT[v] && IT[v].face && A[IT[v].face]; return `<button data-v="${v}" class="${S.rep.proof.includes(v) ? 'on' : ''}">${face ? `<img src="${A[IT[v].face]}" alt="">` : ''}${esc((BP[v] || [0, 0, 0, IT[v].n])[3])}</button>`; }).join('')}</div></div>
-    <div id="rres"></div><div class="rfoot"><button class="btn" id="send">${esc(REPORTC.send || '📨 Send report')}</button><button class="demo" id="dw">Demo: fill a wrong report</button><button class="demo" id="dr">Demo: fill the right report</button>${S.tries ? '<button class="demo" id="d3">Demo: use up all attempts</button>' : ''}</div>`;
+    <div id="rres"></div><div class="rfoot"><button class="btn" id="send">${esc(REPORTC.send || '📨 Send report')}</button>${DEV ? `<button class="demo" id="dw">Demo: fill a wrong report</button><button class="demo" id="dr">Demo: fill the right report</button>${S.tries ? '<button class="demo" id="d3">Demo: use up all attempts</button>' : ''}` : ''}</div>`;
     $$('.chips', o).forEach(ch => ch.onclick = e => { const b = e.target.closest('button'); if (!b) return; const k = ch.dataset.k, v = b.dataset.v; SFX.click();
       if (k === 'proof') { const p = S.rep.proof; p.includes(v) ? p.splice(p.indexOf(v), 1) : (p.length < 3 ? p.push(v) : toast('Pick 3. Tap one to remove it first.')); } else S.rep[k] = v; draw(); });
     const DEMO = PACK.reportDemos || {};
     const fill = spec => { if (!spec) return; const c = Object.assign({}, spec, {proof: (spec.proof || []).filter(x => pins.includes(x)).slice(0, 3)}); Object.assign(S.rep, c); draw(); };
-    $('#send').onclick = send; $('#dw').onclick = () => fill(DEMO.wrong);
-    $('#dr').onclick = () => fill(DEMO.right);
+    $('#send').onclick = send;
+    if (DEV) { $('#dw').onclick = () => fill(DEMO.wrong); $('#dr').onclick = () => fill(DEMO.right); }
     const d3 = $('#d3'); if (d3) d3.onclick = () => { S.tries = 3; closeOv(); softFail(); }; };
   const send = () => { const miss = REPORT.filter(q => !S.rep[q.k]); if (miss.length || S.rep.proof.length < 3) { SFX.buzz(); return toast('Fill every blank and pick 3 pieces of evidence first.'); }
     const okProof = S.rep.proof.filter(p => PROOF_OK.includes(p)).length >= 2; const right = REPORT.filter(q => S.rep[q.k] === q.a).length + (okProof ? 1 : 0);
@@ -755,8 +762,10 @@ function renderSide() { const ns = nextStep(); const a = amb(), ph = AMB[a];
     <div class="r">Breakthroughs <b>${S.real ? '★' : '☆'}☆☆</b></div>${S.beat === 'accuse' || S.tries ? `<div class="r">Report attempts left <b>${3 - S.tries}</b></div>` : ''}`;
   $('#notelist').innerHTML = S.notes.map(n => `<li class="${n.cls}${n.isnew ? ' new' : ''}">${esc(n.t)}</li>`).join('') || '<li style="opacity:.5">(nothing yet)</li>'; S.notes.forEach(n => n.isnew = false);
   const bi = BEATS.findIndex(x => x[0] === S.beat);
-  $('#rail').innerHTML = BEATS.map(([k, l], i) => `${i ? '<b class="sep"></b>' : ''}<button data-j="${k}" class="${i < bi ? 'done' : i === bi ? 'cur' : ''}"><i>${i < bi ? '✓' : i + 1}</i>${l}</button>`).join('');
-  $$('#rail button').forEach(b => b.onclick = () => jump(b.dataset.j));
+  // Players see progress here, not a menu: only dev mode can click a beat and jump to it.
+  const tag = DEV ? 'button' : 'span';
+  $('#rail').innerHTML = BEATS.map(([k, l], i) => `${i ? '<b class="sep"></b>' : ''}<${tag} data-j="${k}" class="bt ${i < bi ? 'done' : i === bi ? 'cur' : ''}"${i === bi ? ' aria-current="step"' : ''}><i>${i < bi ? '✓' : i + 1}</i>${l}</${tag}>`).join('');
+  if (DEV) $$('#rail button').forEach(b => b.onclick = () => jump(b.dataset.j));
   const n = Object.keys(S.board).length, bb = $('#bbadge'); bb.hidden = !n; bb.textContent = n;
   $$('#dz [data-theme]').forEach(b => b.classList.toggle('on', b.dataset.theme === S.theme)); $$('#todrow button').forEach(b => b.classList.toggle('on', (b.dataset.p || null) === AMB_PREVIEW)); $('#voiceb').textContent = S.voice ? '🔊 On' : '🔇 Off'; save(); }
 function renderWhisper(ns) { const el = $('#whisper'); if (!el) return; const show = !!(ns && ns.w && S.beat !== 'intro' && S.beat !== 'handoff'); el.hidden = !show; if (!show) return;
@@ -769,7 +778,7 @@ $('#cutb').onclick = () => cutThread();
 $('#board').onclick = e => { if (window.__jpPan) return; if (e.target.closest('.pin') || e.target.closest('.thread')) return; if (!S.strSel) return; S.strSel = null; renderBoard(); };
 paintVol();
 $('#hintb').onclick = () => { S.hints++; const ns = nextStep(); toast(esc(DET) + ': ' + (ns.w || ns.p), 4200); };
-$('#dzb').onclick = () => { $('#dz').hidden = !$('#dz').hidden; };
+$('#dzb').onclick = () => { const dz = $('#dz'); dz.hidden = !dz.hidden; $('#dzb').setAttribute('aria-expanded', String(!dz.hidden)); };
 $$('#dz [data-theme]').forEach(b => b.onclick = () => { S.theme = b.dataset.theme; localStorage.setItem('jp-theme', S.theme); prevSet = new Set(deskSet()); render(); });
 $('#todrow').innerHTML = `<button data-p="">🕰 My clock</button>` + Object.keys(AMB).map(p => `<button data-p="${p}">${AMB[p][0]} ${AMB[p][1]}</button>`).join(''); $$('#todrow button').forEach(b => b.onclick = () => setAmb(b.dataset.p));
 $('#newb').onclick = () => {
@@ -795,7 +804,7 @@ async function cold() { const C = COPY.cold || {}, L = C.lines || [];
   let stop = false; $('#c1').onclick = () => { stop = true; pickDesk(); }; $('#c2').onclick = () => { stop = true; pickDesk(); };
   if (!L.length) return;
   ortiz('cold'); const sp = $$('.cold span'), tot = L.join('').length; for (const [k, e] of sp.entries()) { if (stop) break; e.classList.add('on'); await sleep(Math.max(1200, L[k].length / tot * 27000)); } }
-function pickDesk() { hush(); scene(`<div class="kick">Choose your desk</div><h1 style="font-size:34px">Where do you want to work this case?</h1><p class="lead">Same case, same evidence. Change it any time under ⚙ Prototype.</p>
+function pickDesk() { hush(); scene(`<div class="kick">Choose your desk</div><h1 style="font-size:34px">Where do you want to work this case?</h1><p class="lead">Same case, same evidence. Change it any time under ⚙ Settings.</p>
   <div class="picks"><button class="pick ${S.theme === 'b' ? 'on' : ''}" data-t="b"><img src="${A.thumb_b}" alt=""><div><h3>☀️ Clean Daylight desk</h3><p>Bright, calm and tidy. Recordings play on a phone.</p></div></button>
   <button class="pick ${S.theme === 'd' ? 'on' : ''}" data-t="d"><img src="${A.thumb_d}" alt=""><div><h3>🍳 Kitchen Table</h3><p>Warm and homey, with morning sun. Recordings play on a tape recorder.</p></div></button></div>`);
   $$('.pick').forEach(b => b.onclick = () => { S.theme = b.dataset.t; localStorage.setItem('jp-theme', S.theme); render(); howTo(); }); }
@@ -1075,7 +1084,7 @@ function initPreview() {
   const bar = $('#pv'); if (!bar) return;
   bar.hidden = false;
   document.body.classList.add('pv-on');   // lifts the version chip clear of the scrubber
-  const hint = $('#dz .small');
+  const hint = $('#jumpnote');
   if (hint) hint.textContent = 'Preview mode does not read or write your saved game. Scrub the bar along the bottom. Reload without ?preview=1 and a real playthrough resumes as usual.';
   const inner = $('#pvinner'); if (inner) inner.style.setProperty('--slots', String(STAGES.length - 1));
   const ticks = $('#pvticks');
@@ -1120,7 +1129,7 @@ function initPreview() {
   const mapped = hashStage[location.hash.slice(1)];
   previewGoto(mapped ? idIndex(mapped) : 0);
 }
-window.__jp = {jump, S: () => S, openFolder, openPlayer, openEnv, openObj, openReport, aha, pinTap, fileStep, setAmb, setView, deskClick, save, loadSave, clearSave, resume, packId: PACK.id, amb, clockAmb, AU: () => AU, preview: () => PREVIEW, previewGoto: (i) => previewGoto(typeof i === 'number' ? i : idIndex(i), {user: true}), previewPlay: () => { if (!previewPlaying) previewToggle(); }, previewPause: () => previewPause(), previewStop: () => previewStop(), previewState: () => ({index: previewIndex, id: STAGES[previewIndex] && STAGES[previewIndex].id, playing: previewPlaying, n: STAGES.length})};
+window.__jp = {setDev, dev: () => DEV, jump, S: () => S, openFolder, openPlayer, openEnv, openObj, openReport, aha, pinTap, fileStep, setAmb, setView, deskClick, save, loadSave, clearSave, resume, packId: PACK.id, amb, clockAmb, AU: () => AU, preview: () => PREVIEW, previewGoto: (i) => previewGoto(typeof i === 'number' ? i : idIndex(i), {user: true}), previewPlay: () => { if (!previewPlaying) previewToggle(); }, previewPause: () => previewPause(), previewStop: () => previewStop(), previewState: () => ({index: previewIndex, id: STAGES[previewIndex] && STAGES[previewIndex].id, playing: previewPlaying, n: STAGES.length})};
 // ---------------- resume ----------------
 function resume(o, opts) {
   const scene = $('#scene');

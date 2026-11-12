@@ -7,10 +7,10 @@ body.th-d{--bg:var(--ds-wood,#3E2C1F);--bar:var(--ds-wood-bar,rgba(255,250,242,.
 .top{position:fixed;left:0;right:0;top:0;height:var(--bar-h);z-index:50;display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--bar);color:var(--barink);box-shadow:0 1px 0 rgba(0,0,0,.12)}
 .ttl b{display:block;font:700 17px Atkinson;white-space:nowrap}.ttl span{font:12px Atkinson;opacity:.7;white-space:nowrap}
 .rail{margin-left:auto;display:flex;gap:2px;align-items:center;overflow:auto;scrollbar-width:none}
-.rail button{border:none;background:none;font:700 12.5px Atkinson;padding:6px 8px;border-radius:999px;white-space:nowrap;opacity:.45;display:flex;gap:5px;align-items:center}
-.rail button i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(127,127,127,.2);font-size:11px}
-.rail button.done{opacity:.8}.rail button.done i{background:var(--accent);color:#fff}
-.rail button.cur{opacity:1;background:rgba(127,127,127,.14)}.rail button.cur i{background:var(--ds-gold,#F2C14E);color:var(--ds-ink,#1D1B18)}
+.rail .bt{border:none;background:none;font:700 12.5px Atkinson;padding:6px 8px;border-radius:999px;white-space:nowrap;opacity:.45;display:flex;gap:5px;align-items:center}
+.rail .bt i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(127,127,127,.2);font-size:11px}
+.rail .bt.done{opacity:.8}.rail .bt.done i{background:var(--accent);color:#fff}
+.rail .bt.cur{opacity:1;background:rgba(127,127,127,.14)}.rail .bt.cur i{background:var(--ds-gold,#F2C14E);color:var(--ds-ink,#1D1B18)}
 .rail b.sep{width:10px;height:2px;background:currentColor;opacity:.2}
 .seg{display:flex;background:rgba(127,127,127,.18);border-radius:12px;padding:4px;gap:4px}
 .seg button{min-height:42px;padding:0 14px;border-radius:9px;border:none;background:none;font:700 14.5px Atkinson;white-space:nowrap;position:relative}
@@ -393,3 +393,7 @@ body.pv-on .verpop{bottom:134px}
 /* on a phone the chip would sit on the bottom sheet; the Prototype panel carries it instead */
 @media (max-width:900px){.verbtn,.verpop{display:none}}
 @media (max-width:480px){.verpop{width:calc(100vw - 24px)}}
+/* Dev tools: only in dev mode (preview, local host, signed-in admin). See DEV in player.js. */
+body:not(.dev) .devonly{display:none!important}
+.rail button.bt{cursor:pointer}.rail span.bt{cursor:default}
+.dz .devonly{margin-top:14px;padding-top:12px;border-top:1px dashed var(--ds-spine,rgba(80,52,24,.22))}
